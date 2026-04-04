@@ -21,21 +21,25 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job }: JobCardProps) {
-  const timeAgo = (dateStr: string) => {
+  const timeAgo = (dateStr: string | null | undefined) => {
+    if (!dateStr) return 'N/A'
     const date = new Date(dateStr)
     const now = new Date()
     const diffInMs = now.getTime() - date.getTime()
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+    if (diffInDays < 0) return 'Just now'
     if (diffInDays === 0) return 'Today'
     if (diffInDays === 1) return 'Yesterday'
     return `${diffInDays}d ago`
   }
 
-  const budgetDisplay = job.budget_min && job.budget_max 
-    ? `$${job.budget_min.toLocaleString()} - $${job.budget_max.toLocaleString()}`
-    : job.budget_max 
-      ? `Up to $${job.budget_max.toLocaleString()}` 
-      : 'Elite Salary'
+  const budgetDisplay = job.budget_min !== null && job.budget_max !== null
+    ? `$${Number(job.budget_min).toLocaleString()} - $${Number(job.budget_max).toLocaleString()}`
+    : job.budget_max !== null
+      ? `Up to $${Number(job.budget_max).toLocaleString()}` 
+      : job.budget_min !== null
+        ? `$${Number(job.budget_min).toLocaleString()}+`
+        : 'Elite Salary'
 
   return (
     <Link href={`/jobs/${job.id}`} className="group flex flex-col h-full snap-start bg-[#1c181c] rounded-[2rem] p-8 hover:bg-[#221e22] hover:border-[#caa2f7]/30 border border-[#292428] transition-all duration-500 shadow-2xl relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#caa2f7]/50">

@@ -85,9 +85,9 @@ export default async function Page({ params }: JobPageProps) {
   const employer = job.employer;
   const companyName = employer?.company_name || employer?.full_name || "Confidential Company";
   const location = employer?.location || "Remote";
-  const budget = job.budget_min && job.budget_max 
-    ? `$${(job.budget_min as number).toLocaleString()} – $${(job.budget_max as number).toLocaleString()}`
-    : "Competitive Salary";
+  const budget = job.budget_min !== null && job.budget_max !== null
+    ? `$${Number(job.budget_min).toLocaleString()} – $${Number(job.budget_max).toLocaleString()}`
+    : (job.budget_min !== null ? `$${Number(job.budget_min).toLocaleString()}+` : "Competitive Salary");
 
   const isOwner = userProfile?.id === job.employer_id;
   const canApply = userProfile?.user_type === 'jobseeker' || userProfile?.user_type === 'both' || !user;
@@ -291,13 +291,13 @@ export default async function Page({ params }: JobPageProps) {
                         <div>
                           <h4 className="font-bold text-[#faf1f5] group-hover:text-[#caa2f7] transition-colors line-clamp-1">{simJob.title}</h4>
                           <p className="text-xs text-[#b0a9ad] line-clamp-1">
-                            {simJob.employer?.full_name} • {simJob.employer?.location || "Remote"}
+                            {simJob.employer?.company_name || simJob.employer?.full_name || 'Quantum Corp'} • {simJob.employer?.location || "Remote"}
                           </p>
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-xs font-bold text-[#caa2f7]">
-                          {simJob.budget_min ? `$${(simJob.budget_min as number).toLocaleString()}+` : "Elite Rate"}
+                          {simJob.budget_min ? `$${Number(simJob.budget_min).toLocaleString()}+` : "Elite Rate"}
                         </span>
                         <span className="material-symbols-outlined text-sm text-[#b0a9ad]">arrow_forward_ios</span>
                       </div>

@@ -53,7 +53,11 @@ export default async function BrowseJobsPage({ searchParams }: PageProps) {
     jobsQuery = jobsQuery.eq('category', category);
   }
 
-  const { data: jobs } = await jobsQuery.limit(50);
+  const { data: jobs, error } = await jobsQuery.limit(50);
+
+  if (error) {
+    throw new Error(`Database Error: ${error.message} (Code: ${error.code})`);
+  }
 
   const industries = [
     { 

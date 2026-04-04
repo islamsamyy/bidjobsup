@@ -48,14 +48,19 @@ export default async function JobDirectoryPage({ searchParams }: PageProps) {
 
   const { data: jobs, error } = await jobsQuery.limit(20);
 
-  const timeAgo = (dateStr: string) => {
+  if (error) {
+    throw new Error(`Database Error: ${error.message} (Code: ${error.code})`);
+  }
+
+  const timeAgo = (dateStr: string | null) => {
+    if (!dateStr) return 'TBD';
     const date = new Date(dateStr)
     const now = new Date()
     const diffInMs = now.getTime() - date.getTime()
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
-    if (diffInDays === 0) return 'Just now'
+    if (diffInDays <= 0) return 'Just now'
     if (diffInDays === 1) return 'Yesterday'
-    return `${diffInDays} days ago`
+    return `${diffInDays}d ago`
   }
 
   return (
@@ -101,7 +106,7 @@ export default async function JobDirectoryPage({ searchParams }: PageProps) {
                 <div className="flex flex-col lg:flex-row gap-8">
                   <div className="w-16 h-16 rounded-xl bg-[#100d10] flex items-center justify-center border border-[#292428] flex-shrink-0 text-2xl group-hover:scale-110 transition-transform overflow-hidden">
                     {job.employer?.avatar_url ? (
-                      <img src={job.employer.avatar_url} alt={job.employer.company_name} className="w-full h-full object-cover" />
+                      <img src={job.employer.avatar_url} alt={job.employer.company_name || 'Employer'} className="w-full h-full object-cover" />
                     ) : (
                       <span className="material-symbols-outlined text-[#caa2f7]">work</span>
                     )}
@@ -113,7 +118,7 @@ export default async function JobDirectoryPage({ searchParams }: PageProps) {
                         <span className="px-3 py-1 rounded-full bg-[#613471]/30 text-[#f1bfff] text-[10px] font-black uppercase tracking-widest border border-[#f1bfff]/10">
                           {job.category}
                         </span>
-                        {job.budget_max >= 2000 && (
+                        {job.budget_max && job.budget_max >= 2000 && (
                           <span className="px-3 py-1 rounded-full bg-[#caa2f7]/10 text-[#caa2f7] text-[10px] font-black uppercase tracking-widest border border-[#caa2f7]/10">
                             High Ticket
                           </span>
@@ -130,9 +135,15 @@ export default async function JobDirectoryPage({ searchParams }: PageProps) {
                         <span className="text-sm font-bold text-[#faf1f5]">{job.location || 'Remote'}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#b0a9ad] mb-1 block">Compensation</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#b0a9ad] mb-1 block">Budget</span>
                         <span className="text-sm font-black text-[#caa2f7] font-headline">
-                          {job.budget_min ? `$${job.budget_min.toLocaleString()} - ` : ''}${job.budget_max.toLocaleString()}
+                          {job.budget_min !== null && job.budget_max !== null
+                            ? `$${Number(job.budget_min).toLocaleString()} - $${Number(job.budget_max).toLocaleString()}`
+                            : job.budget_max !== null
+                              ? `Up to $${Number(job.budget_max).toLocaleString()}` 
+                              : job.budget_min !== null
+                                ? `$${Number(job.budget_min).toLocaleString()}+`
+                                : 'Budget TBD'}
                         </span>
                       </div>
                       <div>

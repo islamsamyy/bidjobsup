@@ -33,16 +33,21 @@ export async function signup(formData: FormData) {
   const phone = formData.get('phone') as string
   const userType = (formData.get('userType') as string) || 'jobseeker'
 
-  // 1. Attempt to Create/Get the user in Supabase Auth
-  let authUser = null;
-
+  // 1. Attempt to Create/Get the user in Supabase Auth with metadata
+  // We pass metadata so the database trigger can handle the profile creation automatically
   const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        full_name: fullName,
+        phone: phone,
+        user_type: userType,
+      }
+    }
   })
 
   if (signUpError) {
-    // If user already exists, try to sign in to verify identity
     if (signUpError.message.includes('already registered')) {
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -52,34 +57,13 @@ export async function signup(formData: FormData) {
       if (signInError) {
         redirect(`/create-profile?message=${signInError.message}`)
       }
-      authUser = signInData.user
+      // If they are already registered and we just signed them in, we can safely redirect
+      revalidatePath('/', 'layout')
+      redirect('/dashboard')
     } else {
       console.error(signUpError)
       redirect(`/create-profile?message=${signUpError.message}`)
     }
-  } else {
-    authUser = signUpData.user
-  }
-
-  if (!authUser) {
-    redirect('/create-profile?message=Identity verification failed')
-  }
-
-  // 2. Insert or update our custom public.users table (upsert to handle partial registration)
-  const { error: userError } = await supabase
-    .from('users')
-    .upsert({
-      auth_id: authUser.id,
-      email: email,
-      username: email.split('@')[0] + '-' + Math.floor(Math.random() * 1000), // fallback if missing
-      full_name: fullName,
-      phone: phone,
-      user_type: userType,
-    }, { onConflict: 'auth_id' })
-
-  if (userError) {
-    console.error('Profile Creation Error:', userError)
-    redirect('/create-profile?message=Error creating profile details')
   }
 
   // 3. Revalidate and redirect to dashboard route center

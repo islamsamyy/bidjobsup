@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import StripeCheckoutButton from '@/components/features/StripeCheckoutButton'
+import StripeBillingPortalButton from '@/components/features/StripeBillingPortalButton'
 
 export default async function EmployerBillingPage() {
   const supabase = await createClient()
@@ -36,7 +37,8 @@ export default async function EmployerBillingPage() {
       description: 'Standard growth for small teams.',
       features: ['10 Active Bids', 'Basic Analytics', 'Standard Support'],
       current: false,
-      color: 'stone-500'
+      color: 'stone-500',
+      planId: 'employer_pro',
     },
     {
       name: 'Visionary Enterprise',
@@ -44,7 +46,8 @@ export default async function EmployerBillingPage() {
       description: 'Elite scaling for rapid talent procurement.',
       features: ['Unlimited Bids', 'AI Talent Matching', 'Dedicated Account Architect'],
       current: true,
-      color: 'secondary'
+      color: 'secondary',
+      planId: 'employer_visionary',
     },
     {
       name: 'Nexus Supreme',
@@ -52,8 +55,9 @@ export default async function EmployerBillingPage() {
       description: 'Global dominance and market predictive intel.',
       features: ['Global Headhunting', 'Predictive Market Intel', 'Multi-Entity Management'],
       current: false,
-      color: 'primary'
-    }
+      color: 'primary',
+      planId: 'employer_nexus',
+    },
   ]
 
   return (
@@ -97,12 +101,14 @@ export default async function EmployerBillingPage() {
             </div>
 
             <div className="flex flex-wrap gap-4 pt-8 border-t border-outline-variant/10">
-              <button className="bg-secondary text-on-secondary-container px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-secondary/10 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                Modify Protocol
-              </button>
-              <button className="bg-surface-container-highest border border-outline-variant/10 text-stone-300 px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-stone-800 transition-all">
-                Pause Renewal
-              </button>
+              <StripeBillingPortalButton
+                label="Modify Protocol"
+                className="bg-secondary text-on-secondary-container px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-secondary/10 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+              />
+              <StripeBillingPortalButton
+                label="Pause Renewal"
+                className="bg-surface-container-highest border border-outline-variant/10 text-stone-300 px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-stone-800 transition-all disabled:opacity-50"
+              />
             </div>
           </div>
         </section>
@@ -196,14 +202,17 @@ export default async function EmployerBillingPage() {
                   </ul>
                </div>
                <div className="mt-12">
-                  <button className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all
-                    ${tier.current 
-                      ? 'bg-secondary/10 border border-secondary/30 text-secondary cursor-default' 
-                      : 'bg-stone-800 text-stone-400 hover:bg-stone-750'
-                    }
-                  `}>
-                    {tier.current ? 'Active Protocol' : 'Initialize Migration'}
-                  </button>
+                  {tier.current ? (
+                    <button className="w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-secondary/10 border border-secondary/30 text-secondary cursor-default">
+                      Active Protocol
+                    </button>
+                  ) : (
+                    <StripeCheckoutButton
+                      planId={tier.planId}
+                      label="Initialize Migration"
+                      className="w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-stone-800 text-stone-400 hover:bg-stone-700 transition-all disabled:opacity-50"
+                    />
+                  )}
                </div>
             </div>
           ))}

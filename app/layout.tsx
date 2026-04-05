@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Serif, Plus_Jakarta_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const notoSerif = Noto_Serif({
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col antialiased bg-background text-on-surface">
         {children}
+        <Analytics />
       </body>
     </html>
   );

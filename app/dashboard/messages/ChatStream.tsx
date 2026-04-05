@@ -9,6 +9,9 @@ interface Message {
   content: string
   sender_id: string
   created_at: string
+  attachment_url?: string
+  attachment_name?: string
+  attachment_type?: string
 }
 
 interface ChatStreamProps {
@@ -22,7 +25,9 @@ export default function ChatStream({ conversationId, currentUserId, initialMessa
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [newMessage, setNewMessage] = useState('')
   const [isSending, setIsSending] = useState(false)
-  const [isTyping, setIsTyping] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [pendingAttachment, setPendingAttachment] = useState<{ url: string; name: string; type: string } | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
   const supabase = createClient()
@@ -58,21 +63,46 @@ export default function ChatStream({ conversationId, currentUserId, initialMessa
     }
   }, [conversationId, supabase])
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    const form = new FormData()
+    form.append('file', file)
+
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: form })
+      const data = await res.json()
+      if (res.ok) {
+        setPendingAttachment({ url: data.url, name: data.name, type: data.type })
+      } else {
+        console.error('Upload error:', data.error)
+      }
+    } catch {
+      console.error('Upload failed')
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newMessage.trim() || isSending) return
+    if ((!newMessage.trim() && !pendingAttachment) || isSending) return
 
     setIsSending(true)
-    const content = newMessage.trim()
+    const content = newMessage.trim() || (pendingAttachment ? `📎 ${pendingAttachment.name}` : '')
     setNewMessage('')
+    const attachment = pendingAttachment
+    setPendingAttachment(null)
 
-    const result = await sendMessage(conversationId, content)
-    
+    const result = await sendMessage(conversationId, content, attachment ?? undefined)
+
     if (result?.error) {
-      // Rollback or show error notification protocol (Neon Nocturne style)
       console.error('Stream Error:', result.error)
     }
-    
+
     setIsSending(false)
   }
 
@@ -119,11 +149,28 @@ export default function ChatStream({ conversationId, currentUserId, initialMessa
               <div className={`max-w-[70%] space-y-2 group`}>
                 <div className={`
                   px-6 py-4 rounded-2xl text-sm leading-relaxed font-medium transition-all
-                  ${isOwn 
-                    ? 'bg-primary text-on-primary rounded-tr-none shadow-[0_10px_30px_rgba(202,162,247,0.2)]' 
+                  ${isOwn
+                    ? 'bg-primary text-on-primary rounded-tr-none shadow-[0_10px_30px_rgba(202,162,247,0.2)]'
                     : 'bg-stone-800/80 text-on-surface-variant rounded-tl-none border border-outline-variant/10'
                   }
                 `}>
+                  {msg.attachment_url && (
+                    msg.attachment_type?.startsWith('image/') ? (
+                      <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" className="block mb-3">
+                        <img src={msg.attachment_url} alt={msg.attachment_name} className="max-w-full rounded-xl max-h-48 object-cover" />
+                      </a>
+                    ) : (
+                      <a
+                        href={msg.attachment_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 mb-3 p-3 rounded-xl bg-black/20 hover:bg-black/30 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-lg">attach_file</span>
+                        <span className="text-xs font-bold truncate max-w-[200px]">{msg.attachment_name}</span>
+                      </a>
+                    )
+                  )}
                   {msg.content}
                 </div>
                 <p className={`text-[9px] font-black uppercase tracking-widest text-stone-600 ${isOwn ? 'text-right' : 'text-left'} opacity-0 group-hover:opacity-100 transition-opacity`}>
@@ -137,25 +184,47 @@ export default function ChatStream({ conversationId, currentUserId, initialMessa
       </div>
 
       {/* Message Input Protocol */}
-      <form onSubmit={handleSend} className="p-8 border-t border-outline-variant/10 bg-stone-900/40 relative z-20">
+      <form onSubmit={handleSend} className="p-8 border-t border-outline-variant/10 bg-stone-900/40 relative z-20 space-y-3">
+        {/* Pending attachment preview */}
+        {pendingAttachment && (
+          <div className="flex items-center gap-3 px-4 py-2 bg-primary/10 border border-primary/20 rounded-xl">
+            <span className="material-symbols-outlined text-primary text-lg">attach_file</span>
+            <span className="text-xs font-bold text-primary truncate flex-1">{pendingAttachment.name}</span>
+            <button type="button" onClick={() => setPendingAttachment(null)} className="text-stone-500 hover:text-error transition-colors">
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+        )}
         <div className="relative group">
-          <input 
+          <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Initialize response sequence..."
-            className="w-full bg-stone-950/80 border border-outline-variant/10 rounded-2xl px-8 py-5 pr-32 text-on-surface focus:outline-none focus:border-primary/50 transition-all font-body text-sm placeholder:text-stone-700"
+            className="w-full bg-stone-950/80 border border-outline-variant/10 rounded-2xl px-8 py-5 pr-36 text-on-surface focus:outline-none focus:border-primary/50 transition-all font-body text-sm placeholder:text-stone-700"
           />
           <div className="absolute right-3 top-3 bottom-3 flex items-center gap-2">
-            <button 
-              type="button" 
-              className="p-2 text-stone-500 hover:text-secondary transition-colors"
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf,.doc,.docx"
+              onChange={handleFileChange}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="p-2 text-stone-500 hover:text-secondary transition-colors disabled:opacity-40"
             >
-              <span className="material-symbols-outlined text-lg">attach_file</span>
+              {isUploading
+                ? <span className="w-4 h-4 border-2 border-stone-500/30 border-t-secondary rounded-full animate-spin block" />
+                : <span className="material-symbols-outlined text-lg">attach_file</span>
+              }
             </button>
-            <button 
+            <button
               type="submit"
-              disabled={!newMessage.trim() || isSending}
+              disabled={(!newMessage.trim() && !pendingAttachment) || isSending}
               className="bg-primary text-on-primary px-6 h-full rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
             >
               Send Protocol

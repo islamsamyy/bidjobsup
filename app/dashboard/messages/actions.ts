@@ -3,8 +3,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { createNotification } from '@/lib/actions/notifications'
+import { sendNewMessageEmail } from '@/lib/email'
 
-export async function sendMessage(conversationId: string, content: string) {
+export async function sendMessage(
+  conversationId: string,
+  content: string,
+  attachment?: { url: string; name: string; type: string }
+) {
   const supabase = await createClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -39,7 +44,12 @@ export async function sendMessage(conversationId: string, content: string) {
     .insert({
       conversation_id: conversationId,
       sender_id: internalUser.id,
-      content
+      content,
+      ...(attachment && {
+        attachment_url: attachment.url,
+        attachment_name: attachment.name,
+        attachment_type: attachment.type,
+      }),
     })
     .select()
     .single()
@@ -55,7 +65,7 @@ export async function sendMessage(conversationId: string, content: string) {
     .update({ last_message_at: new Date().toISOString() })
     .eq('id', conversationId)
 
-  // 3. Notify recipient
+  // 3. Notify recipient (in-app + email)
   if (recipient) {
     await createNotification({
       userId: (recipient as any).id,
@@ -65,6 +75,17 @@ export async function sendMessage(conversationId: string, content: string) {
       content: `${internalUser.full_name || 'An agent'} sent you a message.`,
       link: `/dashboard/messages/${conversationId}`
     })
+
+    const { data: recipientAuth } = await supabase.auth.admin.getUserById((recipient as any).auth_id)
+    if (recipientAuth?.user?.email) {
+      await sendNewMessageEmail({
+        to: recipientAuth.user.email,
+        recipientName: (recipient as any).full_name || 'Agent',
+        senderName: internalUser.full_name || 'An agent',
+        preview: content,
+        conversationId,
+      }).catch(() => {})
+    }
   }
 
   revalidatePath(`/dashboard/messages/${conversationId}`)

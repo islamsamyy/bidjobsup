@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -8,6 +9,33 @@ interface JobPageProps {
   params: Promise<{
     id: string;
   }>;
+}
+
+export async function generateMetadata({ params }: JobPageProps): Promise<Metadata> {
+  const supabase = await createClient();
+  const { id } = await params;
+  const { data: job } = await supabase
+    .from("jobs")
+    .select("title, description, budget_min, budget_max, location")
+    .eq("id", id)
+    .single();
+
+  if (!job) return { title: "Job Not Found | BidJobs" };
+
+  const description = `${job.description?.slice(0, 150) ?? ""}… Budget: $${job.budget_min}–$${job.budget_max}. ${job.location ?? ""}`.trim();
+
+  return {
+    title: `${job.title} | BidJobs`,
+    description,
+    openGraph: {
+      title: `${job.title} | BidJobs`,
+      description,
+      type: "website",
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/jobs/${id}`,
+    },
+  };
 }
 
 export default async function Page({ params }: JobPageProps) {

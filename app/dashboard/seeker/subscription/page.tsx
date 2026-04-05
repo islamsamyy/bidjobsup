@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import StripeCheckoutButton from '@/components/features/StripeCheckoutButton'
 
 export default async function SeekerSubscriptionPage() {
   const supabase = await createClient()
@@ -29,7 +29,8 @@ export default async function SeekerSubscriptionPage() {
       features: ['Basic CV Parsing', '5 Monthly Bids', 'Public Profile'],
       isCurrent: true,
       color: 'stone-500',
-      icon: 'rocket_launch'
+      icon: 'rocket_launch',
+      planId: null,
     },
     {
       name: 'Elite Professional',
@@ -39,7 +40,8 @@ export default async function SeekerSubscriptionPage() {
       isCurrent: false,
       recommended: true,
       color: 'primary',
-      icon: 'workspace_premium'
+      icon: 'workspace_premium',
+      planId: 'seeker_elite',
     },
     {
       name: 'Visionary Enterprise',
@@ -48,8 +50,9 @@ export default async function SeekerSubscriptionPage() {
       features: ['Dedicated Talent Manager', 'Custom API Integration', 'Bulk AI Processing'],
       isCurrent: false,
       color: 'secondary',
-      icon: 'corporate_fare'
-    }
+      icon: 'corporate_fare',
+      planId: null,
+    },
   ]
 
   return (
@@ -120,15 +123,21 @@ export default async function SeekerSubscriptionPage() {
                  <button className="w-full py-5 rounded-2xl border border-outline-variant/20 text-stone-500 font-black uppercase tracking-widest text-[10px] cursor-default bg-stone-900/40">
                     Current Protocol
                  </button>
+               ) : plan.planId ? (
+                 <StripeCheckoutButton
+                   planId={plan.planId}
+                   label="Initialize Upgrade"
+                   className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100
+                     ${plan.name === 'Elite Professional'
+                       ? 'bg-primary text-on-primary shadow-primary/20'
+                       : 'bg-stone-800 text-stone-300 border border-outline-variant/10'
+                     }
+                   `}
+                 />
                ) : (
-                 <button className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]
-                   ${plan.name === 'Elite Professional' 
-                     ? 'bg-primary text-on-primary shadow-primary/20' 
-                     : 'bg-stone-800 text-stone-300 border border-outline-variant/10'
-                   }
-                 `}>
-                    Initialize Upgrade
-                 </button>
+                 <a href="/contact" className="block w-full py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] text-center bg-stone-800 text-stone-300 border border-outline-variant/10 hover:bg-stone-700 transition-all">
+                   Contact Sales
+                 </a>
                )}
             </div>
           </div>

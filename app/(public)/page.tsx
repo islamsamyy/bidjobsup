@@ -1,6 +1,29 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "BidJobs — Where Elite Talent Meets Opportunity",
+  description:
+    "A premium job marketplace connecting employers with world-class freelancers. Post jobs, submit bids, and build your professional reputation in the new economy.",
+  openGraph: {
+    title: "BidJobs — Where Elite Talent Meets Opportunity",
+    description:
+      "A premium job marketplace connecting employers with world-class freelancers.",
+    type: "website",
+    url: process.env.NEXT_PUBLIC_SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BidJobs — Where Elite Talent Meets Opportunity",
+    description:
+      "A premium job marketplace connecting employers with world-class freelancers.",
+  },
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL,
+  },
+};
 
 export default async function LandingPage() {
   const supabase = await createClient();

@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { createNotification } from '@/lib/actions/notifications'
+import { sendBidStatusEmail, sendNewBidEmail } from '@/lib/email'
 
 export async function submitBid(jobId: number | string, amount: number, proposal: string, deliveryDays: number) {
   const supabase = await createClient()
@@ -57,7 +58,7 @@ export async function submitBid(jobId: number | string, amount: number, proposal
     return { error: error.message }
   }
 
-  // 4. Notify employer
+  // 4. Notify employer (in-app + email)
   if (jobData?.employer) {
     await createNotification({
       userId: (jobData.employer as any).id,
@@ -67,6 +68,18 @@ export async function submitBid(jobId: number | string, amount: number, proposal
       content: `${userRecord.full_name || 'An agent'} submitted a bid for "${jobData.title}"`,
       link: `/dashboard/employer/listings`
     })
+
+    // Fetch employer email for notification
+    const { data: employerAuth } = await supabase.auth.admin.getUserById((jobData.employer as any).auth_id)
+    if (employerAuth?.user?.email) {
+      await sendNewBidEmail({
+        to: employerAuth.user.email,
+        recipientName: (jobData.employer as any).full_name || 'Employer',
+        seekerName: userRecord.full_name || 'A talent',
+        jobTitle: jobData.title,
+        jobId: String(jobId),
+      }).catch(() => {}) // non-blocking — don't fail the bid if email fails
+    }
   }
 
   revalidatePath('/dashboard/seeker/search')
@@ -124,7 +137,7 @@ export async function updateBidStatus(bidId: string | number, status: 'accepted'
     return { error: error.message }
   }
 
-  // 4. Notify Seeker
+  // 4. Notify Seeker (in-app + email)
   if (bidData.bidder) {
     const statusText = status.toUpperCase()
     let content = `Your proposal for "${(bidData as any).job.title}" has been ${status}.`
@@ -140,6 +153,16 @@ export async function updateBidStatus(bidId: string | number, status: 'accepted'
       content,
       link: `/dashboard/seeker/applications`
     })
+
+    const { data: seekerAuth } = await supabase.auth.admin.getUserById((bidData.bidder as any).auth_id)
+    if (seekerAuth?.user?.email) {
+      await sendBidStatusEmail({
+        to: seekerAuth.user.email,
+        recipientName: (bidData.bidder as any).full_name || 'Agent',
+        jobTitle: (bidData as any).job.title,
+        status,
+      }).catch(() => {})
+    }
   }
 
   revalidatePath(`/dashboard/employer/listings`)

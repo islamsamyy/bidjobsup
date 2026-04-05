@@ -1,5 +1,256 @@
-export default function Page() {
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+function timeAgo(dateStr: string | null) {
+  if (!dateStr) return 'TBD'
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000)
+  if (diff <= 0) return 'Just now'
+  if (diff === 1) return 'Yesterday'
+  return `${diff}d ago`
+}
+
+const CATEGORIES = ['All', 'Engineering', 'Design', 'Marketing', 'Product', 'Finance', 'Operations', 'Legal', 'Other']
+
+export default async function SearchPage({ searchParams }: PageProps) {
+  const params = await searchParams
+  const q = (params.q as string || '').trim()
+  const category = params.category as string || ''
+  const location = params.location as string || ''
+  const salaryMin = parseInt(params.salary_min as string) || 0
+
+  const supabase = await createClient()
+
+  let query = supabase
+    .from('jobs')
+    .select(`*, employer:employer_id(full_name, company_name, avatar_url, location)`)
+    .eq('status', 'open')
+
+  if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%`)
+  if (category && category !== 'All') query = query.eq('category', category)
+  if (location) query = query.ilike('location', `%${location}%`)
+  if (salaryMin > 0) query = query.gte('budget_max', salaryMin)
+
+  const { data: jobs } = await query.order('created_at', { ascending: false }).limit(30)
+
   return (
-    <div dangerouslySetInnerHTML={{ __html: "<!DOCTYPE html>\n\n<html class=\"dark\" lang=\"en\"><head>\n<meta charset=\"utf-8\"/>\n<meta content=\"width=device-width, initial-scale=1.0\" name=\"viewport\"/>\n<title>BidJobs | Search Results - Vision 2030 Noir</title>\n<script src=\"https://cdn.tailwindcss.com?plugins=forms,container-queries\"></script>\n<link href=\"https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;family=Outfit:wght@200;300;400;500&amp;display=swap\" rel=\"stylesheet\"/>\n<link href=\"https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap\" rel=\"stylesheet\"/>\n<script id=\"tailwind-config\">\n      tailwind.config = {\n        darkMode: \"class\",\n        theme: {\n          extend: {\n            colors: {\n              \"primary\": \"#caa2f7\",\n              \"surface\": \"#0a090a\",\n              \"surface-container\": \"#141214\",\n              \"on-surface\": \"#faf1f5\",\n              \"on-surface-variant\": \"#948f93\",\n              \"outline-variant\": \"#2d2a2d\",\n              \"primary-container\": \"#4c2975\",\n            },\n            fontFamily: {\n              \"headline\": [\"Noto Serif\", \"serif\"],\n              \"body\": [\"Plus Jakarta Sans\", \"sans-serif\"],\n              \"label\": [\"Outfit\", \"sans-serif\"]\n            },\n            borderRadius: {\"DEFAULT\": \"0.125rem\", \"lg\": \"0.25rem\", \"xl\": \"0.5rem\", \"2xl\": \"1rem\", \"full\": \"9999px\"},\n          },\n        },\n      }\n    </script>\n<style>\n      body { \n        background-color: #0a090a; \n        color: #faf1f5; \n        font-family: 'Plus Jakarta Sans', sans-serif; \n        background-image: radial-gradient(circle at 50% -20%, #2a1b3d 0%, transparent 40%),\n                          radial-gradient(circle at 100% 80%, #1a0f26 0%, transparent 30%);\n        background-attachment: fixed;\n      }\n      .glass-card { \n        background: rgba(20, 18, 20, 0.4); \n        backdrop-filter: blur(12px); \n        border: 1px solid rgba(255, 255, 255, 0.05);\n      }\n      .glass-card:hover {\n        background: rgba(28, 25, 28, 0.6);\n        border-color: rgba(202, 162, 247, 0.2);\n      }\n      .serif-headline { font-family: 'Noto Serif', serif; }\n      .noir-gradient-btn {\n        background: linear-gradient(135deg, #caa2f7 0%, #7c4dff 100%);\n        box-shadow: 0 0 20px rgba(124, 77, 255, 0.3);\n      }\n      .elite-badge {\n        background: linear-gradient(90deg, #2a0052 0%, #4c2975 100%);\n        border: 1px solid #7c4dff44;\n        text-transform: uppercase;\n        letter-spacing: 0.1em;\n      }\n      .control-panel-item {\n        border-left: 2px solid transparent;\n        transition: all 0.3s ease;\n      }\n      .control-panel-item:hover, .control-panel-item.active {\n        border-left-color: #caa2f7;\n        background: linear-gradient(90deg, rgba(202, 162, 247, 0.05) 0%, transparent 100%);\n      }\n      ::-webkit-scrollbar { width: 6px; }\n      ::-webkit-scrollbar-track { background: transparent; }\n      ::-webkit-scrollbar-thumb { background: #2d2a2d; border-radius: 10px; }\n    </style>\n</head>\n<body class=\"antialiased min-h-screen\">\n<!-- Top Navigation -->\n<nav class=\"fixed top-0 w-full z-50 flex justify-between items-center px-10 h-24 bg-surface/80 backdrop-blur-2xl border-b border-white/5\">\n<div class=\"flex items-center gap-16\">\n<a class=\"flex items-center gap-3 group\" href=\"#\">\n<img alt=\"BidJobs Logo\" class=\"h-10 w-auto\" src=\"https://lh3.googleusercontent.com/aida/ADBb0uiX0tgBDXU66xlJy-sE41xpYUAaYX68SXBNkZ11-Czu2GQXtqvL2Xvv0MyD_DIUKwKalpdtiGkrld0GCR23-c-dtUulBtSWFccCtnHkYl2TvrSSQIRCoM-j-u4NUFK7gVrK2i84CqldcZ9nIR7vAfFsvGbrvj2qL09gHrsevllN0LOrMtX1qd4xHYzWy-0iPeWQFYZgcPTBVWpbqlaSccmhWzJLpFrjRzHVzQvQ72qQVba9pU2iCa-oSLIV\"/>\n<span class=\"text-2xl font-headline tracking-tight text-white group-hover:text-primary transition-colors\">BidJobs</span>\n</a>\n<div class=\"hidden lg:flex items-center gap-10\">\n<a class=\"text-sm font-label uppercase tracking-widest text-on-surface-variant hover:text-white transition-all\" href=\"#\">Network</a>\n<a class=\"text-sm font-label uppercase tracking-widest text-on-surface-variant hover:text-white transition-all\" href=\"#\">Bounties</a>\n<a class=\"text-sm font-label uppercase tracking-widest text-primary border-b border-primary/40 pb-1\" href=\"#\">Intelligence</a>\n</div>\n</div>\n<div class=\"flex items-center gap-8\">\n<div class=\"relative group hidden sm:block\">\n<div class=\"flex items-center bg-white/5 border border-white/10 rounded-full px-5 py-2.5 w-72 focus-within:border-primary/50 transition-all duration-500\">\n<span class=\"material-symbols-outlined text-on-surface-variant text-xl mr-3\">search</span>\n<input class=\"bg-transparent border-none focus:ring-0 text-sm w-full font-label text-on-surface placeholder-on-surface-variant/50\" placeholder=\"Find talent or opportunities...\" type=\"text\"/>\n</div>\n</div>\n<div class=\"flex items-center gap-5\">\n<button class=\"material-symbols-outlined text-on-surface-variant hover:text-white transition-colors\">notifications</button>\n<div class=\"w-11 h-11 rounded-full p-[1px] bg-gradient-to-tr from-primary to-transparent\">\n<div class=\"w-full h-full rounded-full overflow-hidden border-2 border-surface\">\n<img class=\"w-full h-full object-cover\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDdT1RMmKOPe6khRQoFCRval5UK9xGcjufh-HDdf6YqhT9LZoAL4udEcBjKYsRST0n5mEqos88R7OZ6MPBfTPzAHnZcfiKSmTBlQu8vHeFX2bkvTIN-eIvu5leX4ZUnDd04hyqNaHZBfqMUPhp_VItuhJUBFOaiXyNlHm-kE5qeMhdCghZrWHeWFMmZekbLD3mbWPtFNQLkdGmvk3PeuyZ00tJTx2kxoBPxa4fiYTp2GhDQBrohKiT_JV9o-rzbxW6gO1-8eJmy_N7Q\"/>\n</div>\n</div>\n</div>\n</div>\n</nav>\n<div class=\"flex pt-24\">\n<!-- Studio Control Panel (Sidebar) -->\n<aside class=\"fixed left-0 top-24 h-[calc(100vh-6rem)] w-72 bg-surface/30 border-r border-white/5 overflow-y-auto z-40\">\n<div class=\"py-10 px-8\">\n<div class=\"flex items-center justify-between mb-10\">\n<h3 class=\"font-label text-xs uppercase tracking-[0.3em] text-on-surface-variant\">Control Panel</h3>\n<span class=\"text-[10px] text-primary/60 font-mono\">V.2030.N</span>\n</div>\n<div class=\"space-y-12\">\n<!-- Sector -->\n<section>\n<label class=\"block text-[10px] font-label text-primary uppercase tracking-[0.2em] mb-6\">Sector Parameters</label>\n<div class=\"space-y-4\">\n<label class=\"control-panel-item active flex items-center gap-4 px-2 py-2 cursor-pointer group\">\n<input checked=\"\" class=\"w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-surface focus:ring-primary\" type=\"checkbox\"/>\n<span class=\"text-sm font-label text-white group-hover:text-primary transition-colors\">Creative Architecture</span>\n</label>\n<label class=\"control-panel-item flex items-center gap-4 px-2 py-2 cursor-pointer group\">\n<input class=\"w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-surface focus:ring-primary\" type=\"checkbox\"/>\n<span class=\"text-sm font-label text-on-surface-variant group-hover:text-white transition-colors\">AI Engineering</span>\n</label>\n<label class=\"control-panel-item flex items-center gap-4 px-2 py-2 cursor-pointer group\">\n<input class=\"w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-surface focus:ring-primary\" type=\"checkbox\"/>\n<span class=\"text-sm font-label text-on-surface-variant group-hover:text-white transition-colors\">XR Development</span>\n</label>\n</div>\n</section>\n<!-- Experience -->\n<section>\n<label class=\"block text-[10px] font-label text-primary uppercase tracking-[0.2em] mb-6\">Expertise Level</label>\n<div class=\"grid grid-cols-1 gap-2\">\n<button class=\"text-left px-4 py-3 rounded-lg text-xs font-label bg-white/10 text-white border border-white/10 hover:border-primary/50 transition-all\">ELITE ARCHITECT (10+ YRS)</button>\n<button class=\"text-left px-4 py-3 rounded-lg text-xs font-label text-on-surface-variant border border-transparent hover:bg-white/5 transition-all\">SENIOR FELLOW</button>\n<button class=\"text-left px-4 py-3 rounded-lg text-xs font-label text-on-surface-variant border border-transparent hover:bg-white/5 transition-all\">CONSULTANT</button>\n</div>\n</section>\n<!-- Geolocation -->\n<section>\n<label class=\"block text-[10px] font-label text-primary uppercase tracking-[0.2em] mb-4\">Node Location</label>\n<div class=\"relative\">\n<span class=\"material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-primary\">location_on</span>\n<input class=\"w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-xs font-label text-on-surface focus:ring-1 focus:ring-primary/50\" type=\"text\" value=\"NEOM / RIYADH, KSA\"/>\n</div>\n</section>\n</div>\n</div>\n<div class=\"sticky bottom-0 bg-surface/80 backdrop-blur-md p-8 border-t border-white/5\">\n<button class=\"w-full noir-gradient-btn text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all\">\n                Update Feed\n            </button>\n</div>\n</aside>\n<!-- Main Canvas -->\n<main class=\"ml-72 flex-1 p-16\">\n<header class=\"mb-16\">\n<div class=\"flex items-center gap-3 text-primary text-xs font-label uppercase tracking-[0.4em] mb-4\">\n<span class=\"w-8 h-px bg-primary/40\"></span>\n                Search Intelligence\n            </div>\n<h1 class=\"serif-headline text-6xl mb-6 tracking-tight leading-none text-white\">Results <span class=\"text-primary italic\">Overview</span></h1>\n<p class=\"text-on-surface-variant font-label text-xl font-light\">\n                Found <span class=\"text-white font-normal\">142</span> qualified matches for query: <span class=\"bg-primary/10 text-primary px-2 rounded\">\"Creative Director\"</span>\n</p>\n</header>\n<!-- Navigation Tabs -->\n<div class=\"flex gap-12 mb-16 border-b border-white/5 relative\">\n<button class=\"pb-6 border-b-2 border-primary text-white font-medium text-lg relative z-10 transition-all\">Opportunities</button>\n<button class=\"pb-6 border-b-2 border-transparent text-on-surface-variant hover:text-white font-label text-lg relative z-10 transition-all\">Talent Node</button>\n<button class=\"pb-6 border-b-2 border-transparent text-on-surface-variant hover:text-white font-label text-lg relative z-10 transition-all\">Collective</button>\n</div>\n<!-- Grid -->\n<div class=\"grid grid-cols-1 xl:grid-cols-2 gap-10\">\n<!-- Featured Card (Job) -->\n<div class=\"col-span-1 xl:col-span-2 glass-card rounded-2xl p-10 relative overflow-hidden group\">\n<div class=\"absolute top-0 right-0 p-10\">\n<div class=\"elite-badge text-[10px] font-bold px-4 py-1.5 rounded-full text-white shadow-lg shadow-primary/20\">\n                        High Priority Bid\n                    </div>\n</div>\n<div class=\"flex flex-col lg:flex-row gap-10 items-start\">\n<div class=\"w-24 h-24 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/40 transition-colors\">\n<span class=\"material-symbols-outlined text-primary text-5xl\">architecture</span>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6\">\n<div>\n<h2 class=\"serif-headline text-4xl text-white mb-2 leading-tight\">Lead Narrative Architect</h2>\n<p class=\"text-on-surface-variant font-label text-lg tracking-wide\">Aetheria Global • Remote Intelligence Hub</p>\n</div>\n<div class=\"text-right\">\n<span class=\"text-3xl font-headline text-primary block\">$180k – $240k</span>\n<span class=\"text-[10px] font-label text-on-surface-variant uppercase tracking-widest mt-1 block\">Full-time • Annual</span>\n</div>\n</div>\n<div class=\"flex flex-wrap gap-3 mb-10\">\n<span class=\"px-5 py-2 rounded-lg bg-primary-container/30 border border-primary/20 text-primary text-[11px] font-bold uppercase tracking-wider\">Vision 2030 Partner</span>\n<span class=\"px-5 py-2 rounded-lg bg-white/5 border border-white/10 text-on-surface-variant text-[11px] font-medium uppercase\">Unreal Engine 6</span>\n<span class=\"px-5 py-2 rounded-lg bg-white/5 border border-white/10 text-on-surface-variant text-[11px] font-medium uppercase\">Cyber-Structuralism</span>\n</div>\n<div class=\"flex items-center gap-6\">\n<button class=\"noir-gradient-btn text-white px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:scale-105 transition-transform\">\n                                Initiate Bid\n                            </button>\n<button class=\"p-4 rounded-xl border border-white/10 hover:border-primary/40 text-on-surface-variant hover:text-white transition-all\">\n<span class=\"material-symbols-outlined\">bookmark</span>\n</button>\n</div>\n</div>\n</div>\n</div>\n<!-- People Card 1 -->\n<div class=\"glass-card rounded-2xl p-8 flex items-center gap-8 group\">\n<div class=\"relative shrink-0\">\n<div class=\"w-28 h-28 rounded-2xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 border border-white/10 group-hover:border-primary/40\">\n<img class=\"w-full h-full object-cover\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAShtJPz8RVSLZgjFul9sI7N1ttxmMF4vehmmBWW3TSBEjLE7oprNLHq8smBF-UJ2NS_26Wb5LfSNCu4pdqUMWIYlMMR8JqKWX3jnSoXEGfIA2GIx6K2DSgZXpwPuMhEAcY9-wMURVsAS7i6i1Wo3G7ZKSVooukZMkAZRS3TcYjLr2P3Hk10AMJrj7iYyXpjVAp9wZ7X0ub_2oza4O3VUjtNLzc-zizSnSvBd1yGBaJBa2PO5wQToUa_966VWfUhBLmrems6wVKJrl3\"/>\n</div>\n<div class=\"absolute -bottom-2 -right-2 bg-primary text-surface p-1.5 rounded-lg border-4 border-surface shadow-xl\">\n<span class=\"material-symbols-outlined text-sm font-bold\" style=\"font-variation-settings: 'FILL' 1;\">verified</span>\n</div>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex items-center justify-between mb-2\">\n<h3 class=\"serif-headline text-2xl text-white\">Elena Vance</h3>\n<div class=\"elite-badge text-[9px] font-bold px-3 py-1 rounded-md text-white\">Elite Node</div>\n</div>\n<p class=\"text-on-surface-variant font-label text-sm mb-6 uppercase tracking-widest\">Senior Env. Architect</p>\n<div class=\"flex items-center justify-between\">\n<div class=\"flex flex-col\">\n<span class=\"text-[10px] text-on-surface-variant uppercase tracking-tighter\">Match Score</span>\n<span class=\"text-primary font-mono text-lg\">98.4%</span>\n</div>\n<button class=\"flex items-center gap-2 text-primary font-label text-xs uppercase tracking-widest hover:gap-4 transition-all\">\n                            Dossier <span class=\"material-symbols-outlined text-xs\">arrow_forward</span>\n</button>\n</div>\n</div>\n</div>\n<!-- Job Card 2 -->\n<div class=\"glass-card rounded-2xl p-8 group\">\n<div class=\"flex justify-between items-start mb-8\">\n<div class=\"w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-primary group-hover:border-primary/40 transition-colors\">\n<span class=\"material-symbols-outlined text-3xl\">electric_bolt</span>\n</div>\n<span class=\"text-[10px] font-label text-on-surface-variant uppercase tracking-widest\">Active 2h ago</span>\n</div>\n<h3 class=\"serif-headline text-2xl text-white mb-2\">Motion Experience Lead</h3>\n<p class=\"text-on-surface-variant font-label text-sm mb-10\">Nexus Interactive • New York Digital Precinct</p>\n<div class=\"flex items-center justify-between pt-6 border-t border-white/5\">\n<span class=\"text-2xl font-headline text-primary\">$140k – $190k</span>\n<button class=\"bg-white/5 hover:bg-primary/20 text-white px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all\">\n                        Details\n                    </button>\n</div>\n</div>\n<!-- People Card 2 -->\n<div class=\"glass-card rounded-2xl p-8 flex items-center gap-8 group\">\n<div class=\"relative shrink-0\">\n<div class=\"w-28 h-28 rounded-2xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 border border-white/10 group-hover:border-primary/40\">\n<img class=\"w-full h-full object-cover\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDBK1LQ02LbrulUBqKspZ1Ufj6VVk2cdVMMWcqUHKzOpW-sX9jjVU3kFsumqRgo0eWmWY4sm3A_jLgbPrstxUfYz8v3n_iYxv_qzHmWZqK0G33_X8aw0IAaJxgbcUa32zrGrdMrpzjpxGVKdwVTKxf3eJQlK36a37ESxca0sqsLSklNEQryDpCVWD-l6GjC-UubuFrvNmI4aLXyvdsCE00EDWJ0mAmOSbIWsypz-8lCxQSKTTNezmAj0GhLiJ-aTX2Hl24QIcmYAiai\"/>\n</div>\n<div class=\"absolute -bottom-2 -right-2 bg-primary text-surface p-1.5 rounded-lg border-4 border-surface shadow-xl\">\n<span class=\"material-symbols-outlined text-sm font-bold\" style=\"font-variation-settings: 'FILL' 1;\">verified</span>\n</div>\n</div>\n<div class=\"flex-1\">\n<div class=\"flex items-center justify-between mb-2\">\n<h3 class=\"serif-headline text-2xl text-white\">Marcus Thorne</h3>\n<div class=\"elite-badge text-[9px] font-bold px-3 py-1 rounded-md text-white\">Elite Node</div>\n</div>\n<p class=\"text-on-surface-variant font-label text-sm mb-6 uppercase tracking-widest\">XR Interaction Specialist</p>\n<div class=\"flex items-center justify-between\">\n<div class=\"flex flex-col\">\n<span class=\"text-[10px] text-on-surface-variant uppercase tracking-tighter\">Availability</span>\n<span class=\"text-primary font-mono text-lg italic\">Immediate</span>\n</div>\n<button class=\"noir-gradient-btn text-white px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:scale-105 transition-transform\">\n                            Connect\n                        </button>\n</div>\n</div>\n</div>\n<!-- Job Card 3 -->\n<div class=\"glass-card rounded-2xl p-8 group\">\n<div class=\"flex justify-between items-start mb-8\">\n<div class=\"w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-primary group-hover:border-primary/40 transition-colors\">\n<span class=\"material-symbols-outlined text-3xl\">public</span>\n</div>\n<span class=\"text-[10px] font-label text-on-surface-variant uppercase tracking-widest\">Active 6h ago</span>\n</div>\n<h3 class=\"serif-headline text-2xl text-white mb-2\">Digital Futurist Consultant</h3>\n<p class=\"text-on-surface-variant font-label text-sm mb-10\">Vision 2030 Lab • Tokyo Strategic Node</p>\n<div class=\"flex items-center justify-between pt-6 border-t border-white/5\">\n<span class=\"text-2xl font-headline text-primary\">$300/hr</span>\n<button class=\"bg-white/5 hover:bg-primary/20 text-white px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all\">\n                        Details\n                    </button>\n</div>\n</div>\n</div>\n<!-- Pagination -->\n<div class=\"mt-24 flex flex-col items-center\">\n<div class=\"h-[1px] w-64 bg-gradient-to-r from-transparent via-primary/30 to-transparent mb-12\"></div>\n<button class=\"font-label text-on-surface-variant hover:text-primary transition-all flex items-center gap-4 group uppercase tracking-[0.3em] text-xs\">\n                Scan Next Tier\n                <span class=\"material-symbols-outlined group-hover:translate-y-1 transition-transform\">expand_more</span>\n</button>\n</div>\n</main>\n</div>\n<!-- Mobile Nav (kept simple but restyled) -->\n<div class=\"md:hidden fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-2xl border-t border-white/5 flex justify-around items-center h-20 px-4\">\n<button class=\"flex flex-col items-center gap-1 text-on-surface-variant\">\n<span class=\"material-symbols-outlined\">dashboard</span>\n<span class=\"text-[8px] uppercase tracking-widest\">Home</span>\n</button>\n<button class=\"flex flex-col items-center gap-1 text-primary\">\n<span class=\"material-symbols-outlined\">search</span>\n<span class=\"text-[8px] uppercase tracking-widest\">Search</span>\n</button>\n<button class=\"flex flex-col items-center gap-1 text-on-surface-variant\">\n<span class=\"material-symbols-outlined\">chat</span>\n<span class=\"text-[8px] uppercase tracking-widest\">Comms</span>\n</button>\n<button class=\"flex flex-col items-center gap-1 text-on-surface-variant\">\n<span class=\"material-symbols-outlined\">account_circle</span>\n<span class=\"text-[8px] uppercase tracking-widest\">Id</span>\n</button>\n</div>\n</body></html>" }} />
-  );
+    <div className="max-w-[1440px] mx-auto flex min-h-[calc(100vh-80px)]">
+      {/* Filter Sidebar */}
+      <aside className="hidden md:block w-80 p-8 border-r border-[#292428]/20 bg-[#151215] h-[calc(100vh-80px)] sticky top-20 overflow-y-auto">
+        <form method="get" action="/jobs/search" className="space-y-8">
+          {/* Search query */}
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#b0a9ad] mb-3 block">
+              Keywords
+            </label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4b474a] text-lg">search</span>
+              <input
+                name="q"
+                defaultValue={q}
+                placeholder="Title, skill, keyword…"
+                className="w-full bg-[#1c181c] border border-[#292428] rounded-xl pl-10 pr-4 py-3 text-sm text-[#faf1f5] placeholder:text-[#4b474a] focus:outline-none focus:border-[#caa2f7]/50"
+              />
+            </div>
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#b0a9ad] mb-3 block">
+              Category
+            </label>
+            <div className="space-y-1">
+              {CATEGORIES.map((cat) => (
+                <label key={cat} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1c181c] cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="category"
+                    value={cat === 'All' ? '' : cat}
+                    defaultChecked={category === (cat === 'All' ? '' : cat) || (cat === 'All' && !category)}
+                    className="accent-[#caa2f7]"
+                  />
+                  <span className="text-sm text-[#b0a9ad] group-hover:text-[#faf1f5] transition-colors">{cat}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#b0a9ad] mb-3 block">
+              Location
+            </label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4b474a] text-lg">location_on</span>
+              <input
+                name="location"
+                defaultValue={location}
+                placeholder="City or Remote…"
+                className="w-full bg-[#1c181c] border border-[#292428] rounded-xl pl-10 pr-4 py-3 text-sm text-[#faf1f5] placeholder:text-[#4b474a] focus:outline-none focus:border-[#caa2f7]/50"
+              />
+            </div>
+          </div>
+
+          {/* Min salary */}
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#b0a9ad] mb-3 block">
+              Min Budget ($)
+            </label>
+            <input
+              name="salary_min"
+              type="number"
+              defaultValue={salaryMin || ''}
+              placeholder="e.g. 5000"
+              min="0"
+              className="w-full bg-[#1c181c] border border-[#292428] rounded-xl px-4 py-3 text-sm text-[#faf1f5] placeholder:text-[#4b474a] focus:outline-none focus:border-[#caa2f7]/50"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:brightness-110 transition-all"
+          >
+            Apply Filters
+          </button>
+
+          {(q || category || location || salaryMin > 0) && (
+            <Link
+              href="/jobs/search"
+              className="block text-center text-[10px] font-bold uppercase tracking-widest text-[#4b474a] hover:text-[#b0a9ad] transition-colors"
+            >
+              Clear All
+            </Link>
+          )}
+        </form>
+
+        {/* Upsell */}
+        <div className="mt-10 p-6 rounded-2xl bg-gradient-to-br from-[#1c181c] to-[#292428] border border-[#caa2f7]/10">
+          <h3 className="font-headline text-base font-bold mb-2 text-[#faf1f5]">Elevate Your Bid</h3>
+          <p className="text-xs text-[#b0a9ad] mb-4 leading-relaxed">Get priority listings and direct employer access.</p>
+          <Link href="/pricing" className="text-xs font-bold text-[#caa2f7] underline underline-offset-4 hover:text-[#f1bfff] transition-colors">
+            Upgrade to Elite
+          </Link>
+        </div>
+      </aside>
+
+      {/* Results */}
+      <section className="flex-1 p-8 lg:p-12">
+        <header className="mb-12">
+          <h1 className="font-headline text-5xl font-black tracking-tight text-[#faf1f5] mb-3">
+            {q ? `Results for "${q}"` : 'Search Roles'}
+          </h1>
+          <p className="text-[#b0a9ad] text-lg font-light">
+            {jobs && jobs.length > 0
+              ? `${jobs.length} mission${jobs.length !== 1 ? 's' : ''} found${category ? ` in ${category}` : ''}${location ? ` near ${location}` : ''}`
+              : 'No results — try adjusting your filters'}
+          </p>
+        </header>
+
+        {/* Mobile search bar */}
+        <form method="get" action="/jobs/search" className="md:hidden mb-8 flex gap-2">
+          <div className="relative flex-1">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4b474a]">search</span>
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Search roles…"
+              className="w-full bg-[#1c181c] border border-[#292428] rounded-xl pl-10 pr-4 py-3 text-sm text-[#faf1f5] placeholder:text-[#4b474a] focus:outline-none focus:border-[#caa2f7]/50"
+            />
+          </div>
+          <button type="submit" className="bg-[#caa2f7] text-[#431f6b] px-5 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all">
+            Go
+          </button>
+        </form>
+
+        <div className="space-y-6">
+          {jobs && jobs.length > 0 ? (
+            jobs.map((job) => (
+              <div key={job.id} className="group bg-[#1c181c] border border-[#292428] rounded-2xl p-8 hover:bg-[#221e22] hover:border-[#caa2f7]/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500">
+                <div className="flex flex-col lg:flex-row gap-8">
+                  <div className="w-16 h-16 rounded-xl bg-[#100d10] flex items-center justify-center border border-[#292428] flex-shrink-0 group-hover:scale-110 transition-transform overflow-hidden">
+                    {job.employer?.avatar_url ? (
+                      <img src={job.employer.avatar_url} alt={job.employer.company_name || ''} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-[#caa2f7]">work</span>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                      <h3 className="font-headline text-2xl font-bold group-hover:text-[#caa2f7] transition-colors">{job.title}</h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {job.category && (
+                          <span className="px-3 py-1 rounded-full bg-[#613471]/30 text-[#f1bfff] text-[10px] font-black uppercase tracking-widest border border-[#f1bfff]/10">
+                            {job.category}
+                          </span>
+                        )}
+                        {job.budget_max && job.budget_max >= 2000 && (
+                          <span className="px-3 py-1 rounded-full bg-[#caa2f7]/10 text-[#caa2f7] text-[10px] font-black uppercase tracking-widest border border-[#caa2f7]/10">
+                            High Ticket
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#b0a9ad] mb-1 block">Company</span>
+                        <span className="text-sm font-bold text-[#faf1f5]">{job.employer?.company_name || job.employer?.full_name || '—'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#b0a9ad] mb-1 block">Location</span>
+                        <span className="text-sm font-bold text-[#faf1f5]">{job.location || 'Remote'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#b0a9ad] mb-1 block">Budget</span>
+                        <span className="text-sm font-black text-[#caa2f7] font-headline">
+                          {job.budget_min && job.budget_max
+                            ? `$${Number(job.budget_min).toLocaleString()} – $${Number(job.budget_max).toLocaleString()}`
+                            : job.budget_max
+                              ? `Up to $${Number(job.budget_max).toLocaleString()}`
+                              : job.budget_min
+                                ? `$${Number(job.budget_min).toLocaleString()}+`
+                                : 'TBD'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#b0a9ad] mb-1 block">Posted</span>
+                        <span className="text-sm font-bold text-[#faf1f5]">{timeAgo(job.created_at)}</span>
+                      </div>
+                    </div>
+                    {job.description && (
+                      <p className="text-[#b0a9ad] text-sm leading-relaxed max-w-2xl line-clamp-2 italic">{job.description}</p>
+                    )}
+                  </div>
+                  <div className="flex lg:flex-col justify-end items-end gap-3 flex-shrink-0 min-w-[140px]">
+                    <Link href={`/jobs/${job.id}`} className="w-full text-center px-6 py-3 rounded-xl border border-[#4b474a] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#292428] transition-all text-[#faf1f5]">
+                      Details
+                    </Link>
+                    <Link href={`/jobs/${job.id}`} className="w-full text-center px-6 py-3 rounded-xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#caa2f7]/10 hover:brightness-110 active:scale-95 transition-all">
+                      Place Bid
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-20 text-center bg-[#1c181c] rounded-[2rem] border border-dashed border-[#292428]">
+              <span className="material-symbols-outlined text-6xl text-[#4b474a] mb-6 block">search_off</span>
+              <h3 className="text-2xl font-bold mb-2">No missions match your protocol</h3>
+              <p className="text-[#b0a9ad] mb-8">Try broadening your filters or clearing the search cache.</p>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link href="/jobs/search" className="px-6 py-3 rounded-xl border border-[#4b474a] text-[10px] font-black uppercase tracking-widest text-[#faf1f5] hover:bg-[#292428] transition-all">
+                  Clear Filters
+                </Link>
+                <Link href="/jobs/browse" className="px-6 py-3 rounded-xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all">
+                  Browse All Roles
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  )
 }

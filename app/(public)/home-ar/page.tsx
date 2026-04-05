@@ -1,8 +1,14 @@
-"use client";
-
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
-export default function ArabicLandingPage() {
+export default async function ArabicLandingPage() {
+  const supabase = await createClient();
+  const { data: featuredJobs } = await supabase
+    .from("jobs")
+    .select("id, title, location, budget_min, budget_max, employer:employer_id(company_name, full_name)")
+    .eq("status", "open")
+    .order("created_at", { ascending: false })
+    .limit(3);
   return (
     <div dir="rtl" className="font-body text-[#faf1f5] bg-[#100d10] min-h-screen">
       {/* Hero Section */}
@@ -162,42 +168,49 @@ export default function ArabicLandingPage() {
           </div>
 
           <div className="space-y-6">
-            {[
-              { company: "نيوم", role: "مهندس معماري حضري أول", loc: "نيوم، المملكة العربية السعودية", pay: "45k - 60k ريال", type: "دوام كامل", logo: "🏙️" },
-              { company: "stc", role: "رئيس علماء البيانات", loc: "الرياض، المملكة العربية السعودية", pay: "35k - 50k ريال", type: "هجين", logo: "📡" },
-              { company: "أرامكو", role: "رئيس الاستدامة", loc: "الظهران، المملكة العربية السعودية", pay: "+55k ريال", type: "عقد", logo: "🛢️" }
-            ].map((job, i) => (
-              <div 
-                key={i} 
+            {featuredJobs && featuredJobs.length > 0 ? featuredJobs.map((job) => {
+              const company = (job.employer as any)?.company_name || (job.employer as any)?.full_name || 'شركة';
+              const budget = job.budget_min && job.budget_max
+                ? `$${Number(job.budget_min).toLocaleString()} – $${Number(job.budget_max).toLocaleString()}`
+                : job.budget_max ? `حتى $${Number(job.budget_max).toLocaleString()}` : 'يُحدد لاحقاً';
+              return (
+              <div
+                key={job.id}
                 className="group flex flex-col md:flex-row items-center justify-between p-10 bg-[#1c181c] border border-[#292428] rounded-[2.5rem] hover:bg-[#221e22] hover:border-[#caa2f7]/30 transition-all duration-300 text-right"
               >
                 <div className="flex items-center gap-8 mb-8 md:mb-0 w-full md:w-auto">
                   <div className="order-2 text-right">
-                    <h3 className="text-2xl font-bold mb-2 group-hover:text-[#caa2f7] transition-colors">{job.role}</h3>
+                    <h3 className="text-2xl font-bold mb-2 group-hover:text-[#caa2f7] transition-colors">{job.title}</h3>
                     <p className="text-[#b0a9ad] text-sm flex items-center justify-end gap-3">
-                      {job.loc}
+                      {job.location || 'عن بعد'}
                       <span className="w-1.5 h-1.5 rounded-full bg-[#4b474a]"></span>
-                      <span className="font-bold text-[#faf1f5]/80">{job.company}</span>
+                      <span className="font-bold text-[#faf1f5]/80">{company}</span>
                     </p>
                   </div>
-                  <div className="w-20 h-20 rounded-[1.5rem] bg-[#100d10] flex items-center justify-center text-3xl shadow-inner group-hover:scale-105 transition-transform order-1">
-                    {job.logo}
+                  <div className="w-20 h-20 rounded-[1.5rem] bg-[#100d10] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform order-1 border border-[#292428]">
+                    <span className="material-symbols-outlined text-3xl text-[#caa2f7]">work</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-10 w-full md:w-auto justify-between md:justify-end">
-                  <Link 
-                    href={`/jobs/details`}
+                  <Link
+                    href={`/jobs/${job.id}`}
                     className="bg-[#faf1f5] hover:bg-[#caa2f7] text-[#100d10] font-black px-12 py-4 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:shadow-[0_10px_30px_rgba(202,162,247,0.3)] shadow-none"
                   >
                     تقدم للوظيفة
                   </Link>
                   <div className="hidden sm:flex flex-col gap-2 items-end">
-                    <span className="px-4 py-1.5 rounded-full bg-[#613471]/30 text-[#f1bfff] text-[10px] font-black tracking-widest">{job.pay}</span>
-                    <span className="text-[10px] text-[#b0a9ad] uppercase tracking-[0.2em] font-bold">{job.type}</span>
+                    <span className="px-4 py-1.5 rounded-full bg-[#613471]/30 text-[#f1bfff] text-[10px] font-black tracking-widest">{budget}</span>
+                    <span className="text-[10px] text-[#b0a9ad] uppercase tracking-[0.2em] font-bold">مفتوح</span>
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            }) : (
+              <div className="text-center py-16 text-[#b0a9ad]">
+                <span className="material-symbols-outlined text-5xl text-[#4b474a] mb-4 block">work_off</span>
+                لا توجد وظائف متاحة حالياً
+              </div>
+            )}
           </div>
 
           <div className="mt-16 text-center">

@@ -1,324 +1,164 @@
-export default function Page() {
-  return (
-    <div dangerouslySetInnerHTML={{ __html: `<!DOCTYPE html>
+import Link from 'next/link'
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>BidJobs | Editorial Insights</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "inverse-surface": "#fff7fa",
-              "tertiary": "#ff93aa",
-              "primary": "#caa2f7",
-              "on-background": "#faf1f5",
-              "tertiary-dim": "#f27793",
-              "primary-dim": "#bc95e9",
-              "background": "#100d10",
-              "on-primary": "#431f6b",
-              "secondary-dim": "#dba6eb",
-              "surface-variant": "#292428",
-              "on-tertiary": "#68082a",
-              "on-secondary-fixed-variant": "#6c3e7c",
-              "inverse-on-surface": "#585457",
-              "secondary-fixed-dim": "#e7b0f7",
-              "tertiary-container": "#fc7e9b",
-              "on-error-container": "#ffb2b9",
-              "surface-container": "#1c181c",
-              "error": "#ff6e84",
-              "surface-container-lowest": "#000000",
-              "error-container": "#a70138",
-              "primary-fixed": "#caa2f7",
-              "on-secondary-container": "#f1bfff",
-              "secondary": "#eab3fa",
-              "on-secondary": "#5a2e6a",
-              "on-tertiary-container": "#560020",
-              "secondary-fixed": "#f2c1ff",
-              "surface": "#100d10",
-              "on-tertiary-fixed": "#390013",
-              "inverse-primary": "#724e9c",
-              "outline": "#797477",
-              "surface-tint": "#caa2f7",
-              "tertiary-fixed": "#ff8fa7",
-              "primary-container": "#b690e3",
-              "surface-dim": "#100d10",
-              "tertiary-fixed-dim": "#f87c98",
-              "on-error": "#490013",
-              "on-tertiary-fixed-variant": "#711131",
-              "on-secondary-fixed": "#4d215d",
-              "on-surface-variant": "#b0a9ad",
-              "surface-container-low": "#151215",
-              "surface-container-high": "#221e22",
-              "on-primary-fixed-variant": "#4c2975",
-              "on-primary-fixed": "#2a0052",
-              "surface-container-highest": "#292428",
-              "primary-fixed-dim": "#bc95e9",
-              "on-surface": "#faf1f5",
-              "outline-variant": "#4b474a",
-              "on-primary-container": "#320a5b",
-              "error-dim": "#d73357",
-              "surface-bright": "#2f2b2f",
-              "secondary-container": "#613471"
-            },
-            fontFamily: {
-              "headline": ["Noto Serif"],
-              "body": ["Outfit"],
-              "label": ["Plus Jakarta Sans"]
-            },
-            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.75rem", "full": "9999px"},
-          },
-        },
-      }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .glass-nav {
-            background: rgba(10, 13, 16, 0.7);
-            backdrop-filter: blur(20px);
-        }
-        .hero-gradient {
-            background: linear-gradient(180deg, rgba(16, 13, 16, 0) 0%, rgba(16, 13, 16, 0.9) 100%);
-        }
-        .accent-glow {
-            box-shadow: 0 0 20px rgba(202, 162, 247, 0.15);
-        }
-    </style>
-</head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
-<!-- Top Navigation -->
-<nav class="fixed top-0 z-50 w-full glass-nav shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
-<div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
-<div class="flex items-center gap-8">
-<a href="/" class="flex items-center gap-2 group cursor-pointer">
-<span class="text-2xl font-bold text-purple-300 drop-shadow-[0_0_8px_rgba(202,162,247,0.4)] font-headline">BidJobs</span>
-</a>
-<div class="hidden md:flex gap-6 items-center">
-<a class="text-stone-300 hover:text-purple-200 transition-colors font-medium" href="/jobs">Find Jobs</a>
-<a class="text-stone-300 hover:text-purple-200 transition-colors font-medium" href="/about">Companies</a>
-<a class="text-purple-300 border-b-2 border-purple-400 pb-1 font-medium" href="/blog">Blog</a>
-<a class="text-stone-300 hover:text-purple-200 transition-colors font-medium" href="/community">Community</a>
-<a class="text-stone-300 hover:text-purple-200 transition-colors font-medium" href="/pricing">Pricing</a>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<a href="/sign-in" class="bg-stone-800/50 text-on-surface px-6 py-2 rounded-full font-medium hover:bg-stone-800 transition-all active:scale-95 duration-200">Sign In</a>
-</div>
-</div>
-</nav>
-<main class="pt-24 pb-20">
-<!-- Featured Article Hero -->
-<section class="max-w-screen-2xl mx-auto px-8 mb-24 relative group cursor-pointer">
-<div class="relative h-[716px] w-full overflow-hidden rounded-xl shadow-2xl">
-<img alt="Featured Article" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Modern architectural glass building at night in Riyadh reflecting neon violet and blue city lights with a cinematic atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNpaWKlRw1PqRMossd8w9zlzVF0ZUd7idlp5SeCUXn7uDLZtxZHpcJBeC1dXcpBrFr2lx7ZkktX2JVkkrfeMli_jfZ4R4dalf53AZlPVOv2eTs3puu6Dz7kriYkiq4hIEaec9JyMTuZNXp-S1uXit0yr9RJFQOJMMtezxSbr8mXeWqYIk9pf8IfJoJqdiES9no3FME7aBiNY1weOfRxwEjDcD5utXg1AaJe5bYBwJSYeyRJ-BlxDRFjDXGHH65CsvGZ-ulGR0p8ryp"/>
-<div class="absolute inset-0 hero-gradient"></div>
-<div class="absolute bottom-0 left-0 p-12 w-full md:w-2/3">
-<div class="flex gap-3 mb-6">
-<span class="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Vision 2030 Updates</span>
-<span class="text-stone-400 text-xs py-1">October 24, 2030 • 12 min read</span>
-</div>
-<h1 class="font-headline text-5xl md:text-7xl font-bold text-on-surface mb-6 leading-tight tracking-tight">
-                        The Architectural Shift: Defining Saudi Arabia’s Tech Frontier
-                    </h1>
-<p class="text-stone-300 text-lg md:text-xl max-w-2xl font-light mb-8 leading-relaxed">
-                        How NEOM and the Red Sea Project are creating a vacuum for global elite talent and what it means for the regional economy.
-                    </p>
-<div class="flex items-center gap-4">
-<div class="flex items-center gap-3">
-<div class="w-12 h-12 rounded-full overflow-hidden border border-primary/30">
-<img alt="Author" data-alt="Professional portrait of a male tech industry analyst with sharp lighting and a blurred office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBOPPz3kQanMTZjg11tjQ2KUz5sEMjISWYw3A-CzbzxQ1DgloT1Qe86s08IQwfiD-JMVcPelSEvNPTipeJUeDG7k-x5uzuwhdzSizQrIEO-8Eyl1_oa42Q8XynnJ8KFAn-6pBzdrBWJvY2Xm7QaVWBuvICfuSKDcjZ8Gfq8eaiumMfRjiGKTv7Fix12HAtyW_JTLRr-E-t2ht1wYuQ_WzSyJmCYtZGOs_j9JYdMHzwsy0XBQ66JYyXithMh6O-CcIOg50joWfJ2usq"/>
-</div>
-<div>
-<p class="text-sm font-bold text-on-surface">Dr. Fahad Al-Zahrani</p>
-<p class="text-xs text-stone-500">Economic Strategist</p>
-</div>
-</div>
-<div class="h-8 w-px bg-stone-700 mx-4"></div>
-<span class="text-primary hover:text-primary-dim transition-colors cursor-pointer font-bold flex items-center gap-2">
-                            Read Full Editorial <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Category Filters -->
-<section class="max-w-screen-2xl mx-auto px-8 mb-16 overflow-x-auto no-scrollbar">
-<div class="flex gap-4 min-w-max pb-4">
-<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold text-sm transition-all shadow-lg accent-glow">All Insights</button>
-<button class="bg-surface-container text-stone-400 hover:text-on-surface px-8 py-3 rounded-full font-bold text-sm transition-all border border-transparent hover:border-outline-variant">Career Insights</button>
-<button class="bg-surface-container text-stone-400 hover:text-on-surface px-8 py-3 rounded-full font-bold text-sm transition-all border border-transparent hover:border-outline-variant">Vision 2030 Updates</button>
-<button class="bg-surface-container text-stone-400 hover:text-on-surface px-8 py-3 rounded-full font-bold text-sm transition-all border border-transparent hover:border-outline-variant">Tech Trends</button>
-<button class="bg-surface-container text-stone-400 hover:text-on-surface px-8 py-3 rounded-full font-bold text-sm transition-all border border-transparent hover:border-outline-variant">Saudi Economy</button>
-</div>
-</section>
-<!-- Main Content Grid -->
-<section class="max-w-screen-2xl mx-auto px-8 flex flex-col lg:flex-row gap-12">
-<!-- Articles Grid -->
-<div class="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
-<!-- Article Card 1 -->
-<div class="group flex flex-col gap-6">
-<div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-surface-container">
-<img alt="Industry News" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110" data-alt="Digital analytics dashboard showing growing trends with violet glow on a sleek dark monitor screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcimRsTkRFBs36K4KQHEkYTvFWgAu5M7257XJFMHkbrqe_emBoZutlA6mZe-ub3qOnd7zIALekIUwUktvD2Rau_i-jo-xXqUste4oyxYyOYJPWg9UzFZEZpGnucsnhLO0AR4q7j0_F8bjfwG5bcV8DDUN1qGtZzcSL0leuKSYSknipDvq1VC9ssCI4tw0bYvX2HhcgKCLfytkx-F7vN47x2QyjNja3aJAYRNsjCvG4qHtuFxY5tzxSSv0KkLfT-SM32Tcu9K14qlX4"/>
-<div class="absolute top-4 left-4">
-<span class="bg-surface-container-highest/80 backdrop-blur-md text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">Tech Trends</span>
-</div>
-</div>
-<div class="flex flex-col gap-3">
-<p class="text-xs font-label text-stone-500">8th October 2030</p>
-<h3 class="text-2xl font-headline font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">The Rise of Sovereign AI in the Kingdom</h3>
-<p class="text-stone-400 text-sm leading-relaxed line-clamp-3">Saudi Arabia is making a massive pivot towards hosting sovereign cloud infrastructure, creating thousands of specialized roles for AI architects and data governance experts.</p>
-<a class="mt-2 text-stone-200 text-xs font-bold underline underline-offset-4 decoration-primary/50 hover:decoration-primary transition-all" href="/blog/single">Read Story</a>
-</div>
-</div>
-<!-- Article Card 2 -->
-<div class="group flex flex-col gap-6">
-<div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-surface-container">
-<img alt="Career Insights" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110" data-alt="A professional woman confidently leading a strategy meeting in a minimalist high-end office with warm ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtVjaA73B3UGJPt2YxwekREO2F9AfGerYDvsJLr9uJQA450T9gtrYpBeqV0Kot94Wuq2PzCJ7asqMM_Bb9wmS8ClQBtvC747qhnH6uyJC0uq48ZwvmAE6HH4mUWdfMhpjtTzGo3egy8jZ-NXM-NbK0N8fDEF0hfA73hnhX-0l0eB49iL6tgxLegtDmhEElkMVRCHv3VdUcluT2803TuMK9XpVt28f23FGA-NmttRlxZ3Z4gTn9QYi6JgP6WPg2iM_cxY54Stur3dQR"/>
-<div class="absolute top-4 left-4">
-<span class="bg-surface-container-highest/80 backdrop-blur-md text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">Career Insights</span>
-</div>
-</div>
-<div class="flex flex-col gap-3">
-<p class="text-xs font-label text-stone-500">5th October 2030</p>
-<h3 class="text-2xl font-headline font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">Executive Negotiation in the Neo-Gulf</h3>
-<p class="text-stone-400 text-sm leading-relaxed line-clamp-3">Mastering the art of the multi-tier compensation package: why equity and relocation are being redefined for 2030 standards.</p>
-<a class="mt-2 text-stone-200 text-xs font-bold underline underline-offset-4 decoration-primary/50 hover:decoration-primary transition-all" href="/blog/single">Read Story</a>
-</div>
-</div>
-<!-- Article Card 3 -->
-<div class="group flex flex-col gap-6">
-<div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-surface-container">
-<img alt="Saudi Economy" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110" data-alt="Overhead shot of luxury business stationery, a tablet, and a sleek coffee cup on a dark textured desk, very editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8YefDsTrN09RKG6N0LPIqaaSSli0nvvVLfrWA-VdQ015YYSuShuwNh3HIL59MM4Q8pURJYFx4D_vgsc3orc2fkrtZaGCt-DpLFvDLbD1pQFqw4W-iu6_tCZSLWytAy64vybme5AjfrXwTshEFSwCxH3WPCNThhmg_knI6_RqnG46NC9rKXrHP9Ob5yCET5pxQ0n8_7ye6VbI6ANEysQG1XQKh4q-g7wBgbK4qbFw-47Jh9tpIyX_DNiE93AHj6i9dbc2gL9Yx2k2X"/>
-<div class="absolute top-4 left-4">
-<span class="bg-surface-container-highest/80 backdrop-blur-md text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">Saudi Economy</span>
-</div>
-</div>
-<div class="flex flex-col gap-3">
-<p class="text-xs font-label text-stone-500">1st October 2030</p>
-<h3 class="text-2xl font-headline font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">Post-Oil Financial Markets: What Talent Needs to Know</h3>
-<p class="text-stone-400 text-sm leading-relaxed line-clamp-3">As the Tadawul expands, the need for specialized fintech compliance talent is reaching an all-time high. Is your CV ready for the shift?</p>
-<a class="mt-2 text-stone-200 text-xs font-bold underline underline-offset-4 decoration-primary/50 hover:decoration-primary transition-all" href="/blog/single">Read Story</a>
-</div>
-</div>
-<!-- Article Card 4 -->
-<div class="group flex flex-col gap-6">
-<div class="relative overflow-hidden rounded-xl aspect-[16/10] bg-surface-container">
-<img alt="Teamwork" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110" data-alt="Group of diverse professionals collaborating around a futuristic light table in a dark, high-tech research lab" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUGkT0Tn8tFuTwFybg-QHUGwSG4qgQJeiTIkkLN4AA4vo7IlgDfWvwmTRsEp9mbdcuknpwd7oqeMbmEvE8PfB43UQ52fFl09l8QmDeboVhdccjYbiHDjxC5MFkymKTUcaEVcOB2rG9cUJEf6ereeC6RsFVIDVdBFRBa2hSa9PEBEPvbAYoPe2lWHGG5y92PqMZi4872qmxleUiD_142TsGL0_-7BTwW08zoP_N5oyf35Luswwp2mo3h5sP8QiuVqIJF7nxXICbAn4d"/>
-<div class="absolute top-4 left-4">
-<span class="bg-surface-container-highest/80 backdrop-blur-md text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">Career Insights</span>
-</div>
-</div>
-<div class="flex flex-col gap-3">
-<p class="text-xs font-label text-stone-500">28th September 2030</p>
-<h3 class="text-2xl font-headline font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">Hybrid Work Cultures in Riyadh's Giga-Projects</h3>
-<p class="text-stone-400 text-sm leading-relaxed line-clamp-3">Balancing remote flexibility with the need for high-stakes on-site presence in Saudi's burgeoning innovation hubs.</p>
-<a class="mt-2 text-stone-200 text-xs font-bold underline underline-offset-4 decoration-primary/50 hover:decoration-primary transition-all" href="/blog/single">Read Story</a>
-</div>
-</div>
-</div>
-<!-- Sidebar -->
-<aside class="lg:w-1/3 flex flex-col gap-12">
-<!-- Newsletter Signup -->
-<div class="bg-surface-container p-10 rounded-xl relative overflow-hidden border border-outline-variant/15">
-<div class="absolute top-0 right-0 p-4 opacity-10">
-<span class="material-symbols-outlined text-8xl text-primary">mail</span>
-</div>
-<h4 class="font-headline text-2xl font-bold mb-4 relative z-10">The Insight Digest</h4>
-<p class="text-stone-400 text-sm mb-8 leading-relaxed relative z-10">Join 15,000+ elite professionals receiving weekly market intelligence and vision-aligned career opportunities.</p>
-<form class="flex flex-col gap-4 relative z-10">
-<input class="bg-surface-container-lowest border-none focus:ring-2 focus:ring-primary/50 rounded-lg p-4 text-sm text-on-surface placeholder-stone-600" placeholder="Email Address" type="email"/>
-<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold py-4 rounded-lg hover:shadow-[0_0_20px_rgba(202,162,247,0.3)] transition-all">Subscribe Now</button>
-</form>
-<p class="text-[10px] text-stone-600 mt-4 text-center">No spam. Only high-impact career intelligence.</p>
-</div>
-<!-- Featured Categories / Tags -->
-<div class="p-4">
-<h4 class="font-headline text-xl font-bold mb-6 flex items-center gap-3">
-                        Trending Topics
-                        <span class="h-px flex-1 bg-stone-800"></span>
-</h4>
-<div class="flex flex-wrap gap-2">
-<a class="text-xs px-4 py-2 bg-stone-900 border border-stone-800 rounded-full hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all" href="#">#NeomCareers</a>
-<a class="text-xs px-4 py-2 bg-stone-900 border border-stone-800 rounded-full hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all" href="#">#Vision2030</a>
-<a class="text-xs px-4 py-2 bg-stone-900 border border-stone-800 rounded-full hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all" href="#">#GreenInitiative</a>
-<a class="text-xs px-4 py-2 bg-stone-900 border border-stone-800 rounded-full hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all" href="#">#FinTechSaudi</a>
-<a class="text-xs px-4 py-2 bg-stone-900 border border-stone-800 rounded-full hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all" href="#">#DigitalTransformation</a>
-</div>
-</div>
-<!-- Latest Whitepapers -->
-<div class="bg-stone-950 p-8 rounded-xl border-l-4 border-primary">
-<span class="text-[10px] text-primary font-bold uppercase tracking-widest mb-2 block">Special Report</span>
-<h5 class="text-lg font-bold mb-4 leading-snug">2031 Talent Outlook: The Great Re-Skilling of the GCC</h5>
-<button class="flex items-center gap-2 text-sm font-bold text-on-surface group">
-                        Download Report 
-                        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">download</span>
-</button>
-</div>
-</aside>
-</section>
-<!-- Pagination -->
-<section class="max-w-screen-2xl mx-auto px-8 mt-20 flex justify-center">
-<div class="flex items-center gap-2">
-<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-sm">chevron_left</span>
-</button>
-<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold text-sm">1</button>
-<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors text-sm">2</button>
-<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors text-sm">3</button>
-<span class="px-2 text-stone-700">...</span>
-<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors text-sm">12</button>
-<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-sm">chevron_right</span>
-</button>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-stone-950 dark:bg-stone-950 border-t border-stone-800/20 tonal-gradient-fade">
-<div class="max-w-screen-2xl mx-auto px-8 py-16 flex flex-col md:flex-row justify-between gap-12">
-<div class="md:w-1/3 flex flex-col gap-6">
-<div class="flex items-center gap-2">
-<span class="text-lg font-bold text-purple-300 font-headline">BidJobs</span>
-</div>
-<p class="text-stone-500 text-sm leading-relaxed max-w-xs Outfit">
-                    The premier career destination for the modern Middle East. Redefining the link between high-stakes projects and top-tier professionals.
-                </p>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-3 gap-8 md:w-2/3">
-<div class="flex flex-col gap-4">
-<h6 class="font-headline text-on-surface font-bold text-sm">Ecosystem</h6>
-<a class="text-stone-500 hover:text-purple-400 transition-colors text-[0.75rem] font-medium Outfit" href="#">Vision 2030 Alignment</a>
-<a class="text-stone-500 hover:text-purple-400 transition-colors text-[0.75rem] font-medium Outfit" href="/about">About Us</a>
-<a class="text-stone-500 hover:text-purple-400 transition-colors text-[0.75rem] font-medium Outfit" href="/contact">Contact Us</a>
-</div>
-<div class="flex flex-col gap-4">
-<h6 class="font-headline text-on-surface font-bold text-sm">Legal</h6>
-<a class="text-stone-500 hover:text-purple-400 transition-colors text-[0.75rem] font-medium Outfit" href="/privacy">Privacy Policy</a>
-<a class="text-stone-500 hover:text-purple-400 transition-colors text-[0.75rem] font-medium Outfit" href="/terms">Terms of Service</a>
-</div>
-<div class="flex flex-col gap-4 col-span-2 md:col-span-1">
-<h6 class="font-headline text-on-surface font-bold text-sm">Connect</h6>
-<div class="flex gap-4">
-<a class="w-8 h-8 rounded-full bg-stone-900 flex items-center justify-center hover:bg-primary transition-all" href="#"><span class="material-symbols-outlined text-sm">share</span></a>
-<a class="w-8 h-8 rounded-full bg-stone-900 flex items-center justify-center hover:bg-primary transition-all" href="#"><span class="material-symbols-outlined text-sm">public</span></a>
-<a class="w-8 h-8 rounded-full bg-stone-900 flex items-center justify-center hover:bg-primary transition-all" href="#"><span class="material-symbols-outlined text-sm">campaign</span></a>
-</div>
-</div>
-</div>
-</div>
-<div class="max-w-screen-2xl mx-auto px-8 py-6 border-t border-stone-900/50 flex justify-center">
-<p class="text-[0.7rem] text-stone-600 font-medium Outfit">© 2030 BidJobs. Empowering Saudi Vision 2030 through elite talent matching.</p>
-</div>
-</footer>
-</body></html>` }} />
-  );
+const ARTICLES = [
+  {
+    slug: 'single',
+    category: 'Strategy',
+    readTime: '6 min',
+    title: 'The Bid That Changed Everything: How Precision Proposals Win Premium Roles',
+    excerpt: 'Most bids fail in the first sentence. We break down the anatomy of proposals that convert — and the psychology behind why employers say yes.',
+    date: 'March 2026',
+    featured: true,
+  },
+  {
+    slug: 'single',
+    category: 'Market Intelligence',
+    readTime: '4 min',
+    title: 'Rate Anchoring: Why Setting Your Price High Wins More Work',
+    excerpt: 'Counter-intuitive but proven — elite freelancers who anchor high close more deals at better terms. Here\'s the data and the reasoning.',
+    date: 'February 2026',
+    featured: false,
+  },
+  {
+    slug: 'single',
+    category: 'Employer Playbook',
+    readTime: '5 min',
+    title: 'Hiring in the Open: Why Transparent Salaries Attract Better Candidates',
+    excerpt: 'Companies that show their budget upfront receive 3x more qualified bids and cut time-to-hire by 40%. The evidence is clear.',
+    date: 'February 2026',
+    featured: false,
+  },
+  {
+    slug: 'single',
+    category: 'Career',
+    readTime: '7 min',
+    title: 'Portfolio Architecture: Structuring Your Work History for Maximum Impact',
+    excerpt: 'Your portfolio is a narrative, not a gallery. Learn how top-earning freelancers structure past work to make employers feel the outcome, not just see the output.',
+    date: 'January 2026',
+    featured: false,
+  },
+  {
+    slug: 'single',
+    category: 'Platform',
+    readTime: '3 min',
+    title: 'Introducing Direct Messaging: The End of Email Threads',
+    excerpt: 'Real-time communication between employers and talent — built into BidJobs from first contact to contract close.',
+    date: 'January 2026',
+    featured: false,
+  },
+  {
+    slug: 'single',
+    category: 'Mindset',
+    readTime: '8 min',
+    title: 'The Specialist Premium: Why Niching Down Multiplies Your Earning Power',
+    excerpt: 'Generalists compete on price. Specialists compete on value. The math of specialization — and how to position yourself as the only logical choice.',
+    date: 'December 2025',
+    featured: false,
+  },
+]
+
+const CATEGORY_COLORS: Record<string, string> = {
+  Strategy: 'bg-[#613471]/30 text-[#f1bfff] border-[#f1bfff]/10',
+  'Market Intelligence': 'bg-[#caa2f7]/10 text-[#caa2f7] border-[#caa2f7]/10',
+  'Employer Playbook': 'bg-[#eab3fa]/10 text-[#eab3fa] border-[#eab3fa]/10',
+  Career: 'bg-[#bc95e9]/10 text-[#bc95e9] border-[#bc95e9]/10',
+  Platform: 'bg-[#4b474a]/30 text-[#b0a9ad] border-[#4b474a]/10',
+  Mindset: 'bg-[#613471]/20 text-[#f1bfff] border-[#f1bfff]/10',
+}
+
+export default function BlogPage() {
+  const featured = ARTICLES[0]
+  const rest = ARTICLES.slice(1)
+
+  return (
+    <main className="max-w-screen-2xl mx-auto px-8 pt-32 pb-40">
+      {/* Header */}
+      <section className="mb-20">
+        <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-black tracking-[0.2em] uppercase mb-6">
+          BidJobs Editorial
+        </span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <h1 className="font-headline text-7xl font-black tracking-tighter leading-[0.9] text-[#faf1f5]">
+            Intelligence<br />
+            <span className="text-[#caa2f7] italic font-light">Dispatch</span>
+          </h1>
+          <p className="text-[#b0a9ad] text-lg font-light max-w-sm">
+            Strategy, market insight, and career architecture — for professionals who bid to win.
+          </p>
+        </div>
+      </section>
+
+      {/* Featured Article */}
+      <Link href={`/blog/${featured.slug}`} className="block mb-16 group">
+        <div className="bg-[#1c181c] border border-[#292428] rounded-[2rem] p-12 md:p-16 hover:border-[#caa2f7]/20 hover:bg-[#221e22] hover:shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-all duration-500">
+          <div className="flex flex-col lg:flex-row gap-12 items-start">
+            <div className="flex-1">
+              <div className="flex items-center gap-4 mb-6">
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${CATEGORY_COLORS[featured.category]}`}>
+                  {featured.category}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#4b474a]">
+                  Featured · {featured.readTime} read
+                </span>
+              </div>
+              <h2 className="font-headline text-4xl md:text-5xl font-black text-[#faf1f5] leading-tight mb-6 group-hover:text-[#caa2f7] transition-colors">
+                {featured.title}
+              </h2>
+              <p className="text-[#b0a9ad] text-lg leading-relaxed mb-8 max-w-2xl font-light">{featured.excerpt}</p>
+              <div className="flex items-center gap-3 text-[#caa2f7] font-black text-xs uppercase tracking-widest group-hover:gap-5 transition-all">
+                Read Article
+                <span className="material-symbols-outlined text-base">arrow_forward</span>
+              </div>
+            </div>
+            <div className="lg:w-48 shrink-0 flex items-center justify-center">
+              <div className="w-40 h-40 rounded-[2rem] bg-gradient-to-br from-[#613471] to-[#100d10] border border-[#caa2f7]/10 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
+                <span className="material-symbols-outlined text-7xl text-[#caa2f7]" style={{ fontVariationSettings: "'FILL' 0" }}>auto_stories</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+
+      {/* Article Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {rest.map((article) => (
+          <Link key={article.title} href={`/blog/${article.slug}`} className="group">
+            <div className="bg-[#1c181c] border border-[#292428] rounded-2xl p-8 h-full hover:border-[#caa2f7]/20 hover:bg-[#221e22] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-all duration-500 flex flex-col">
+              <div className="flex items-center gap-3 mb-6">
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${CATEGORY_COLORS[article.category] || 'bg-[#4b474a]/20 text-[#b0a9ad] border-[#4b474a]/10'}`}>
+                  {article.category}
+                </span>
+              </div>
+              <h3 className="font-headline text-xl font-bold text-[#faf1f5] leading-snug mb-4 group-hover:text-[#caa2f7] transition-colors flex-1">
+                {article.title}
+              </h3>
+              <p className="text-[#b0a9ad] text-sm leading-relaxed mb-6 line-clamp-3">{article.excerpt}</p>
+              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest border-t border-[#292428] pt-4 mt-auto">
+                <span className="text-[#4b474a]">{article.date}</span>
+                <span className="text-[#caa2f7] flex items-center gap-2 group-hover:gap-3 transition-all">
+                  {article.readTime}
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Newsletter CTA */}
+      <section className="mt-24 text-center bg-gradient-to-br from-[#1c181c] to-[#100d10] border border-[#caa2f7]/10 rounded-[2rem] p-16">
+        <h2 className="font-headline text-4xl font-black text-[#faf1f5] mb-4">Stay Sharp</h2>
+        <p className="text-[#b0a9ad] font-light mb-8 max-w-md mx-auto">
+          New intelligence dispatches, market data, and strategy guides — delivered when they matter.
+        </p>
+        <Link
+          href="/sign-up"
+          className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] font-black text-xs uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all"
+        >
+          <span className="material-symbols-outlined text-base">notifications</span>
+          Join the Network
+        </Link>
+      </section>
+    </main>
+  )
 }

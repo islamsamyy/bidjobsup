@@ -63,6 +63,9 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
+      // metadata on the session — readable in checkout.session.completed webhook
+      metadata: { supabase_uid: user.id, planId },
+      // metadata on the subscription — readable in subscription.* webhooks
       subscription_data: {
         metadata: { supabase_uid: user.id, planId },
       },

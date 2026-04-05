@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
-      const supabaseUid = session.subscription_data?.metadata?.supabase_uid
-      const planId = session.subscription_data?.metadata?.planId
+      // Read from session-level metadata (set in checkout creation)
+      const supabaseUid = session.metadata?.supabase_uid
 
       if (!supabaseUid) break
 

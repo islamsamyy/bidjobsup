@@ -2,20 +2,22 @@ import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest } from 'next/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-03-31.basil',
-})
-
-const PRICE_IDS: Record<string, string> = {
-  // Employer tiers
-  employer_pro: process.env.STRIPE_PRICE_EMPLOYER_PRO!,
-  employer_visionary: process.env.STRIPE_PRICE_EMPLOYER_VISIONARY!,
-  employer_nexus: process.env.STRIPE_PRICE_EMPLOYER_NEXUS!,
-  // Seeker plans
-  seeker_elite: process.env.STRIPE_PRICE_SEEKER_ELITE!,
+const PRICE_IDS: Record<string, string | undefined> = {
+  employer_pro: process.env.STRIPE_PRICE_EMPLOYER_PRO,
+  employer_visionary: process.env.STRIPE_PRICE_EMPLOYER_VISIONARY,
+  employer_nexus: process.env.STRIPE_PRICE_EMPLOYER_NEXUS,
+  seeker_elite: process.env.STRIPE_PRICE_SEEKER_ELITE,
 }
 
 export async function POST(req: NextRequest) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return Response.json({ error: 'Stripe is not configured yet.' }, { status: 503 })
+  }
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-03-31.basil',
+  })
+
   try {
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -31,7 +33,6 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Invalid plan selected' }, { status: 400 })
     }
 
-    // Fetch or create Stripe customer
     const { data: profile } = await supabase
       .from('users')
       .select('full_name, stripe_customer_id')
@@ -48,7 +49,6 @@ export async function POST(req: NextRequest) {
       })
       customerId = customer.id
 
-      // Save customer ID to database
       await supabase
         .from('users')
         .update({ stripe_customer_id: customerId })
@@ -63,9 +63,7 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/dashboard?checkout=cancelled`,
-      // metadata on the session — readable in checkout.session.completed webhook
       metadata: { supabase_uid: user.id, planId },
-      // metadata on the subscription — readable in subscription.* webhooks
       subscription_data: {
         metadata: { supabase_uid: user.id, planId },
       },

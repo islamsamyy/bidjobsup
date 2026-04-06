@@ -14,32 +14,28 @@ const NAV = [
     icon: "work",
     items: [
       { label: "Browse Jobs",    href: "/jobs/browse",  icon: "grid_view",     desc: "Explore all open roles" },
-      { label: "All Listings",   href: "/jobs/list",    icon: "view_list",     desc: "Full job catalogue" },
+      { label: "Job Listings",   href: "/jobs/list",    icon: "view_list",     desc: "Full job catalogue with filters" },
       { label: "Search Jobs",    href: "/jobs/search",  icon: "search",        desc: "Find by keyword or skill" },
-      { label: "No Results?",    href: "/jobs/no-results", icon: "explore",    desc: "Discover hidden gems" },
+      { label: "Arabic Version", href: "/home-ar",      icon: "translate",     desc: "النسخة العربية" },
     ],
   },
   {
     label: "Community",
     icon: "groups",
     items: [
-      { label: "Blog",           href: "/blog",          icon: "article",      desc: "Insights & industry intel" },
-      { label: "Single Article", href: "/blog/single",   icon: "newsmode",     desc: "Deep-dive editorial" },
-      { label: "Community Feed", href: "/community",     icon: "forum",        desc: "Connect with the network" },
-      { label: "Feed Stream",    href: "/community/feed",icon: "dynamic_feed", desc: "Live community updates" },
-      { label: "Community Blog", href: "/community/blog",icon: "edit_note",    desc: "Member-written stories" },
+      { label: "Editorial Blog", href: "/blog",         icon: "article",       desc: "Strategy, insights & market intel" },
+      { label: "Community Hub",  href: "/community",    icon: "forum",         desc: "Our mission & network values" },
+      { label: "Vision 2030",    href: "/vision-2030",  icon: "flag",          desc: "Saudi national alignment" },
     ],
   },
   {
     label: "Company",
     icon: "corporate_fare",
     items: [
-      { label: "About Us",       href: "/about",         icon: "info",         desc: "Our mission & team" },
-      { label: "Vision 2030",    href: "/vision-2030",   icon: "flag",         desc: "Saudi national alignment" },
-      { label: "Pricing",        href: "/pricing",       icon: "payments",     desc: "Plans for every level" },
-      { label: "Contact",        href: "/contact",       icon: "mail",         desc: "Get in touch" },
-      { label: "Support",        href: "/contact-support",icon: "headset_mic", desc: "Help & troubleshooting" },
-      { label: "Terms & Privacy",href: "/terms",         icon: "policy",       desc: "Legal & privacy docs" },
+      { label: "About Us",       href: "/about",        icon: "info",          desc: "Our mission & team" },
+      { label: "Pricing",        href: "/pricing",      icon: "payments",      desc: "Plans for every level" },
+      { label: "Contact",        href: "/contact",      icon: "mail",          desc: "Get in touch with us" },
+      { label: "Terms & Privacy",href: "/terms",        icon: "policy",        desc: "Legal & privacy docs" },
     ],
   },
 ];
@@ -193,19 +189,19 @@ export default function PublicHeader({
               );
             })}
 
-            {/* Standalone Vision 2030 quick-link */}
+            {/* Standalone Pricing quick-link */}
             <Link
-              href="/vision-2030"
+              href="/pricing"
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black tracking-[0.18em] uppercase transition-all duration-200
-                ${pathname === "/vision-2030"
+                ${pathname === "/pricing"
                   ? "text-primary bg-primary/10"
                   : "text-[#b0a9ad] hover:text-[#faf1f5] hover:bg-white/5"
                 }`}
             >
-              <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: pathname === "/vision-2030" ? "'FILL' 1" : "'FILL' 0" }}>
-                flag
+              <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: pathname === "/pricing" ? "'FILL' 1" : "'FILL' 0" }}>
+                payments
               </span>
-              2030
+              Pricing
             </Link>
           </div>
 
@@ -348,34 +344,19 @@ export default function PublicHeader({
                 );
               })}
 
-              {/* Vision 2030 standalone */}
+              {/* Pricing standalone */}
               <Link
-                href="/vision-2030"
+                href="/pricing"
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-colors
-                  ${pathname === "/vision-2030" ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-[#b0a9ad]"}`}
+                  ${pathname === "/pricing" ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-[#b0a9ad]"}`}
               >
                 <span
-                  className={`material-symbols-outlined text-[18px] ${pathname === "/vision-2030" ? "text-primary" : "text-[#4b474a]"}`}
-                  style={{ fontVariationSettings: pathname === "/vision-2030" ? "'FILL' 1" : "'FILL' 0" }}
+                  className={`material-symbols-outlined text-[18px] ${pathname === "/pricing" ? "text-primary" : "text-[#4b474a]"}`}
+                  style={{ fontVariationSettings: pathname === "/pricing" ? "'FILL' 1" : "'FILL' 0" }}
                 >
-                  flag
+                  payments
                 </span>
-                <span className="text-[10px] font-black tracking-[0.18em] uppercase">Vision 2030</span>
-              </Link>
-
-              {/* Home Arabic */}
-              <Link
-                href="/home-ar"
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-colors
-                  ${pathname === "/home-ar" ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-[#b0a9ad]"}`}
-              >
-                <span
-                  className={`material-symbols-outlined text-[18px] ${pathname === "/home-ar" ? "text-primary" : "text-[#4b474a]"}`}
-                  style={{ fontVariationSettings: "'FILL' 0" }}
-                >
-                  translate
-                </span>
-                <span className="text-[10px] font-black tracking-[0.18em] uppercase">العربية</span>
+                <span className="text-[10px] font-black tracking-[0.18em] uppercase">Pricing</span>
               </Link>
             </div>
 

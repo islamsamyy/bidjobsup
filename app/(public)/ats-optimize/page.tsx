@@ -351,6 +351,13 @@ export default function ATSOptimizePage() {
               )}
             </button>
             <Link
+              href="/ats-optimize/editor"
+              className="flex-1 bg-secondary/20 border border-secondary/30 text-secondary font-bold py-4 px-6 rounded-xl hover:bg-secondary/30 transition-all flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined">edit</span>
+              Use CV Editor
+            </Link>
+            <Link
               href="/"
               className="flex-1 bg-surface-container border border-outline-variant/20 text-on-surface font-bold py-4 px-6 rounded-xl hover:bg-surface-container-high transition-all flex items-center justify-center gap-2"
             >

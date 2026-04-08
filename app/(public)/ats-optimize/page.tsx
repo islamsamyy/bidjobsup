@@ -141,8 +141,10 @@ export default function ATSOptimizePage() {
     try {
       const results = await analyzeCV(cvText, jobDescription);
 
-      // Store results in sessionStorage for results page
+      // Store results and CV text in sessionStorage for results page
       sessionStorage.setItem("atsResults", JSON.stringify(results));
+      sessionStorage.setItem("cvText", cvText);
+      sessionStorage.setItem("jobDescription", jobDescription);
 
       router.push("/ats-optimize/results");
     } catch (err: any) {

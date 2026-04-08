@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { generateUpdatedCV, generateRecommendationSummary } from "@/lib/actions/cv-export";
 
 interface ATSAnalysisResult {
   matchScore: number
@@ -26,10 +27,14 @@ export default function ATSResultsPage() {
   const [expandedTip, setExpandedTip] = useState<number | null>(null)
   const [results, setResults] = useState<ATSAnalysisResult | null>(null)
   const [loading, setLoading] = useState(true)
+  const [cvText, setCvText] = useState<string>("")
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
 
   useEffect(() => {
     // Retrieve results from sessionStorage
     const storedResults = sessionStorage.getItem("atsResults")
+    const storedCV = sessionStorage.getItem("cvText")
     if (storedResults) {
       try {
         setResults(JSON.parse(storedResults))
@@ -37,8 +42,84 @@ export default function ATSResultsPage() {
         console.error("Failed to parse results:", err)
       }
     }
+    if (storedCV) {
+      setCvText(storedCV)
+    }
     setLoading(false)
   }, [])
+
+  // Download updated CV with recommendations
+  const handleDownloadUpdatedCV = async () => {
+    if (!results || !cvText) {
+      setDownloadError("Missing CV or analysis data");
+      return;
+    }
+
+    setDownloading(true);
+    setDownloadError(null);
+
+    try {
+      const updatedContent = await generateUpdatedCV({
+        originalCV: cvText,
+        missingKeywords: results.missingKeywords,
+        recommendations: results.recommendations,
+        matchScore: results.matchScore,
+        atsScore: results.atsScore,
+        keywordMatchPercentage: results.keywordMatchPercentage
+      });
+
+      // Create blob and download
+      const blob = new Blob([updatedContent], { type: "text/plain" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `CV_Optimized_${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      setDownloadError(err.message || "Failed to generate CV");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  // Download recommendation summary
+  const handleDownloadSummary = async () => {
+    if (!results) {
+      setDownloadError("Missing analysis data");
+      return;
+    }
+
+    setDownloading(true);
+    setDownloadError(null);
+
+    try {
+      const summary = await generateRecommendationSummary({
+        originalCV: cvText,
+        missingKeywords: results.missingKeywords,
+        recommendations: results.recommendations,
+        matchScore: results.matchScore,
+        atsScore: results.atsScore,
+        keywordMatchPercentage: results.keywordMatchPercentage
+      });
+
+      const blob = new Blob([summary], { type: "text/plain" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ATS_Recommendations_${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      setDownloadError(err.message || "Failed to generate summary");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -379,6 +460,59 @@ export default function ATSResultsPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Download Section */}
+        <div className="bg-surface-container/60 backdrop-blur-xl rounded-2xl border border-white/5 p-8 mb-12">
+          <h2 className="text-2xl font-bold text-on-surface mb-6 flex items-center gap-3">
+            <span className="material-symbols-outlined text-primary">
+              download
+            </span>
+            Download Your Updates
+          </h2>
+          <p className="text-on-surface-variant mb-6">
+            Download your optimized CV with recommendations or a summary of improvements to make.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Download Recommendation Summary */}
+            <button
+              onClick={handleDownloadSummary}
+              disabled={downloading}
+              className="bg-secondary/20 border border-secondary/30 text-secondary hover:bg-secondary/30 disabled:opacity-50 disabled:cursor-not-allowed font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined">
+                {downloading ? "hourglass_top" : "description"}
+              </span>
+              {downloading ? "Generating..." : "Download Summary"}
+            </button>
+
+            {/* Download Updated CV */}
+            <button
+              onClick={handleDownloadUpdatedCV}
+              disabled={downloading}
+              className="bg-gradient-to-br from-primary to-primary-container text-on-primary-container hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined">
+                {downloading ? "hourglass_top" : "file_download"}
+              </span>
+              {downloading ? "Generating..." : "Download Updated CV"}
+            </button>
+          </div>
+
+          {/* Error Message */}
+          {downloadError && (
+            <div className="mt-4 bg-red-500/20 border border-red-500/30 rounded-lg p-3 text-red-300 flex items-start gap-2">
+              <span className="material-symbols-outlined flex-shrink-0 mt-0.5">
+                error
+              </span>
+              <p className="text-sm">{downloadError}</p>
+            </div>
+          )}
+
+          <p className="text-xs text-on-surface-variant mt-6">
+            💡 <strong>Tip:</strong> Download the updated CV with recommendations integrated. Use the summary to track improvements you need to make.
+          </p>
         </div>
 
         {/* Action Buttons */}

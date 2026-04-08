@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { generateUpdatedCV, generateRecommendationSummary } from "@/lib/actions/cv-export";
 import { suggestMissingKeywordsWithAI } from "@/lib/actions/ai-suggestions";
+import { saveAnalysisToHistory } from "@/lib/actions/analysis-history";
 
 interface ATSAnalysisResult {
   matchScore: number
@@ -43,7 +44,23 @@ export default function ATSResultsPage() {
     const storedJob = sessionStorage.getItem("jobDescription")
     if (storedResults) {
       try {
-        setResults(JSON.parse(storedResults))
+        const parsedResults = JSON.parse(storedResults)
+        setResults(parsedResults)
+
+        // Save to analysis history (fire and forget)
+        if (storedJob && storedCV) {
+          saveAnalysisToHistory({
+            analysisDate: new Date().toISOString(),
+            jobTitle: "Job Analysis",
+            matchScore: parsedResults.matchScore,
+            atsScore: parsedResults.atsScore,
+            keywordMatchPercentage: parsedResults.keywordMatchPercentage,
+            missingKeywords: parsedResults.missingKeywords || [],
+            presentKeywords: parsedResults.presentKeywords || [],
+            recommendations: parsedResults.recommendations || [],
+            cvVersion: "1.0"
+          }).catch(err => console.error("Failed to save analysis history:", err))
+        }
       } catch (err) {
         console.error("Failed to parse results:", err)
       }
@@ -720,6 +737,13 @@ export default function ATSResultsPage() {
           >
             <span className="material-symbols-outlined">refresh</span>
             Run New Analysis
+          </Link>
+          <Link
+            href="/dashboard/ats-history"
+            className="flex-1 bg-secondary/20 border border-secondary/30 text-secondary font-bold py-4 px-6 rounded-xl hover:bg-secondary/30 transition-all flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined">history</span>
+            View History
           </Link>
           <Link
             href="/jobs/browse"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { generateUpdatedCV, generateRecommendationSummary } from "@/lib/actions/cv-export";
+import { suggestMissingKeywordsWithAI } from "@/lib/actions/ai-suggestions";
 
 interface ATSAnalysisResult {
   matchScore: number
@@ -30,11 +31,16 @@ export default function ATSResultsPage() {
   const [cvText, setCvText] = useState<string>("")
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [jobDescription, setJobDescription] = useState<string>("")
+  const [aiSuggestions, setAiSuggestions] = useState<any>(null)
+  const [loadingAI, setLoadingAI] = useState(false)
+  const [showAISuggestions, setShowAISuggestions] = useState(false)
 
   useEffect(() => {
     // Retrieve results from sessionStorage
     const storedResults = sessionStorage.getItem("atsResults")
     const storedCV = sessionStorage.getItem("cvText")
+    const storedJob = sessionStorage.getItem("jobDescription")
     if (storedResults) {
       try {
         setResults(JSON.parse(storedResults))
@@ -45,8 +51,34 @@ export default function ATSResultsPage() {
     if (storedCV) {
       setCvText(storedCV)
     }
+    if (storedJob) {
+      setJobDescription(storedJob)
+    }
     setLoading(false)
   }, [])
+
+  // Load AI suggestions when user clicks the button
+  const handleLoadAISuggestions = async () => {
+    if (!cvText || !jobDescription || !results) {
+      console.error("Missing data for AI suggestions")
+      return
+    }
+
+    setLoadingAI(true)
+    try {
+      const suggestions = await suggestMissingKeywordsWithAI(
+        cvText,
+        jobDescription,
+        "Job Title" // Could extract from jobDescription if available
+      )
+      setAiSuggestions(suggestions)
+      setShowAISuggestions(true)
+    } catch (err) {
+      console.error("Failed to load AI suggestions:", err)
+    } finally {
+      setLoadingAI(false)
+    }
+  }
 
   // Download updated CV with recommendations
   const handleDownloadUpdatedCV = async () => {
@@ -460,6 +492,171 @@ export default function ATSResultsPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* AI Suggestions Section */}
+        <div className="bg-surface-container/60 backdrop-blur-xl rounded-2xl border border-white/5 p-8 mb-12">
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold text-on-surface flex items-center gap-3">
+              <span className="material-symbols-outlined text-primary">
+                auto_awesome
+              </span>
+              AI-Powered Suggestions
+            </h2>
+            {!showAISuggestions && (
+              <button
+                onClick={handleLoadAISuggestions}
+                disabled={loadingAI}
+                className="bg-gradient-to-br from-primary to-primary-container text-on-primary-container hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2 text-sm"
+              >
+                <span className="material-symbols-outlined">
+                  {loadingAI ? "hourglass_top" : "spark"}
+                </span>
+                {loadingAI ? "Generating..." : "Get AI Suggestions"}
+              </button>
+            )}
+          </div>
+
+          {showAISuggestions && aiSuggestions ? (
+            <div className="space-y-6">
+              {/* Explanation */}
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-6">
+                <p className="text-on-surface">{aiSuggestions.explanation}</p>
+              </div>
+
+              {/* Priority Keywords */}
+              <div>
+                <h3 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-yellow-400">
+                    priority_high
+                  </span>
+                  Top Priority Keywords
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {aiSuggestions.priorityKeywords.map((keyword: string, idx: number) => (
+                    <div
+                      key={idx}
+                      className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 text-on-surface"
+                    >
+                      <div className="text-sm font-bold text-yellow-300 mb-1">
+                        #{idx + 1}
+                      </div>
+                      <div className="font-semibold text-on-surface">{keyword}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Incorporation Tips */}
+              <div>
+                <h3 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-emerald-400">
+                    lightbulb
+                  </span>
+                  How to Add These Keywords
+                </h3>
+                <div className="space-y-3">
+                  {aiSuggestions.incorporationTips.map((tip: string, idx: number) => (
+                    <div
+                      key={idx}
+                      className="bg-surface-container-high/60 border border-outline-variant/10 rounded-lg p-4 flex gap-3"
+                    >
+                      <div className="text-emerald-300 font-bold flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-emerald-500/20">
+                        {idx + 1}
+                      </div>
+                      <p className="text-on-surface-variant text-sm">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Skill Gaps */}
+              {aiSuggestions.skillGaps && aiSuggestions.skillGaps.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-blue-400">
+                      school
+                    </span>
+                    Skill Gaps to Address
+                  </h3>
+                  <div className="space-y-3">
+                    {aiSuggestions.skillGaps.map((gap: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className={`border rounded-lg p-4 ${
+                          gap.importance === 'critical'
+                            ? 'bg-red-500/10 border-red-500/30'
+                            : gap.importance === 'important'
+                              ? 'bg-yellow-500/10 border-yellow-500/30'
+                              : 'bg-blue-500/10 border-blue-500/30'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <div>
+                            <h4 className="font-bold text-on-surface">
+                              {gap.skill}
+                            </h4>
+                            <div
+                              className={`text-xs font-semibold uppercase tracking-wide mt-1 ${
+                                gap.importance === 'critical'
+                                  ? 'text-red-300'
+                                  : gap.importance === 'important'
+                                    ? 'text-yellow-300'
+                                    : 'text-blue-300'
+                              }`}
+                            >
+                              {gap.importance} PRIORITY
+                            </div>
+                          </div>
+                          <div className="text-xs text-on-surface-variant whitespace-nowrap bg-surface-container-lowest px-3 py-1 rounded-full">
+                            {gap.learningTime}
+                          </div>
+                        </div>
+                        <p className="text-sm text-on-surface-variant">
+                          {gap.reason}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* All Suggested Keywords */}
+              <div>
+                <h3 className="text-lg font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">
+                    tag
+                  </span>
+                  All Suggested Keywords
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {aiSuggestions.suggestedKeywords.map((keyword: string, idx: number) => (
+                    <div
+                      key={idx}
+                      className="px-4 py-2 bg-primary/20 border border-primary/30 text-primary rounded-lg text-sm font-medium"
+                    >
+                      {keyword}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Refresh Button */}
+              <button
+                onClick={() => {
+                  setShowAISuggestions(false)
+                  setAiSuggestions(null)
+                }}
+                className="w-full bg-surface-container-high/60 border border-outline-variant/10 text-on-surface-variant hover:bg-surface-container-high font-semibold py-3 px-6 rounded-lg transition-all"
+              >
+                Hide AI Suggestions
+              </button>
+            </div>
+          ) : !showAISuggestions ? (
+            <p className="text-on-surface-variant">
+              Click "Get AI Suggestions" to receive AI-powered keyword recommendations tailored to this specific job, including priority ranking and learning time estimates for skill gaps.
+            </p>
+          ) : null}
         </div>
 
         {/* Download Section */}

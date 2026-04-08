@@ -367,6 +367,55 @@ export default function ATSOptimizePage() {
           </div>
         </form>
 
+        {/* Additional Features */}
+        <div className="mt-12 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl border border-primary/20 p-8 mb-12">
+          <h2 className="text-2xl font-bold text-on-surface mb-6">More Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/ats-optimize/editor"
+              className="bg-surface-container/60 border border-white/5 hover:border-primary/30 rounded-xl p-6 transition-all group"
+            >
+              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
+                <span className="material-symbols-outlined text-primary">edit</span>
+              </div>
+              <h3 className="font-bold text-on-surface mb-1">CV Editor</h3>
+              <p className="text-xs text-on-surface-variant">
+                Edit your CV and see live ATS score updates
+              </p>
+            </Link>
+
+            <Link
+              href="/ats-optimize/batch"
+              className="bg-surface-container/60 border border-white/5 hover:border-secondary/30 rounded-xl p-6 transition-all group"
+            >
+              <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center mb-4 group-hover:bg-secondary/30 transition-colors">
+                <span className="material-symbols-outlined text-secondary">
+                  batch_prediction
+                </span>
+              </div>
+              <h3 className="font-bold text-on-surface mb-1">Batch Analyzer</h3>
+              <p className="text-xs text-on-surface-variant">
+                Compare one CV against multiple jobs or vice versa
+              </p>
+            </Link>
+
+            <Link
+              href="/dashboard/ats-history"
+              className="bg-surface-container/60 border border-white/5 hover:border-primary/30 rounded-xl p-6 transition-all group"
+            >
+              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
+                <span className="material-symbols-outlined text-primary">
+                  history
+                </span>
+              </div>
+              <h3 className="font-bold text-on-surface mb-1">View History</h3>
+              <p className="text-xs text-on-surface-variant">
+                Track your ATS improvement over time with analytics
+              </p>
+            </Link>
+          </div>
+        </div>
+
         {/* Info Section */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6">

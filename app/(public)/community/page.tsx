@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import CreatePostForm from "@/components/features/community/CreatePostForm";
 import DeletePostButton from "@/components/features/community/DeletePostButton";
+import PostLikeButton from "@/components/features/community/PostLikeButton";
+import PostComments from "@/components/features/community/PostComments";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -107,6 +109,49 @@ export default async function CommunityPage() {
     .order('created_at', { ascending: false })
     .limit(20)
 
+  // Fetch likes, comments, and user's like status for each post
+  const postsWithEngagement = await Promise.all(
+    (posts || []).map(async (post) => {
+      // Get like count
+      const { count: likeCount } = await supabase
+        .from('community_post_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', post.id)
+
+      // Check if current user liked this post
+      let isLiked = false
+      if (currentProfile) {
+        const { data: liked } = await supabase
+          .from('community_post_likes')
+          .select('id')
+          .eq('post_id', post.id)
+          .eq('user_id', currentProfile.id)
+          .single()
+        isLiked = !!liked
+      }
+
+      // Get comments with author info
+      const { data: comments } = await supabase
+        .from('community_post_comments')
+        .select('id, content, created_at, user_id, user:user_id(id, full_name, avatar_url)')
+        .eq('post_id', post.id)
+        .order('created_at', { ascending: true })
+
+      return {
+        ...post,
+        likeCount: likeCount || 0,
+        isLiked,
+        comments: (comments || []).map((c: any) => ({
+          id: c.id,
+          content: c.content,
+          created_at: c.created_at,
+          user_id: c.user_id,
+          user: c.user,
+        })),
+      }
+    })
+  )
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10">
       {/* Feed Header */}
@@ -140,8 +185,8 @@ export default async function CommunityPage() {
 
           {/* Feed Posts */}
           <div className="space-y-8">
-            {posts && posts.length > 0 ? (
-              posts.map((post, i) => {
+            {postsWithEngagement && postsWithEngagement.length > 0 ? (
+              postsWithEngagement.map((post, i) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const author = post.author as any
                 const authorName = author?.full_name || author?.username || 'Anonymous'
@@ -182,6 +227,30 @@ export default async function CommunityPage() {
                       <p className="font-body text-lg text-on-surface/90 leading-relaxed whitespace-pre-wrap">
                         {post.content}
                       </p>
+
+                      {/* Engagement Section */}
+                      <div className="flex items-center gap-8 mt-8 pt-6 border-t border-white/5">
+                        {currentProfile && (
+                          <PostLikeButton
+                            postId={post.id}
+                            initialLikeCount={post.likeCount}
+                            isLiked={post.isLiked}
+                          />
+                        )}
+                        <div className="text-xs text-neutral-500 font-body">
+                          {post.comments.length} Comment{post.comments.length !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+
+                      {/* Comments Section */}
+                      {currentProfile && (
+                        <PostComments
+                          postId={post.id}
+                          initialComments={post.comments}
+                          currentUserId={currentProfile.id}
+                          canDelete={(userId: number) => currentProfile.id === userId}
+                        />
+                      )}
                     </div>
                   </article>
                 )

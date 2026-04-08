@@ -35,6 +35,26 @@ export default async function FindTalentPage({
 
   const { data: talents, error } = await q.limit(20)
 
+  // Fetch review stats for each talent
+  const talentsWithRatings = await Promise.all(
+    (talents || []).map(async (talent) => {
+      const { data: reviews } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('reviewee_id', talent.id)
+
+      const avgRating = reviews && reviews.length > 0
+        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        : null
+
+      return {
+        ...talent,
+        avgRating,
+        reviewCount: reviews?.length || 0,
+      }
+    })
+  )
+
   // Fetch unique industries from job categories for filter
   const { data: industriesData } = await supabase
     .from('jobs')
@@ -100,7 +120,7 @@ export default async function FindTalentPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {talents?.map((talent) => (
+            {talentsWithRatings?.map((talent: any) => (
               <TalentCard key={talent.id} talent={talent} />
             ))}
           </div>

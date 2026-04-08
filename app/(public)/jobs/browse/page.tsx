@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import JobCard from '@/components/features/JobCard'
+import JobFilterPanel from '@/components/features/JobFilterPanel'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { handleSearch } from './actions'
@@ -11,10 +12,15 @@ interface PageProps {
 export default async function BrowseJobsPage({ searchParams }: PageProps) {
   const supabase = await createClient()
   const params = await searchParams;
-  
+
   const query = params.q || '';
   const location = params.l || '';
   const category = params.c || '';
+  const budgetMin = params.budget_min ? Number(params.budget_min) : null;
+  const budgetMax = params.budget_max ? Number(params.budget_max) : null;
+  const jobType = params.job_type || '';
+  const experienceLevel = params.experience_level || '';
+  const sort = params.sort || 'newest';
 
   // 1. Fetch Real Industry Counts
   const { data: categoryStats } = await supabase
@@ -28,7 +34,7 @@ export default async function BrowseJobsPage({ searchParams }: PageProps) {
     counts[cat] = (counts[cat] || 0) + 1
   })
 
-  // 2. Fetch Jobs with filtering
+  // 2. Fetch Jobs with advanced filtering
   let jobsQuery = supabase
     .from('jobs')
     .select(`
@@ -40,9 +46,9 @@ export default async function BrowseJobsPage({ searchParams }: PageProps) {
         location
       )
     `)
-    .eq('status', 'open')
-    .order('created_at', { ascending: false });
+    .eq('status', 'open');
 
+  // Apply text filters
   if (query) {
     jobsQuery = jobsQuery.ilike('title', `%${query}%`);
   }
@@ -51,6 +57,33 @@ export default async function BrowseJobsPage({ searchParams }: PageProps) {
   }
   if (category) {
     jobsQuery = jobsQuery.eq('category', category);
+  }
+
+  // Apply numeric filters for budget range
+  if (budgetMin !== null) {
+    jobsQuery = jobsQuery.gte('budget_max', budgetMin);
+  }
+  if (budgetMax !== null) {
+    jobsQuery = jobsQuery.lte('budget_min', budgetMax);
+  }
+
+  // Apply job type filter
+  if (jobType) {
+    jobsQuery = jobsQuery.eq('job_type', jobType);
+  }
+
+  // Apply experience level filter
+  if (experienceLevel) {
+    jobsQuery = jobsQuery.eq('experience_level', experienceLevel);
+  }
+
+  // Apply sorting
+  if (sort === 'salary_high') {
+    jobsQuery = jobsQuery.order('budget_max', { ascending: false });
+  } else if (sort === 'salary_low') {
+    jobsQuery = jobsQuery.order('budget_min', { ascending: true });
+  } else {
+    jobsQuery = jobsQuery.order('created_at', { ascending: false });
   }
 
   const { data: jobs, error } = await jobsQuery.limit(50);
@@ -201,13 +234,29 @@ export default async function BrowseJobsPage({ searchParams }: PageProps) {
         </div>
       </section>
 
+      {/* Advanced Filters */}
+      <section className="mb-12">
+        <JobFilterPanel
+          defaultValues={{
+            budget_min: budgetMin || undefined,
+            budget_max: budgetMax || undefined,
+            job_type: jobType || undefined,
+            experience_level: experienceLevel || undefined,
+            sort: sort || 'newest'
+          }}
+          onSearch={(filters) => {
+            // This is handled by form submission, so we just need the component to render
+          }}
+        />
+      </section>
+
       {/* Missions Feed */}
       <section className="mb-32">
         <div className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
             <h2 className="font-headline text-4xl font-bold tracking-tight mb-2">Available Missions</h2>
             <p className="text-[#b0a9ad] font-light">
-              {query || location || category ? `Filtered results for your selection` : `Hottest opportunities right now`}
+              {query || location || category || budgetMin || budgetMax || jobType || experienceLevel ? `Filtered results for your selection` : `Hottest opportunities right now`}
             </p>
           </div>
           <div className="flex gap-4">

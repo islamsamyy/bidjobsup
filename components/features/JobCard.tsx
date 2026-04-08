@@ -11,6 +11,8 @@ interface JobCardProps {
     duration: string
     bids_count: number
     created_at: string
+    job_type?: string
+    experience_level?: string
     employer?: {
       company_name?: string
       full_name?: string
@@ -66,6 +68,16 @@ export default function JobCard({ job }: JobCardProps) {
         </p>
         <div className="flex flex-wrap gap-2 mb-4">
              <span className="px-3 py-1 rounded-lg bg-[#100d10] border border-[#292428] text-[9px] font-bold text-[#caa2f7] uppercase tracking-widest">{job.category}</span>
+             {job.job_type && (
+               <span className="px-3 py-1 rounded-lg bg-[#100d10] border border-[#292428] text-[9px] font-bold text-[#f1bfff] uppercase tracking-widest">
+                 {job.job_type}
+               </span>
+             )}
+             {job.experience_level && (
+               <span className="px-3 py-1 rounded-lg bg-[#100d10] border border-[#292428] text-[9px] font-bold text-[#ff93aa] uppercase tracking-widest">
+                 {job.experience_level}
+               </span>
+             )}
              {job.employer?.location && (
                <span className="px-3 py-1 rounded-lg bg-[#100d10] border border-[#292428] text-[9px] font-bold text-[#b0a9ad] uppercase tracking-widest flex items-center gap-1">
                  <span className="material-symbols-outlined text-[10px]">location_on</span>

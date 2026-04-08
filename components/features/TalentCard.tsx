@@ -13,6 +13,8 @@ interface TalentCardProps {
     industry: string | null
     skills: string | null
     role: string
+    avgRating?: number | null
+    reviewCount?: number
   }
 }
 
@@ -79,15 +81,27 @@ export default function TalentCard({ talent }: TalentCardProps) {
       </div>
 
       <div className="flex items-center gap-6 border-t border-[#292428] pt-6 relative z-10 w-full mt-auto">
-        <div className="flex flex-col gap-1 w-1/2">
-          <span className="text-[10px] uppercase tracking-widest text-[#4b474a] font-black">Location</span>
-          <span className="text-xs font-black text-[#faf1f5] flex items-center gap-1.5 uppercase truncate">
-            <span className="material-symbols-outlined text-[14px] text-[#caa2f7]">location_on</span>
-            {talent.location || 'Remote'}
-          </span>
+        <div className="flex flex-col gap-1">
+          {talent.avgRating ? (
+            <>
+              <span className="text-[10px] uppercase tracking-widest text-[#4b474a] font-black">Rating</span>
+              <span className="text-xs font-black text-[#f1bfff] flex items-center gap-1.5">
+                <span className="text-[#caa2f7]">★</span>
+                {talent.avgRating.toFixed(1)} ({talent.reviewCount || 0})
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="text-[10px] uppercase tracking-widest text-[#4b474a] font-black">Location</span>
+              <span className="text-xs font-black text-[#faf1f5] flex items-center gap-1.5 uppercase truncate">
+                <span className="material-symbols-outlined text-[14px] text-[#caa2f7]">location_on</span>
+                {talent.location || 'Remote'}
+              </span>
+            </>
+          )}
         </div>
-        
-        <div className="ml-auto flex justify-end w-1/2">
+
+        <div className="ml-auto flex justify-end">
           <div className="flex items-center gap-3 text-[#f1bfff] text-[10px] font-black tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
             View Profile
             <div className="w-10 h-10 rounded-xl bg-[#100d10] border border-[#292428] flex items-center justify-center hover:bg-[#caa2f7] hover:text-[#431f6b] hover:shadow-[0_0_20px_rgba(202,162,247,0.3)] transition-all">

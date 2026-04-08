@@ -89,8 +89,8 @@ export default function PostJobPage() {
               />
             </div>
 
-            {/* Department & Employment Type */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Department & Employment Type & Job Type */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-3">
                 <label className="font-label font-medium text-[10px] uppercase tracking-widest text-stone-400 block ml-1">Category / Department</label>
                 <select name="category" required className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-6 py-4 text-on-surface focus:ring-1 focus:ring-secondary/50 focus:border-secondary transition-all outline-none font-body appearance-none cursor-pointer">
@@ -108,6 +108,16 @@ export default function PostJobPage() {
                   <option value="full-time">Full-time</option>
                   <option value="contract">Contractor</option>
                   <option value="part-time">Part-time Advisory</option>
+                </select>
+              </div>
+
+              <div className="space-y-3">
+                <label className="font-label font-medium text-[10px] uppercase tracking-widest text-stone-400 block ml-1">Job Type</label>
+                <select name="job_type" required className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-6 py-4 text-on-surface focus:ring-1 focus:ring-secondary/50 focus:border-secondary transition-all outline-none font-body appearance-none cursor-pointer">
+                  <option value="full-time">Full-time</option>
+                  <option value="part-time">Part-time</option>
+                  <option value="contract">Contract</option>
+                  <option value="project">Project-based</option>
                 </select>
               </div>
             </div>

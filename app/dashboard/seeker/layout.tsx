@@ -40,6 +40,7 @@ export default async function SeekerDashboardLayout({
           <SidebarLink href="/dashboard/seeker/profile" icon="person" label="Profile" />
           <SidebarLink href="/dashboard/seeker/applications" icon="description" label="Applications" />
           <SidebarLink href="/dashboard/seeker/saved" icon="bookmark" label="Saved Jobs" />
+          <SidebarLink href="/dashboard/contracts" icon="handshake" label="Contracts" />
           <SidebarLink href="/dashboard/messages" icon="forum" label="Messages" />
           <SidebarLink href="/dashboard/seeker/notifications" icon="notifications" label="Notifications" />
           <SidebarLink href="/dashboard/seeker/subscription" icon="workspace_premium" label="Subscription" />

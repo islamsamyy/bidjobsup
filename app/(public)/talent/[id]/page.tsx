@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import ReviewForm from '@/components/features/ReviewForm'
+import InviteToJobModal from '@/components/features/employer/InviteToJobModal'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -27,6 +29,35 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
   if (error || !profile) {
     notFound()
+  }
+
+  // Get current user for showing interactive features
+  const { data: { user: authUser } } = await supabase.auth.getUser()
+  let currentUser: any = null
+  let isEmployer = false
+  let employerJobs: any[] = []
+
+  if (authUser) {
+    const { data: curUser } = await supabase
+      .from('users')
+      .select('id, user_type')
+      .eq('auth_id', authUser.id)
+      .single()
+
+    currentUser = curUser
+    isEmployer = curUser?.user_type === 'employer' || curUser?.user_type === 'both'
+
+    // If employer, fetch their active jobs for invites
+    if (isEmployer) {
+      const { data: jobs } = await supabase
+        .from('jobs')
+        .select('id, title')
+        .eq('employer_id', currentUser.id)
+        .eq('status', 'open')
+        .limit(20)
+
+      employerJobs = jobs || []
+    }
   }
 
   const skills = profile.skills ? profile.skills.split(',').map((s: string) => s.trim()) : []
@@ -86,6 +117,17 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
                   <span className="text-[#caa2f7] font-black">${profile.hourly_rate || '0'}/hr</span>
                 </div>
               </div>
+
+              {isEmployer && employerJobs.length > 0 && (
+                <InviteToJobModal
+                  talentId={parseInt(id)}
+                  talentName={profile.full_name || 'Talent'}
+                  jobs={employerJobs}
+                  onSuccess={() => {
+                    // Could refresh page or show toast notification
+                  }}
+                />
+              )}
 
               <button className="w-full mt-10 py-5 rounded-2xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] font-black text-xs uppercase tracking-widest shadow-xl shadow-[#caa2f7]/10 hover:brightness-110 active:scale-95 transition-all">
                 Book Consultation
@@ -150,6 +192,24 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
             </section>
+
+            {/* Review Section */}
+            {currentUser && currentUser.id !== parseInt(id) && (
+              <section>
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="h-px flex-grow bg-gradient-to-r from-transparent to-[#292428]" />
+                  <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#caa2f7]">Leave a Review</h2>
+                  <span className="h-px w-12 bg-[#292428]" />
+                </div>
+                <ReviewForm
+                  revieweeId={parseInt(id)}
+                  jobId={0} // Placeholder - in real app would be the job ID from completed contract
+                  onSuccess={() => {
+                    // Could show success toast or refresh reviews
+                  }}
+                />
+              </section>
+            )}
 
             {/* CTA Section */}
             <section className="bg-gradient-to-r from-[#1c181c] to-[#141114] border border-[#caa2f7]/10 rounded-4xl p-12 text-center overflow-hidden relative group">

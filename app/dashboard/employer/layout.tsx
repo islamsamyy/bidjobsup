@@ -39,6 +39,7 @@ export default async function EmployerDashboardLayout({
           <SidebarLink href="/dashboard/employer" icon="dashboard" label="Dashboard" accentColor="secondary" exact />
           <SidebarLink href="/dashboard/employer/profile" icon="corporate_fare" label="Company Profile" accentColor="secondary" />
           <SidebarLink href="/dashboard/employer/listings" icon="work" label="Manage Roles" accentColor="secondary" />
+          <SidebarLink href="/dashboard/contracts" icon="handshake" label="Contracts" accentColor="secondary" />
           <SidebarLink href="/dashboard/messages" icon="forum" label="Messages" accentColor="secondary" />
           <SidebarLink href="/dashboard/employer/talent" icon="groups" label="Talent Pool" accentColor="secondary" />
           <SidebarLink href="/dashboard/employer/billing" icon="receipt_long" label="Billing & Plans" accentColor="secondary" />

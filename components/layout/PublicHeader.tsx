@@ -30,6 +30,14 @@ const NAV = [
     ],
   },
   {
+    label: "Tools",
+    icon: "build",
+    items: [
+      { label: "ATS Optimizer",  href: "/ats-optimize",  icon: "verified_user", desc: "Optimize your CV for ATS systems" },
+      { label: "Talent Finder",  href: "/talent",        icon: "person_search", desc: "Find and hire top talent" },
+    ],
+  },
+  {
     label: "Community",
     icon: "groups",
     items: [

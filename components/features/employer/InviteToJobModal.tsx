@@ -39,7 +39,7 @@ export default function InviteToJobModal({
     setError(null)
 
     try {
-      const result = await inviteToJob(selectedJobId, talentId, message)
+      const result = await inviteToJob(selectedJobId, talentId)
 
       if (result.success) {
         setSelectedJobId(null)

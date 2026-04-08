@@ -4,11 +4,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { LanguageSwitcher } from "@/components/features/LanguageSwitcher";
+import NotificationBell from "@/components/features/NotificationBell";
 
 /* ─────────────────────────────────────────────────────────────────
    NAV STRUCTURE
 ───────────────────────────────────────────────────────────────── */
 const NAV = [
+  {
+    label: "Hire Talent",
+    icon: "person_search",
+    items: [
+      { label: "Find Talent",    href: "/talent",           icon: "person_search", desc: "Browse our elite specialist directory" },
+      { label: "Post Mandate",   href: "/join",             icon: "stars",         desc: "Join as an employer" },
+      { label: "Arabic Version", href: "/home-ar",          icon: "translate",     desc: "النسخة العربية" },
+    ],
+  },
   {
     label: "Find Work",
     icon: "work",
@@ -16,26 +27,25 @@ const NAV = [
       { label: "Browse Jobs",    href: "/jobs/browse",  icon: "grid_view",     desc: "Explore all open roles" },
       { label: "Job Listings",   href: "/jobs/list",    icon: "view_list",     desc: "Full job catalogue with filters" },
       { label: "Search Jobs",    href: "/jobs/search",  icon: "search",        desc: "Find by keyword or skill" },
-      { label: "Arabic Version", href: "/home-ar",      icon: "translate",     desc: "النسخة العربية" },
     ],
   },
   {
     label: "Community",
     icon: "groups",
     items: [
-      { label: "Editorial Blog", href: "/blog",         icon: "article",       desc: "Strategy, insights & market intel" },
-      { label: "Community Hub",  href: "/community",    icon: "forum",         desc: "Our mission & network values" },
-      { label: "Vision 2030",    href: "/vision-2030",  icon: "flag",          desc: "Saudi national alignment" },
+      { label: "Editorial Blog", href: "/blog",           icon: "article",       desc: "Strategy, insights & market intel" },
+      { label: "Community Hub",  href: "/community",      icon: "forum",         desc: "Our mission & network values" },
+      { label: "Vision 2030",    href: "/vision-2030",    icon: "flag",          desc: "Saudi national alignment" },
     ],
   },
   {
     label: "Company",
     icon: "corporate_fare",
     items: [
-      { label: "About Us",       href: "/about",        icon: "info",          desc: "Our mission & team" },
-      { label: "Pricing",        href: "/pricing",      icon: "payments",      desc: "Plans for every level" },
-      { label: "Contact",        href: "/contact",      icon: "mail",          desc: "Get in touch with us" },
-      { label: "Terms & Privacy",href: "/terms",        icon: "policy",        desc: "Legal & privacy docs" },
+      { label: "About Us",       href: "/about",          icon: "info",          desc: "Our mission & team" },
+      { label: "Pricing",        href: "/pricing",        icon: "payments",      desc: "Plans for every level" },
+      { label: "Contact",        href: "/contact",        icon: "mail",          desc: "Get in touch with us" },
+      { label: "Terms & Privacy",href: "/terms",          icon: "policy",        desc: "Legal & privacy docs" },
     ],
   },
 ];
@@ -92,10 +102,13 @@ export default function PublicHeader({
       }
     );
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [initialUser, supabase]);
 
   // Close mobile drawer on route change
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: reset UI on navigation
   useEffect(() => { setMobileOpen(false); setOpenMenu(null); }, [pathname]);
 
   /* dropdown helpers ────────────────────────────────────────── */
@@ -207,10 +220,14 @@ export default function PublicHeader({
 
           {/* ── Auth + mobile toggle ── */}
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             {loading ? (
               <div className="w-28 h-9 bg-surface-container-highest animate-pulse rounded-full" />
             ) : user ? (
               <div className="hidden xl:flex items-center gap-3">
+                {profile && (
+                  <NotificationBell userId={profile.id} userAuthId={user.id} userType={profile.user_type} />
+                )}
                 <Link
                   href="/dashboard"
                   className="flex items-center gap-2 bg-gradient-to-br from-[#caa2f7] to-[#b690e3] text-[#431f6b] font-black py-2 px-5 rounded-full shadow-[0_8px_20px_rgba(202,162,247,0.2)] hover:scale-[0.98] hover:shadow-none transition-all text-[10px] tracking-[0.18em] uppercase"

@@ -1,164 +1,320 @@
-import Link from 'next/link'
+import type { Metadata } from "next";
 
-const ARTICLES = [
-  {
-    slug: 'single',
-    category: 'Strategy',
-    readTime: '6 min',
-    title: 'The Bid That Changed Everything: How Precision Proposals Win Premium Roles',
-    excerpt: 'Most bids fail in the first sentence. We break down the anatomy of proposals that convert — and the psychology behind why employers say yes.',
-    date: 'March 2026',
-    featured: true,
-  },
-  {
-    slug: 'single',
-    category: 'Market Intelligence',
-    readTime: '4 min',
-    title: 'Rate Anchoring: Why Setting Your Price High Wins More Work',
-    excerpt: 'Counter-intuitive but proven — elite freelancers who anchor high close more deals at better terms. Here\'s the data and the reasoning.',
-    date: 'February 2026',
-    featured: false,
-  },
-  {
-    slug: 'single',
-    category: 'Employer Playbook',
-    readTime: '5 min',
-    title: 'Hiring in the Open: Why Transparent Salaries Attract Better Candidates',
-    excerpt: 'Companies that show their budget upfront receive 3x more qualified bids and cut time-to-hire by 40%. The evidence is clear.',
-    date: 'February 2026',
-    featured: false,
-  },
-  {
-    slug: 'single',
-    category: 'Career',
-    readTime: '7 min',
-    title: 'Portfolio Architecture: Structuring Your Work History for Maximum Impact',
-    excerpt: 'Your portfolio is a narrative, not a gallery. Learn how top-earning freelancers structure past work to make employers feel the outcome, not just see the output.',
-    date: 'January 2026',
-    featured: false,
-  },
-  {
-    slug: 'single',
-    category: 'Platform',
-    readTime: '3 min',
-    title: 'Introducing Direct Messaging: The End of Email Threads',
-    excerpt: 'Real-time communication between employers and talent — built into BidJobs from first contact to contract close.',
-    date: 'January 2026',
-    featured: false,
-  },
-  {
-    slug: 'single',
-    category: 'Mindset',
-    readTime: '8 min',
-    title: 'The Specialist Premium: Why Niching Down Multiplies Your Earning Power',
-    excerpt: 'Generalists compete on price. Specialists compete on value. The math of specialization — and how to position yourself as the only logical choice.',
-    date: 'December 2025',
-    featured: false,
-  },
-]
+export const metadata: Metadata = {
+  title: "Blog | BidJobs",
+};
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Strategy: 'bg-[#613471]/30 text-[#f1bfff] border-[#f1bfff]/10',
-  'Market Intelligence': 'bg-[#caa2f7]/10 text-[#caa2f7] border-[#caa2f7]/10',
-  'Employer Playbook': 'bg-[#eab3fa]/10 text-[#eab3fa] border-[#eab3fa]/10',
-  Career: 'bg-[#bc95e9]/10 text-[#bc95e9] border-[#bc95e9]/10',
-  Platform: 'bg-[#4b474a]/30 text-[#b0a9ad] border-[#4b474a]/10',
-  Mindset: 'bg-[#613471]/20 text-[#f1bfff] border-[#f1bfff]/10',
+function PlaceholderImage({
+  className,
+  gradient = "from-primary/30 to-secondary/20",
+}: {
+  className?: string;
+  gradient?: string;
+}) {
+  return (
+    <div
+      className={`bg-gradient-to-br ${gradient} ${className ?? ""}`}
+      aria-hidden="true"
+    />
+  );
 }
 
 export default function BlogPage() {
-  const featured = ARTICLES[0]
-  const rest = ARTICLES.slice(1)
-
   return (
-    <main className="max-w-screen-2xl mx-auto px-8 pt-32 pb-40">
-      {/* Header */}
-      <section className="mb-20">
-        <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-black tracking-[0.2em] uppercase mb-6">
-          BidJobs Editorial
-        </span>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <h1 className="font-headline text-7xl font-black tracking-tighter leading-[0.9] text-[#faf1f5]">
-            Intelligence<br />
-            <span className="text-[#caa2f7] italic font-light">Dispatch</span>
-          </h1>
-          <p className="text-[#b0a9ad] text-lg font-light max-w-sm">
-            Strategy, market insight, and career architecture — for professionals who bid to win.
-          </p>
-        </div>
-      </section>
-
-      {/* Featured Article */}
-      <Link href={`/blog/${featured.slug}`} className="block mb-16 group">
-        <div className="bg-[#1c181c] border border-[#292428] rounded-[2rem] p-12 md:p-16 hover:border-[#caa2f7]/20 hover:bg-[#221e22] hover:shadow-[0_30px_60px_rgba(0,0,0,0.4)] transition-all duration-500">
-          <div className="flex flex-col lg:flex-row gap-12 items-start">
-            <div className="flex-1">
-              <div className="flex items-center gap-4 mb-6">
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${CATEGORY_COLORS[featured.category]}`}>
-                  {featured.category}
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#4b474a]">
-                  Featured · {featured.readTime} read
-                </span>
-              </div>
-              <h2 className="font-headline text-4xl md:text-5xl font-black text-[#faf1f5] leading-tight mb-6 group-hover:text-[#caa2f7] transition-colors">
-                {featured.title}
-              </h2>
-              <p className="text-[#b0a9ad] text-lg leading-relaxed mb-8 max-w-2xl font-light">{featured.excerpt}</p>
-              <div className="flex items-center gap-3 text-[#caa2f7] font-black text-xs uppercase tracking-widest group-hover:gap-5 transition-all">
-                Read Article
-                <span className="material-symbols-outlined text-base">arrow_forward</span>
-              </div>
+    <div className="pb-20">
+      {/* Featured Article Hero */}
+      <section className="max-w-screen-2xl mx-auto px-8 mb-24 relative group cursor-pointer">
+        <div className="relative h-[716px] w-full overflow-hidden rounded-xl shadow-2xl">
+          <PlaceholderImage
+            className="w-full h-full transition-transform duration-700 group-hover:scale-105"
+            gradient="from-primary/40 via-secondary/20 to-tertiary/30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface/90 to-transparent" />
+          <div className="absolute bottom-0 left-0 p-12 w-full md:w-2/3">
+            <div className="flex gap-3 mb-6">
+              <span className="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+                Vision 2030 Updates
+              </span>
+              <span className="text-stone-400 text-xs py-1">
+                October 24, 2030 &bull; 12 min read
+              </span>
             </div>
-            <div className="lg:w-48 shrink-0 flex items-center justify-center">
-              <div className="w-40 h-40 rounded-[2rem] bg-gradient-to-br from-[#613471] to-[#100d10] border border-[#caa2f7]/10 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
-                <span className="material-symbols-outlined text-7xl text-[#caa2f7]" style={{ fontVariationSettings: "'FILL' 0" }}>auto_stories</span>
+            <h1 className="font-headline text-5xl md:text-7xl font-bold text-on-surface mb-6 leading-tight tracking-tight">
+              The Architectural Shift: Defining Saudi Arabia&apos;s Tech
+              Frontier
+            </h1>
+            <p className="text-stone-300 text-lg md:text-xl max-w-2xl font-light mb-8 leading-relaxed">
+              How NEOM and the Red Sea Project are creating a vacuum for global
+              elite talent and what it means for the regional economy.
+            </p>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full overflow-hidden border border-primary/30">
+                  <PlaceholderImage
+                    className="w-full h-full"
+                    gradient="from-primary-container to-primary/50"
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-on-surface">
+                    Dr. Fahad Al-Zahrani
+                  </p>
+                  <p className="text-xs text-stone-500">Economic Strategist</p>
+                </div>
               </div>
+              <div className="h-8 w-px bg-stone-700 mx-4" />
+              <span className="text-primary hover:text-primary-dim transition-colors cursor-pointer font-bold flex items-center gap-2">
+                Read Full Editorial
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </span>
             </div>
           </div>
         </div>
-      </Link>
-
-      {/* Article Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {rest.map((article) => (
-          <Link key={article.title} href={`/blog/${article.slug}`} className="group">
-            <div className="bg-[#1c181c] border border-[#292428] rounded-2xl p-8 h-full hover:border-[#caa2f7]/20 hover:bg-[#221e22] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-all duration-500 flex flex-col">
-              <div className="flex items-center gap-3 mb-6">
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${CATEGORY_COLORS[article.category] || 'bg-[#4b474a]/20 text-[#b0a9ad] border-[#4b474a]/10'}`}>
-                  {article.category}
-                </span>
-              </div>
-              <h3 className="font-headline text-xl font-bold text-[#faf1f5] leading-snug mb-4 group-hover:text-[#caa2f7] transition-colors flex-1">
-                {article.title}
-              </h3>
-              <p className="text-[#b0a9ad] text-sm leading-relaxed mb-6 line-clamp-3">{article.excerpt}</p>
-              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest border-t border-[#292428] pt-4 mt-auto">
-                <span className="text-[#4b474a]">{article.date}</span>
-                <span className="text-[#caa2f7] flex items-center gap-2 group-hover:gap-3 transition-all">
-                  {article.readTime}
-                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Newsletter CTA */}
-      <section className="mt-24 text-center bg-gradient-to-br from-[#1c181c] to-[#100d10] border border-[#caa2f7]/10 rounded-[2rem] p-16">
-        <h2 className="font-headline text-4xl font-black text-[#faf1f5] mb-4">Stay Sharp</h2>
-        <p className="text-[#b0a9ad] font-light mb-8 max-w-md mx-auto">
-          New intelligence dispatches, market data, and strategy guides — delivered when they matter.
-        </p>
-        <Link
-          href="/sign-up"
-          className="inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] font-black text-xs uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all"
-        >
-          <span className="material-symbols-outlined text-base">notifications</span>
-          Join the Network
-        </Link>
       </section>
-    </main>
-  )
+
+      {/* Category Filters */}
+      <section className="max-w-screen-2xl mx-auto px-8 mb-16 overflow-x-auto">
+        <div className="flex gap-4 min-w-max pb-4">
+          <button className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold text-sm transition-all shadow-lg shadow-primary/15">
+            All Insights
+          </button>
+          {["Career Insights", "Vision 2030 Updates", "Tech Trends", "Saudi Economy"].map(
+            (cat) => (
+              <button
+                key={cat}
+                className="bg-surface-container text-stone-400 hover:text-on-surface px-8 py-3 rounded-full font-bold text-sm transition-all border border-transparent hover:border-outline-variant"
+              >
+                {cat}
+              </button>
+            )
+          )}
+        </div>
+      </section>
+
+      {/* Main Content Grid */}
+      <section className="max-w-screen-2xl mx-auto px-8 flex flex-col lg:flex-row gap-12">
+        {/* Articles Grid */}
+        <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-12">
+          {articles.map((article) => (
+            <ArticleCard key={article.title} {...article} />
+          ))}
+        </div>
+
+        {/* Sidebar */}
+        <aside className="lg:w-1/3 flex flex-col gap-12">
+          {/* Newsletter Signup */}
+          <div className="bg-surface-container p-10 rounded-xl relative overflow-hidden border border-outline-variant/15">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <svg
+                className="w-20 h-20 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                />
+              </svg>
+            </div>
+            <h4 className="font-headline text-2xl font-bold mb-4 relative z-10">
+              The Insight Digest
+            </h4>
+            <p className="text-stone-400 text-sm mb-8 leading-relaxed relative z-10">
+              Join 15,000+ elite professionals receiving weekly market
+              intelligence and vision-aligned career opportunities.
+            </p>
+            <form className="flex flex-col gap-4 relative z-10">
+              <input
+                className="bg-surface-container-lowest border-none focus:ring-2 focus:ring-primary/50 rounded-lg p-4 text-sm text-on-surface placeholder-stone-600"
+                placeholder="Email Address"
+                type="email"
+              />
+              <button
+                type="submit"
+                className="bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold py-4 rounded-lg hover:shadow-[0_0_20px_rgba(202,162,247,0.3)] transition-all"
+              >
+                Subscribe Now
+              </button>
+            </form>
+            <p className="text-[10px] text-stone-600 mt-4 text-center">
+              No spam. Only high-impact career intelligence.
+            </p>
+          </div>
+
+          {/* Trending Topics */}
+          <div className="p-4">
+            <h4 className="font-headline text-xl font-bold mb-6 flex items-center gap-3">
+              Trending Topics
+              <span className="h-px flex-1 bg-stone-800" />
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "#NeomCareers",
+                "#Vision2030",
+                "#GreenInitiative",
+                "#FinTechSaudi",
+                "#DigitalTransformation",
+              ].map((tag) => (
+                <a
+                  key={tag}
+                  href={`/talent?query=${encodeURIComponent(tag.replace('#', ''))}`}
+                  className="text-xs px-4 py-2 bg-stone-900 border border-stone-800 rounded-full hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all"
+                >
+                  {tag}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Special Report */}
+          <div className="bg-stone-950 p-8 rounded-xl border-l-4 border-primary">
+            <span className="text-[10px] text-primary font-bold uppercase tracking-widest mb-2 block">
+              Special Report
+            </span>
+            <h5 className="text-lg font-bold mb-4 leading-snug">
+              2031 Talent Outlook: The Great Re-Skilling of the GCC
+            </h5>
+            <button className="flex items-center gap-2 text-sm font-bold text-on-surface group">
+              Download Report
+              <svg
+                className="w-4 h-4 group-hover:translate-y-0.5 transition-transform"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
+              </svg>
+            </button>
+          </div>
+        </aside>
+      </section>
+
+      {/* Pagination */}
+      <section className="max-w-screen-2xl mx-auto px-8 mt-20 flex justify-center">
+        <div className="flex items-center gap-2">
+          <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+          <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold text-sm">
+            1
+          </button>
+          {[2, 3].map((n) => (
+            <button
+              key={n}
+              className="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors text-sm"
+            >
+              {n}
+            </button>
+          ))}
+          <span className="px-2 text-stone-700">...</span>
+          <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors text-sm">
+            12
+          </button>
+          <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ── Article data ── */
+
+const articles = [
+  {
+    category: "Tech Trends",
+    date: "8th October 2030",
+    title: "The Rise of Sovereign AI in the Kingdom",
+    summary:
+      "Saudi Arabia is making a massive pivot towards hosting sovereign cloud infrastructure, creating thousands of specialized roles for AI architects and data governance experts.",
+    gradient: "from-primary/30 via-surface-container to-secondary/20",
+  },
+  {
+    category: "Career Insights",
+    date: "5th October 2030",
+    title: "Executive Negotiation in the Neo-Gulf",
+    summary:
+      "Mastering the art of the multi-tier compensation package: why equity and relocation are being redefined for 2030 standards.",
+    gradient: "from-secondary/30 via-surface-container to-primary/20",
+  },
+  {
+    category: "Saudi Economy",
+    date: "1st October 2030",
+    title: "Post-Oil Financial Markets: What Talent Needs to Know",
+    summary:
+      "As the Tadawul expands, the need for specialized fintech compliance talent is reaching an all-time high. Is your CV ready for the shift?",
+    gradient: "from-tertiary/20 via-surface-container to-primary/30",
+  },
+  {
+    category: "Career Insights",
+    date: "28th September 2030",
+    title: "Hybrid Work Cultures in Riyadh's Giga-Projects",
+    summary:
+      "Balancing remote flexibility with the need for high-stakes on-site presence in Saudi's burgeoning innovation hubs.",
+    gradient: "from-primary/20 via-surface-container to-tertiary/20",
+  },
+];
+
+function ArticleCard({
+  category,
+  date,
+  title,
+  summary,
+  gradient,
+}: (typeof articles)[number]) {
+  return (
+    <div className="group flex flex-col gap-6">
+      <div className="relative overflow-hidden rounded-xl aspect-[16/10] bg-surface-container">
+        <PlaceholderImage
+          className="w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-110"
+          gradient={gradient}
+        />
+        <div className="absolute top-4 left-4">
+          <span className="bg-surface-container-highest/80 backdrop-blur-md text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">
+            {category}
+          </span>
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <p className="text-xs font-label text-stone-500">{date}</p>
+        <h3 className="text-2xl font-headline font-bold text-on-surface leading-snug group-hover:text-primary transition-colors">
+          {title}
+        </h3>
+        <p className="text-stone-400 text-sm leading-relaxed line-clamp-3">
+          {summary}
+        </p>
+        <a
+          href="/blog"
+          className="mt-2 text-stone-200 text-xs font-bold underline underline-offset-4 decoration-primary/50 hover:decoration-primary transition-all"
+        >
+          Read Story
+        </a>
+      </div>
+    </div>
+  );
 }

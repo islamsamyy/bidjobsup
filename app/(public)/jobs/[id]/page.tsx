@@ -57,7 +57,8 @@ export default async function Page({ params }: JobPageProps) {
         location,
         company_name,
         industry
-      )
+      ),
+      bids_count:bids(count)
     `)
     .eq("id", id)
     .single();
@@ -247,7 +248,7 @@ export default async function Page({ params }: JobPageProps) {
                   <h3 className="text-2xl font-heading font-bold mb-2">This is your listing</h3>
                   <p className="text-[#b0a9ad] mb-8 text-lg">You can view applications and manage this job from your employer dashboard.</p>
                   <Link href={`/dashboard/employer/listings/${job.id}`} className="inline-block bg-[#caa2f7] text-[#431f6b] font-bold px-10 py-4 rounded-xl transition-transform hover:scale-105">
-                    View Applications ({job.bids_count})
+                    View Applications ({job.bids_count?.[0]?.count || 0})
                   </Link>
                 </div>
               ) : !canApply ? (

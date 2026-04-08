@@ -33,8 +33,7 @@ export async function signup(formData: FormData) {
   const phone = formData.get('phone') as string
   const userType = (formData.get('userType') as string) || 'jobseeker'
 
-  // 1. Attempt to Create/Get the user in Supabase Auth with metadata
-  // We pass metadata so the database trigger can handle the profile creation automatically
+  // 1. Create user in Supabase Auth with metadata
   const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
     email,
     password,
@@ -49,20 +48,38 @@ export async function signup(formData: FormData) {
 
   if (signUpError) {
     if (signUpError.message.includes('already registered')) {
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
-      
+
       if (signInError) {
-        redirect(`/create-profile?message=${signInError.message}`)
+        redirect(`/sign-in?message=${encodeURIComponent(signInError.message)}`)
       }
-      // If they are already registered and we just signed them in, we can safely redirect
       revalidatePath('/', 'layout')
       redirect('/dashboard')
     } else {
       console.error(signUpError)
-      redirect(`/create-profile?message=${signUpError.message}`)
+      redirect(`/sign-up?message=${encodeURIComponent(signUpError.message)}`)
+    }
+  }
+
+  // 2. Ensure profile row exists in users table (fallback if DB trigger didn't fire)
+  if (signUpData?.user) {
+    const { data: existingProfile } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', signUpData.user.id)
+      .single()
+
+    if (!existingProfile) {
+      await supabase.from('users').insert({
+        auth_id: signUpData.user.id,
+        email: email,
+        full_name: fullName,
+        phone: phone || null,
+        user_type: userType,
+      })
     }
   }
 
@@ -109,5 +126,5 @@ export async function resetPassword(formData: FormData) {
     redirect(`/reset-password?message=${encodeURIComponent(error.message)}`)
   }
 
-  redirect('/sign-in?message=Password updated successfully')
+  redirect('/sign-in?message=Password+updated+successfully')
 }

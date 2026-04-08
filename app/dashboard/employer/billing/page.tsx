@@ -3,6 +3,69 @@ import { redirect } from 'next/navigation'
 import StripeCheckoutButton from '@/components/features/StripeCheckoutButton'
 import StripeBillingPortalButton from '@/components/features/StripeBillingPortalButton'
 
+async function getStripeSubscription(stripeCustomerId: string | null) {
+  if (!stripeCustomerId || !process.env.STRIPE_SECRET_KEY) return null
+  try {
+    const Stripe = (await import('stripe')).default
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+    const subs = await stripe.subscriptions.list({
+      customer: stripeCustomerId,
+      status: 'active',
+      limit: 1,
+      expand: ['data.items.data.price.product'],
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sub = subs.data[0] as any
+    if (!sub) return null
+
+    const items = sub.items as { data: Array<{ price: { unit_amount: number; recurring?: { interval: string }; product?: { name?: string } | string } }> }
+    const item = items?.data?.[0]
+    const price = item?.price
+    const product = price?.product as { name?: string } | undefined
+
+    return {
+      planName: (typeof product === 'object' ? product?.name : null) || 'Active Plan',
+      amount: ((price?.unit_amount || 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 }),
+      interval: price?.recurring?.interval || 'month',
+      renewalDate: new Date(((sub.current_period_end as number) || 0) * 1000).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+      status: sub.status as string,
+    }
+  } catch {
+    return null
+  }
+}
+
+async function getStripeInvoices(stripeCustomerId: string | null) {
+  if (!stripeCustomerId || !process.env.STRIPE_SECRET_KEY) return []
+  try {
+    const Stripe = (await import('stripe')).default
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+    const result = await stripe.invoices.list({
+      customer: stripeCustomerId,
+      limit: 10,
+    })
+    return result.data.map((inv) => ({
+      id: inv.number || inv.id,
+      date: new Date((inv.created || 0) * 1000).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+      amount: ((inv.amount_paid || 0) / 100).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+      }),
+      status: inv.status === 'paid' ? 'Paid' : inv.status === 'open' ? 'Pending' : (inv.status || 'Unknown'),
+      pdfUrl: inv.invoice_pdf || null,
+    }))
+  } catch {
+    return []
+  }
+}
+
 export default async function EmployerBillingPage() {
   const supabase = await createClient()
 
@@ -22,13 +85,13 @@ export default async function EmployerBillingPage() {
     redirect('/dashboard/seeker')
   }
 
-  // Mock Invoice History
-  const invoices = [
-    { id: 'BJ-990112', date: 'Sept 24, 2023', amount: '1,450.00', status: 'Paid' },
-    { id: 'BJ-990111', date: 'Aug 24, 2023', amount: '1,450.00', status: 'Paid' },
-    { id: 'BJ-990110', date: 'July 24, 2023', amount: '1,200.00', status: 'Paid' },
-    { id: 'BJ-990109', date: 'June 24, 2023', amount: '1,200.00', status: 'Paid' },
-  ]
+  // Fetch real Stripe data
+  const [invoices, subscription] = await Promise.all([
+    getStripeInvoices(profile?.stripe_customer_id),
+    getStripeSubscription(profile?.stripe_customer_id),
+  ])
+
+  const activePlanName = subscription?.planName?.toLowerCase() || ''
 
   const tiers = [
     {
@@ -36,7 +99,7 @@ export default async function EmployerBillingPage() {
       price: '450',
       description: 'Standard growth for small teams.',
       features: ['10 Active Bids', 'Basic Analytics', 'Standard Support'],
-      current: false,
+      current: activePlanName.includes('pro'),
       color: 'stone-500',
       planId: 'employer_pro',
     },
@@ -45,7 +108,7 @@ export default async function EmployerBillingPage() {
       price: '1,450',
       description: 'Elite scaling for rapid talent procurement.',
       features: ['Unlimited Bids', 'AI Talent Matching', 'Dedicated Account Architect'],
-      current: true,
+      current: activePlanName.includes('visionary') || activePlanName.includes('enterprise'),
       color: 'secondary',
       planId: 'employer_visionary',
     },
@@ -54,7 +117,7 @@ export default async function EmployerBillingPage() {
       price: '5,000',
       description: 'Global dominance and market predictive intel.',
       features: ['Global Headhunting', 'Predictive Market Intel', 'Multi-Entity Management'],
-      current: false,
+      current: activePlanName.includes('nexus') || activePlanName.includes('supreme'),
       color: 'primary',
       planId: 'employer_nexus',
     },
@@ -82,21 +145,35 @@ export default async function EmployerBillingPage() {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-3">Active Subscription</p>
-                <h2 className="text-4xl font-headline font-black italic text-on-surface">Visionary Enterprise</h2>
+                <h2 className="text-4xl font-headline font-black italic text-on-surface">
+                  {subscription?.planName || 'No Active Plan'}
+                </h2>
               </div>
-              <div className="bg-secondary/10 text-secondary border border-secondary/20 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
-                Protocol Verified
-              </div>
+              {subscription ? (
+                <div className="bg-secondary/10 text-secondary border border-secondary/20 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  Protocol Verified
+                </div>
+              ) : (
+                <div className="bg-stone-800 text-stone-400 border border-stone-700 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  No Subscription
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-12">
               <div className="space-y-1">
                 <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">Next Renewal Cycle</p>
-                <p className="text-3xl font-headline font-black italic text-on-surface">Oct 24, 2023</p>
+                <p className="text-3xl font-headline font-black italic text-on-surface">
+                  {subscription?.renewalDate || '—'}
+                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">Cycle Investment</p>
-                <p className="text-3xl font-headline font-black italic text-on-surface">$1,450.00 <span className="text-sm italic font-normal text-stone-500">/mo</span></p>
+                <p className="text-3xl font-headline font-black italic text-on-surface">
+                  {subscription ? (
+                    <>${subscription.amount} <span className="text-sm italic font-normal text-stone-500">/{subscription.interval}</span></>
+                  ) : '—'}
+                </p>
               </div>
             </div>
 
@@ -158,16 +235,30 @@ export default async function EmployerBillingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/5">
-                {invoices.map((inv) => (
+                {invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-10 py-16 text-center text-stone-500 text-sm italic">
+                      No invoices yet. Your billing history will appear here after your first payment.
+                    </td>
+                  </tr>
+                ) : invoices.map((inv) => (
                   <tr key={inv.id} className="hover:bg-surface-container-highest transition-colors group">
                     <td className="px-10 py-8 font-black text-sm text-on-surface tracking-tighter">#{inv.id}</td>
                     <td className="px-10 py-8 text-sm text-stone-400 font-bold">{inv.date}</td>
                     <td className="px-10 py-8 font-headline text-lg italic text-on-surface-variant font-black">${inv.amount}</td>
                     <td className="px-10 py-8">
-                       <span className="bg-green-500/10 text-green-400 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-green-500/20">Finalized</span>
+                       <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border ${
+                         inv.status === 'Paid'
+                           ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                           : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                       }`}>{inv.status === 'Paid' ? 'Finalized' : inv.status}</span>
                     </td>
                     <td className="px-10 py-8 text-right">
-                       <button className="material-symbols-outlined text-stone-500 hover:text-secondary transition-all opacity-0 group-hover:opacity-100">download</button>
+                       {inv.pdfUrl ? (
+                         <a href={inv.pdfUrl} target="_blank" rel="noopener noreferrer" className="material-symbols-outlined text-stone-500 hover:text-secondary transition-all opacity-0 group-hover:opacity-100">download</a>
+                       ) : (
+                         <span className="material-symbols-outlined text-stone-700 opacity-0 group-hover:opacity-50">download</span>
+                       )}
                     </td>
                   </tr>
                 ))}

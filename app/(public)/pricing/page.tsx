@@ -1,223 +1,196 @@
-"use client";
+import PublicHeader from '@/components/layout/PublicHeader'
+import PublicFooter from '@/components/layout/PublicFooter'
+import Link from 'next/link'
 
-import { useState } from "react";
-import Link from "next/link";
+export const metadata = {
+  title: 'Pricing Plans | BidJobs — Invest in Your Career Legacy',
+  description: 'Join the elite tier of Saudi talent. Scale your visibility, optimize your applications, and land high-stakes roles.',
+}
+
+const TIER_FEATURES = {
+  starter: [
+    { name: 'Standard Job Search', active: true },
+    { name: 'Basic Profile Builder', active: true },
+    { name: 'ATS Optimizer', active: false },
+    { name: 'Priority Support', active: false },
+  ],
+  elite: [
+    { name: 'AI ATS Optimizer (Unlimited)', active: true },
+    { name: 'Priority Role Access', active: true },
+    { name: 'Profile Boost in Search', active: true },
+    { name: 'Advanced App Tracking', active: true },
+  ],
+  enterprise: [
+    { name: 'Dedicated Success Manager', active: true },
+    { name: 'API & ERP Integration', active: true },
+    { name: 'Custom Employer Branding', active: true },
+    { name: 'Volume Direct Hiring', active: true },
+  ]
+}
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(true);
-
-  const plans = [
-    {
-      name: "Talent Starter",
-      tagline: "For those beginning their ascent.",
-      price: "0",
-      features: [
-        "Standard Job Search",
-        "Basic Profile Builder",
-        "Public Portfolio",
-        "Community Access"
-      ],
-      cta: "Start for Free",
-      featured: false,
-      blocked: ["ATS Optimizer", "Priority Role Access", "Profile Boost"]
-    },
-    {
-      name: "Elite Professional",
-      tagline: "The definitive toolset for high-end roles.",
-      price: isYearly ? "15" : "19",
-      features: [
-        "AI ATS Optimizer (Unlimited)",
-        "Priority Role Access",
-        "Profile Boost in Search",
-        "Advanced Application Tracking",
-        "Salary Benchmarking",
-        "Direct Inbox Access"
-      ],
-      cta: "Upgrade Now",
-      featured: true,
-      blocked: []
-    },
-    {
-      name: "Visionary Enterprise",
-      tagline: "For organizations shaping the Kingdom.",
-      price: "Custom",
-      features: [
-        "Dedicated Success Manager",
-        "API & ERP Integration",
-        "Custom Employer Branding",
-        "Bulk Video Interviewing",
-        "White-label Talent Portal",
-        "Advanced Analytics"
-      ],
-      cta: "Contact Us",
-      featured: false,
-      blocked: []
-    }
-  ];
-
   return (
-    <main className="pt-24 pb-40">
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-8 py-24 text-center">
-        <h1 className="font-headline text-6xl md:text-8xl font-black mb-8 tracking-tighter text-[#faf1f5] uppercase leading-[0.9]">
-          Invest in Your <br/>
-          <span className="text-[#caa2f7] italic font-light drop-shadow-[0_0_20px_rgba(202,162,247,0.3)]">Career Legacy</span>
-        </h1>
-        <p className="text-[#b0a9ad] max-w-2xl mx-auto text-xl font-light leading-relaxed mb-16">
-          Join the elite tier of Saudi talent. From AI-driven ATS optimization to exclusive high-stakes roles, BidJobs provides the tools for Vision 2030 excellence.
-        </p>
+    <div className="bg-[#100d10] text-[#faf1f5] font-body min-h-screen flex flex-col selection:bg-[#caa2f7] selection:text-[#431f6b]">
+      <PublicHeader />
+      
+      <main className="pt-40 pb-24 px-8 relative overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute top-0 left-1/4 w-[800px] h-[600px] bg-[#caa2f7]/5 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[400px] bg-[#613471]/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Toggle */}
-        <div className="flex items-center justify-center gap-6 mb-20">
-          <span className={`text-sm font-bold tracking-widest uppercase transition-colors ${!isYearly ? 'text-[#faf1f5]' : 'text-[#b0a9ad]'}`}>Monthly</span>
-          <button 
-            onClick={() => setIsYearly(!isYearly)}
-            className="w-16 h-8 bg-[#1c181c] rounded-full p-1.5 flex items-center border border-[#292428] relative transition-all duration-300"
-          >
-            <div className={`w-5 h-5 bg-[#caa2f7] rounded-full shadow-[0_0_15px_rgba(202,162,247,0.5)] transition-transform duration-300 ${isYearly ? 'translate-x-8' : 'translate-x-0'}`}></div>
-          </button>
-          <span className={`text-sm font-bold tracking-widest uppercase transition-colors ${isYearly ? 'text-[#faf1f5]' : 'text-[#b0a9ad]'}`}>
-            Yearly <span className="text-[#caa2f7] ml-2 text-[10px] bg-[#613471]/30 px-2 py-0.5 rounded-full border border-[#caa2f7]/20">Save 20%</span>
+        {/* Hero */}
+        <section className="max-w-7xl mx-auto text-center mb-20 relative z-10">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-black tracking-[0.2em] uppercase mb-8">
+            Ecosystem Access
           </span>
-        </div>
+          <h1 className="font-headline text-5xl md:text-7xl font-bold mb-8 tracking-tighter leading-tight">
+            Invest in Your <br />
+            <span className="text-[#caa2f7] italic font-light drop-shadow-[0_0_30px_rgba(202,162,247,0.3)]">
+              Career Legacy.
+            </span>
+          </h1>
+          <p className="text-[#b0a9ad] max-w-2xl mx-auto text-lg leading-relaxed mb-12 font-light">
+            Join the elite tier of Saudi talent. From AI-driven ATS optimization to exclusive high-stakes roles, BidJobs provides the tools for Vision 2030 excellence.
+          </p>
+          
+          <div className="flex items-center justify-center gap-6 mb-20">
+            <span className="text-xs font-black uppercase tracking-widest text-[#585457]">Monthly</span>
+            <button className="w-16 h-8 bg-[#1c181c] border border-[#292428] rounded-full p-1.5 flex items-center relative transition-all group">
+              <div className="w-5 h-5 bg-[#caa2f7] rounded-full shadow-lg shadow-[#caa2f7]/40 transition-transform absolute right-1.5" />
+            </button>
+            <span className="text-xs font-black uppercase tracking-widest text-[#faf1f5]">Yearly <span className="text-[#caa2f7] ml-2 text-[10px] bg-[#caa2f7]/10 px-2 py-0.5 rounded">-20%</span></span>
+          </div>
 
-        {/* Pricing Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch pt-12">
-          {plans.map((plan) => (
-            <div 
-              key={plan.name}
-              className={`relative flex flex-col p-12 rounded-[2.5rem] transition-all duration-500 group ${
-                plan.featured 
-                ? 'bg-[#1c181c] border-2 border-[#caa2f7] shadow-[0_40px_100px_rgba(0,0,0,0.6),0_0_30px_rgba(202,162,247,0.1)] scale-105 z-10' 
-                : 'bg-[#151215] border border-[#292428] hover:border-[#caa2f7]/30'
-              }`}
-            >
-              {plan.featured && (
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#caa2f7] text-[#431f6b] px-8 py-2 rounded-full text-[10px] font-black tracking-[0.2em] uppercase shadow-[0_10px_20px_rgba(202,162,247,0.3)]">
-                  Most Popular
-                </div>
-              )}
-              
-              <div className="text-left mb-12">
-                <h3 className={`text-3xl font-headline font-black mb-3 ${plan.featured ? 'text-[#caa2f7]' : 'text-[#faf1f5]'}`}>{plan.name}</h3>
-                <p className="text-[#b0a9ad] text-sm font-light min-h-[40px] uppercase tracking-wider">{plan.tagline}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+            {/* Starter */}
+            <div className="bg-[#1c181c]/50 backdrop-blur-xl p-10 rounded-3xl border border-[#292428] text-left hover:bg-[#1c181c] transition-all group">
+              <h3 className="font-headline text-2xl font-bold mb-2">Talent Starter</h3>
+              <p className="text-[#585457] text-[10px] font-black uppercase tracking-widest mb-10">Ascent Mode</p>
+              <div className="mb-10">
+                <span className="text-5xl font-black">Free</span>
               </div>
-
-              <div className="text-left mb-12 flex items-baseline gap-2">
-                {plan.price !== "Custom" && <span className="text-sm font-bold text-[#b0a9ad] uppercase tracking-widest">SAR</span>}
-                <span className="text-6xl font-headline font-black text-[#faf1f5] tracking-tighter">
-                  {plan.price}
-                </span>
-                {plan.price !== "Custom" && plan.price !== "Free" && (
-                  <span className="text-sm font-bold text-[#b0a9ad] uppercase tracking-widest">/mo</span>
-                )}
-              </div>
-
-              <div className="space-y-6 mb-12 flex-grow">
-                {plan.features.map((feature) => (
-                  <div key={feature} className="flex items-center gap-4 group/item">
-                    <div className={`flex items-center justify-center w-6 h-6 rounded-full transition-colors ${plan.featured ? 'bg-[#caa2f7]/10' : 'bg-[#292428]'}`}>
-                      <span className="material-symbols-outlined text-[14px] text-[#caa2f7] font-bold">check</span>
-                    </div>
-                    <span className="text-[#faf1f5] text-sm font-medium tracking-tight group-hover/item:translate-x-1 transition-transform">{feature}</span>
-                  </div>
+              <ul className="space-y-5 mb-12">
+                {TIER_FEATURES.starter.map(f => (
+                  <li key={f.name} className={`flex items-center gap-3 text-xs ${f.active ? 'text-[#faf1f5]' : 'text-[#585457] opacity-60'}`}>
+                    <span className={`material-symbols-outlined text-lg ${f.active ? 'text-[#caa2f7]' : ''}`}>{f.active ? 'check_circle' : 'block'}</span>
+                    <span className={!f.active ? 'line-through' : ''}>{f.name}</span>
+                  </li>
                 ))}
-                {plan.blocked?.map((feature) => (
-                  <div key={feature} className="flex items-center gap-4 opacity-30 grayscale">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#292428]">
-                      <span className="material-symbols-outlined text-[14px] text-[#b0a9ad]">lock</span>
-                    </div>
-                    <span className="text-[#b0a9ad] text-sm font-light line-through">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link 
-                href={plan.price === "Custom" ? "mailto:sales@bidjobs.sa" : "/join"}
-                className={`w-full py-6 rounded-2xl font-black text-xs tracking-[0.2em] uppercase transition-all duration-300 transform active:scale-95 ${
-                  plan.featured 
-                  ? 'bg-gradient-to-br from-[#caa2f7] to-[#b690e3] text-[#431f6b] shadow-[0_20px_40px_rgba(202,162,247,0.3)] hover:brightness-110' 
-                  : 'bg-[#1c181c] border border-[#292428] text-[#faf1f5] hover:bg-[#221e22] hover:border-[#caa2f7]/30'
-                }`}
-              >
-                {plan.cta}
+              </ul>
+              <Link href="/sign-in" className="block w-full py-5 rounded-2xl border border-[#292428] text-[#faf1f5] font-black text-xs uppercase tracking-widest text-center hover:bg-white/5 transition-all">
+                Start for Free
               </Link>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Feature Spotlight: ATS Optimizer */}
-      <section className="py-40 bg-[#151215] border-y border-[#292428]/30">
-        <div className="max-w-7xl mx-auto px-8 flex flex-col lg:flex-row gap-24 items-center">
-          <div className="lg:w-1/2 space-y-10 text-left">
-            <span className="inline-block px-4 py-1 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-black tracking-[0.2em] uppercase">
-              Premium Intelligence
-            </span>
-            <h2 className="text-5xl font-headline font-black text-[#faf1f5] leading-[0.9] tracking-tighter uppercase">
-              Defeat the <br /> 
-              <span className="text-[#caa2f7] italic font-light">Algorithm</span>
-            </h2>
-            <p className="text-xl text-[#b0a9ad] font-light leading-relaxed">
-              Our ATS Optimizer analyzes your CV against high-tier job descriptions in real-time, suggesting linguistic adjustments to ensure you land in the "Shortlist" pile consistently.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
-              <div className="space-y-4">
-                <span className="material-symbols-outlined text-[#caa2f7] text-4xl">psychology</span>
-                <h4 className="text-lg font-bold text-[#faf1f5] tracking-tight">Neural Mapping</h4>
-                <p className="text-sm text-[#b0a9ad] font-light">Matches experience with Saudi Giga-project standards.</p>
-              </div>
-              <div className="space-y-4">
-                <span className="material-symbols-outlined text-[#caa2f7] text-4xl">description</span>
-                <h4 className="text-lg font-bold text-[#faf1f5] tracking-tight">Structure Audit</h4>
-                <p className="text-sm text-[#b0a9ad] font-light">Readable by all major global enterprise HR platforms.</p>
+            {/* Elite Professional */}
+            <div className="relative transform md:scale-105 z-20">
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#caa2f7] text-[#431f6b] px-6 py-1.5 rounded-full text-[9px] font-black tracking-[0.2em] uppercase whitespace-nowrap shadow-xl shadow-[#caa2f7]/20">Most Popular</div>
+              <div className="bg-[#1c181c] p-12 rounded-3xl border-2 border-[#caa2f7]/30 text-left shadow-[0_24px_80px_rgba(202,162,247,0.15)] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#caa2f7]/5 to-transparent rounded-bl-[120px]" />
+                <h3 className="font-headline text-3xl font-bold mb-2 text-[#caa2f7]">Elite Pro</h3>
+                <p className="text-[#585457] text-[10px] font-black uppercase tracking-widest mb-10 text-primary-fixed">Definitive Toolset</p>
+                <div className="mb-10 flex items-baseline gap-2">
+                  <span className="text-xs font-black text-[#585457] uppercase tracking-tighter">SAR</span>
+                  <span className="text-6xl font-black text-[#faf1f5]">19</span>
+                  <span className="text-sm font-light text-[#585457]">/month</span>
+                </div>
+                <ul className="space-y-6 mb-14">
+                  {TIER_FEATURES.elite.map(f => (
+                    <li key={f.name} className="flex items-center gap-4 text-sm font-bold text-[#faf1f5]">
+                      <span className="material-symbols-outlined text-[#caa2f7] text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                      <span>{f.name}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button className="w-full py-5 rounded-2xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-[#caa2f7]/20 hover:brightness-110 active:scale-[0.98] transition-all">
+                  Upgrade to Elite
+                </button>
               </div>
             </div>
-          </div>
-          <div className="lg:w-1/2 relative group">
-            <div className="absolute -inset-4 bg-[#caa2f7]/5 rounded-[3rem] blur-3xl group-hover:bg-[#caa2f7]/10 transition duration-700"></div>
-            <div className="relative rounded-[2.5rem] overflow-hidden border border-[#caa2f7]/10 shadow-[0_40px_100px_rgba(0,0,0,0.6)] aspect-video">
-              <img 
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-100 group-hover:scale-110" 
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2070" 
-                alt="AI Analytics"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#100d10] via-transparent to-transparent"></div>
+
+            {/* Enterprise */}
+            <div className="bg-[#1c181c]/50 backdrop-blur-xl p-10 rounded-3xl border border-[#292428] text-left hover:bg-[#1c181c] transition-all group">
+              <h3 className="font-headline text-2xl font-bold mb-2">Visionary</h3>
+              <p className="text-[#585457] text-[10px] font-black uppercase tracking-widest mb-10">Institutional</p>
+              <div className="mb-10">
+                <span className="text-4xl font-black">Custom</span>
+              </div>
+              <ul className="space-y-5 mb-12">
+                {TIER_FEATURES.enterprise.map(f => (
+                  <li key={f.name} className="flex items-center gap-3 text-xs text-[#faf1f5]">
+                    <span className="material-symbols-outlined text-[#caa2f7] text-lg">check_circle</span>
+                    <span>{f.name}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/contact" className="block w-full py-5 rounded-2xl border border-[#292428] text-[#faf1f5] font-black text-xs uppercase tracking-widest text-center hover:bg-white/5 transition-all">
+                Contact Strategy
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* FAQ Section */}
-      <section className="py-40 max-w-4xl mx-auto px-8">
-        <h2 className="text-4xl font-headline font-black text-center mb-24 tracking-tight uppercase">Common Decoded Questions</h2>
-        <div className="space-y-6">
-          {[
-            { 
-              q: "Can I cancel my Elite Professional subscription at any time?", 
-              a: "Yes. We believe in total flexibility. You can cancel your subscription at any time with no penalties. Access remains until the end of your billing cycle."
-            },
-            { 
-              q: "Does the ATS Optimizer work for Arabic CVs?", 
-              a: "Absolutely. Our system is localized specifically for Saudi Arabia, supporting both Modern Standard Arabic and English industry terminology used in the Kingdom's evolving sectors."
-            },
-            { 
-              q: "What makes 'Visionary Enterprise' different?", 
-              a: "Enterprise users receive unlimited job postings, customized vetting pipelines, and dedicated support from our human capital architects in Riyadh."
-            }
-          ].map((faq, i) => (
-            <details key={i} className="group bg-[#1c181c] border border-[#292428] rounded-3xl overflow-hidden hover:border-[#caa2f7]/30 transition-all">
-              <summary className="flex justify-between items-center p-10 cursor-pointer list-none list-outside">
-                <h4 className="text-lg font-bold text-[#faf1f5] tracking-tight">{faq.q}</h4>
-                <span className="material-symbols-outlined text-[#caa2f7] group-open:rotate-180 transition-transform">expand_more</span>
-              </summary>
-              <div className="px-10 pb-10 border-t border-[#292428]/50 pt-8">
-                <p className="text-[#b0a9ad] font-light leading-relaxed">{faq.a}</p>
+        {/* ATS Advantage */}
+        <section className="max-w-7xl mx-auto mb-32">
+          <div className="bg-[#1c181c] border border-[#292428] rounded-[40px] overflow-hidden grid grid-cols-1 lg:grid-cols-2">
+            <div className="p-12 lg:p-20 flex flex-col justify-center">
+              <div className="inline-block w-fit px-4 py-1.5 bg-[#caa2f7]/10 border border-[#caa2f7]/20 text-[#caa2f7] rounded-full text-[9px] font-black tracking-widest uppercase mb-10">
+                Premium Engine
               </div>
-            </details>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
+              <h2 className="font-headline text-4xl font-bold mb-8">Defeat the <span className="italic text-[#caa2f7] font-light">Algorithm.</span></h2>
+              <p className="text-[#b0a9ad] text-lg mb-12 leading-relaxed font-light">
+                Our ATS Optimizer analyzes your CV against high-tier job descriptions in real-time, suggesting keywords and structural changes to ensure you land in the "Shortlist" pile 95% of the time.
+              </p>
+              <div className="space-y-6">
+                {[
+                  { title: 'Neural Keyword Mapping', desc: 'Matches your experience with regional industry standards.', icon: 'psychology' },
+                  { title: 'Structure Auditing', desc: 'Ensures formatting is readable by all major HR software.', icon: 'description' }
+                ].map(item => (
+                  <div key={item.title} className="flex items-center gap-5 translate-x-0 hover:translate-x-2 transition-transform duration-300 group cursor-default">
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-[#292428] flex items-center justify-center shrink-0 group-hover:border-[#caa2f7]/30 transition-colors">
+                      <span className="material-symbols-outlined text-[#caa2f7] text-2xl">{item.icon}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-black text-[10px] uppercase tracking-widest text-[#faf1f5]">{item.title}</h4>
+                      <p className="text-xs text-[#585457] font-medium mt-1 uppercase tracking-tight">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="relative group overflow-hidden">
+               <img 
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsUkvUFJMFkOKQNsBZmiZjehRgyba_TRfKOwhlpRbVJe369erN8GD6TNQbkpH04iJikmJSIGoGpNzEd5ka8gyBGzcO2N8U9U-AJeY2_Y0fUiuHIMjj2unW1boFX6o6Y7vzUK4r6L_-AyYRfESsatjexpDRfnDiGJ6kPwgEbVFESOa1nsEYAJiscgEA6IigVrAJqyuy0eDkhqqxaWscsDoONPk3SPfdfvRAY0AwIbD4O7LB4W0F1FyUeTLRkE5Hq_dPxTAbMlko16_y" 
+                 alt="Elite Metrics" 
+                 className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-60 transition-all duration-1000"
+               />
+               <div className="absolute inset-0 bg-gradient-to-r from-[#1c181c] via-transparent to-transparent" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#1c181c]/80 to-transparent" />
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="max-w-4xl mx-auto mb-20 text-center">
+          <h2 className="font-headline text-3xl font-bold mb-16">Curated Intelligence</h2>
+          <div className="space-y-4">
+             {[
+               { q: "Can I cancel my Elite Professional subscription at any time?", a: "Yes. We believe in the value of our product. You can cancel your monthly subscription at any time with no hidden fees or locked contracts." },
+               { q: "Does the ATS Optimizer work for Arabic CVs?", a: "Absolutely. Our system is fully localized for Saudi Vision 2030, supporting both Modern Standard Arabic and English industry terminology." }
+             ].map((item, i) => (
+               <div key={i} className="bg-[#1c181c]/50 border border-[#292428] p-8 rounded-3xl text-left hover:border-[#caa2f7]/20 transition-all cursor-pointer">
+                 <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-[#faf1f5] flex justify-between items-center">
+                   {item.q}
+                   <span className="material-symbols-outlined text-[#caa2f7]">expand_more</span>
+                 </h4>
+                 <p className="mt-4 text-[#b0a9ad] text-sm font-light leading-relaxed">{item.a}</p>
+               </div>
+             ))}
+          </div>
+        </section>
+      </main>
+
+      <PublicFooter />
+    </div>
+  )
 }

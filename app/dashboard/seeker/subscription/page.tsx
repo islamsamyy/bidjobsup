@@ -13,7 +13,7 @@ export default async function SeekerSubscriptionPage() {
   // 1. Fetch Subscription Status
   const { data: profile } = await supabase
     .from('users')
-    .select('user_type')
+    .select('user_type, stripe_customer_id')
     .eq('auth_id', user.id)
     .single()
 
@@ -21,13 +21,39 @@ export default async function SeekerSubscriptionPage() {
     redirect('/dashboard/employer')
   }
 
+  // Check real Stripe subscription
+  let activePlanName = ''
+  if (profile?.stripe_customer_id && process.env.STRIPE_SECRET_KEY) {
+    try {
+      const Stripe = (await import('stripe')).default
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+      const subs = await stripe.subscriptions.list({
+        customer: profile.stripe_customer_id,
+        status: 'active',
+        limit: 1,
+        expand: ['data.items.data.price.product'],
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sub = subs.data[0] as any
+      if (sub) {
+        const product = sub.items?.data?.[0]?.price?.product
+        activePlanName = (typeof product === 'object' ? product?.name : '') || ''
+      }
+    } catch {
+      // Stripe not configured or error — treat as free tier
+    }
+  }
+
+  const hasActiveSub = activePlanName.length > 0
+  const isElite = activePlanName.toLowerCase().includes('elite') || activePlanName.toLowerCase().includes('professional')
+
   const plans = [
     {
       name: 'Talent Starter',
       price: '0',
       description: 'Perfect for discovering the platform and making your first professional connections.',
       features: ['Basic CV Parsing', '5 Monthly Bids', 'Public Profile'],
-      isCurrent: true,
+      isCurrent: !hasActiveSub,
       color: 'stone-500',
       icon: 'rocket_launch',
       planId: null,
@@ -37,7 +63,7 @@ export default async function SeekerSubscriptionPage() {
       price: '19',
       description: 'The competitive edge for serious talent looking to dominate their market niche.',
       features: ['Unlimited AI Optimization', 'Priority Role Access', 'Profile Boost (2x Visibility)', 'Direct DM to Recruiters'],
-      isCurrent: false,
+      isCurrent: isElite,
       recommended: true,
       color: 'primary',
       icon: 'workspace_premium',
@@ -48,7 +74,7 @@ export default async function SeekerSubscriptionPage() {
       price: 'Custom',
       description: 'Bespoke solutions for executive search and institutional talent procurement.',
       features: ['Dedicated Talent Manager', 'Custom API Integration', 'Bulk AI Processing'],
-      isCurrent: false,
+      isCurrent: hasActiveSub && !isElite,
       color: 'secondary',
       icon: 'corporate_fare',
       planId: null,
@@ -167,9 +193,9 @@ export default async function SeekerSubscriptionPage() {
       <footer className="mt-32 pt-12 border-t border-outline-variant/10 text-center space-y-4">
          <p className="text-[10px] text-stone-600 font-black uppercase tracking-[0.2em]">BidJobs Protocol Billing & Governance</p>
          <div className="flex justify-center gap-8 text-[9px] font-black uppercase tracking-widest text-stone-500">
-            <a href="#" className="hover:text-primary transition-colors">Integrity Terms</a>
-            <a href="#" className="hover:text-primary transition-colors">Privacy Shield</a>
-            <a href="#" className="hover:text-primary transition-colors">Refund Protocol</a>
+            <a href="/terms" className="hover:text-primary transition-colors">Integrity Terms</a>
+            <a href="/terms" className="hover:text-primary transition-colors">Privacy Shield</a>
+            <a href="/terms" className="hover:text-primary transition-colors">Refund Protocol</a>
          </div>
       </footer>
     </main>

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from '../components/LogoutButton'
 import { SidebarLink } from '../components/SidebarLink'
-
+import NotificationBell from '@/components/features/NotificationBell'
 export default async function SeekerDashboardLayout({
   children,
 }: {
@@ -75,9 +75,7 @@ export default async function SeekerDashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/dashboard/seeker/notifications" className="p-2 text-on-surface-variant hover:text-on-surface transition-colors">
-              <span className="material-symbols-outlined">notifications</span>
-            </Link>
+            <NotificationBell userId={profile.id} userAuthId={user.id} userType={profile.user_type} />
             <Link href="/dashboard/settings" className="p-2 text-on-surface-variant hover:text-on-surface transition-colors">
               <span className="material-symbols-outlined">settings</span>
             </Link>

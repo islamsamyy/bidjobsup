@@ -8,7 +8,7 @@ export default function PublicFooter() {
       title: "Platform",
       links: [
         { name: "Find Jobs", href: "/jobs/browse" },
-        { name: "Companies", href: "/jobs/list" },
+        { name: "Find Talent", href: "/talent" },
         { name: "CV Optimizer", href: "/dashboard/seeker/profile" },
         { name: "Pricing", href: "/pricing" },
       ],
@@ -19,7 +19,7 @@ export default function PublicFooter() {
         { name: "About Us", href: "/about" },
         { name: "Vision 2030", href: "/vision-2030" },
         { name: "Contact Support", href: "/contact" },
-        { name: "Careers", href: "/join" },
+        { name: "Join", href: "/join" },
       ],
     },
     {

@@ -184,7 +184,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             />
           </div>
 
-          {initialData.user_type === 'seeker' && (
+          {(initialData.user_type === 'jobseeker' || initialData.user_type === 'seeker') && (
             <>
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-2">

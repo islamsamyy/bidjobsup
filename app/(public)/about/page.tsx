@@ -1,159 +1,241 @@
-"use client";
+import type { Metadata } from "next";
+import { createClient } from "@/lib/supabase/server";
 
-import Link from "next/link";
+export const metadata: Metadata = {
+  title: "About Us | BidJobs",
+  description:
+    "We are the bridge between elite talent and the monumental ambitions of Saudi Vision 2030.",
+};
 
-export default function AboutPage() {
+const teamMembers = [
+  {
+    name: "Dr. Khalid Al-Faisal",
+    role: "Founder & Chief Visionary",
+    bio: "Former advisor to the Ministry of Investment with 15 years in talent architecture.",
+    gradient: "from-primary/60 to-secondary/40",
+  },
+  {
+    name: "Sarah Bin Saud",
+    role: "Chief Operating Officer",
+    bio: "Lead scaling operations for three Saudi unicorns before joining the BidJobs mission.",
+    gradient: "from-secondary/60 to-tertiary/40",
+  },
+  {
+    name: "Mark Sterling",
+    role: "Chief Technology Officer",
+    bio: "AI pioneer specializing in predictive talent matching algorithms and secure HR-tech.",
+    gradient: "from-tertiary/60 to-primary/40",
+  },
+];
+
+export default async function AboutPage() {
+  const supabase = await createClient()
+
+  // Fetch real platform stats
+  const [
+    { count: totalUsers },
+    { count: totalContracts },
+    { count: totalJobs },
+    { count: totalSeekers },
+  ] = await Promise.all([
+    supabase.from('users').select('*', { count: 'exact', head: true }),
+    supabase.from('contracts').select('*', { count: 'exact', head: true }),
+    supabase.from('jobs').select('*', { count: 'exact', head: true }),
+    supabase.from('users').select('*', { count: 'exact', head: true }).eq('user_type', 'jobseeker'),
+  ])
+
+  // Calculate completion rate from contracts
+  const { count: completedContracts } = await supabase
+    .from('contracts')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'completed')
+
+  const completionRate = (totalContracts || 0) > 0
+    ? Math.round(((completedContracts || 0) / (totalContracts || 1)) * 100)
+    : 0
+
+  // Get distinct job categories as "sectors"
+  const { data: categories } = await supabase
+    .from('jobs')
+    .select('category')
+  const uniqueSectors = new Set(categories?.map(j => j.category).filter(Boolean))
+
+  const formattedUsers = (totalUsers || 0) >= 1000
+    ? `${((totalUsers || 0) / 1000).toFixed(0)}k+`
+    : `${totalUsers || 0}+`
+
   return (
     <>
       {/* Hero Section */}
-      <header className="relative py-32 flex items-center justify-center overflow-hidden min-h-[60vh]">
+      <header className="relative h-[80vh] flex items-center justify-center overflow-hidden -mt-24">
         <div className="absolute inset-0 z-0">
-          <img 
-            className="w-full h-full object-cover opacity-30 grayscale" 
-            src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=80&w=2070" 
-            alt="Riyadh Skyline"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#100d10]/0 via-[#100d10]/50 to-[#100d10]"></div>
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-surface to-secondary/10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-surface" />
         </div>
-        
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto space-y-8 animate-fade-in">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-bold tracking-[0.2em] uppercase">
-            ESTABLISHED 2024
-          </span>
-          <h1 className="text-6xl md:text-8xl font-headline font-black text-[#faf1f5] tracking-tighter mb-8 leading-[0.9] uppercase">
-            Pioneering the <br/> 
-            <span className="text-[#caa2f7] italic font-light drop-shadow-[0_0_20px_rgba(202,162,247,0.3)]">Digital Renaissance</span>
+        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+          <h1 className="text-6xl md:text-8xl font-headline font-bold text-on-background tracking-tighter mb-8 leading-none">
+            Pioneering the <br />
+            <span className="text-primary italic font-light">
+              Digital Renaissance
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl text-[#b0a9ad] font-light max-w-3xl mx-auto leading-relaxed">
-            We are the premier bridge between elite global talent and the monumental ambitions of Saudi Vision 2030.
+          <p className="text-xl md:text-2xl text-on-surface-variant font-light max-w-2xl mx-auto leading-relaxed">
+            We are the bridge between elite talent and the monumental ambitions
+            of Saudi Vision 2030.
           </p>
         </div>
       </header>
 
-      {/* Vision Narrative */}
-      <section className="py-32 bg-[#100d10]">
+      {/* Vision 2030 Narrative */}
+      <section className="py-32 bg-surface">
         <div className="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
           <div className="space-y-12">
             <div className="space-y-4">
-              <span className="text-[#caa2f7] font-bold tracking-[0.2em] uppercase text-[10px]">Kingdom-First Ecosystem</span>
-              <h2 className="text-5xl font-headline font-bold text-[#faf1f5] leading-tight">Aligning with the <br/> Ambition of a Nation.</h2>
+              <span className="text-primary font-label tracking-widest uppercase text-sm font-bold">
+                Kingdom-First Ecosystem
+              </span>
+              <h2 className="text-4xl md:text-5xl font-headline font-semibold text-on-background leading-tight">
+                Aligning with the <br /> Ambition of a Nation.
+              </h2>
             </div>
-            <p className="text-lg text-[#b0a9ad] leading-relaxed font-light">
-              BidJobs was born from a singular realization: the rapid transformation of the Kingdom requires a talent matching engine as sophisticated as the projects it fuels. From the cognitive city of NEOM to the cultural hub of Diriyah, we provide the human capital infrastructure that turns vision into reality.
+            <p className="text-lg text-on-surface-variant leading-relaxed font-light">
+              BidJobs was born from a singular realization: the rapid
+              transformation of the Kingdom requires a talent matching engine as
+              sophisticated as the projects it fuels. From the cognitive city of
+              NEOM to the cultural hub of Diriyah, we provide the human capital
+              infrastructure that turns vision into reality.
             </p>
             <div className="grid grid-cols-2 gap-8 pt-8">
-              <div className="p-8 rounded-2xl bg-[#1c181c] border border-[#292428] hover:border-[#caa2f7]/30 transition-all duration-300 group">
-                <div className="text-4xl font-headline text-[#caa2f7] font-black mb-2 group-hover:scale-110 transition-transform">2030</div>
-                <p className="text-[10px] text-[#b0a9ad] font-bold uppercase tracking-widest">Vision Alignment</p>
-              </div>
-              <div className="p-8 rounded-2xl bg-[#1c181c] border border-[#292428] hover:border-[#caa2f7]/30 transition-all duration-300 group">
-                <div className="text-4xl font-headline text-[#caa2f7] font-black mb-2 group-hover:scale-110 transition-transform">100%</div>
-                <p className="text-[10px] text-[#b0a9ad] font-bold uppercase tracking-widest">Local Commitment</p>
-              </div>
-            </div>
-          </div>
-          <div className="relative group perspective-1000">
-            <div className="absolute -inset-4 bg-[#caa2f7]/5 rounded-[3rem] blur-3xl group-hover:bg-[#caa2f7]/10 transition duration-700"></div>
-            <div className="relative rounded-[2.5rem] overflow-hidden border border-[#caa2f7]/10 shadow-[0_40px_100px_rgba(0,0,0,0.6)]">
-              <img 
-                className="w-full h-[650px] object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-100 group-hover:scale-105" 
-                src="https://images.unsplash.com/photo-1578891752244-672ce74ae877?auto=format&fit=crop&q=80&w=2070" 
-                alt="Architecture"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Impact Stats */}
-      <section className="py-40 bg-[#151215] border-y border-[#292428]/30">
-        <div className="max-w-screen-2xl mx-auto px-8">
-          <div className="mb-24 text-center space-y-4">
-            <h2 className="text-5xl font-headline font-black uppercase tracking-tight">The Talent Impact</h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#caa2f7] to-transparent mx-auto"></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="md:col-span-2 bg-[#1c181c] p-16 rounded-[2.5rem] border border-[#292428] flex flex-col justify-between hover:bg-[#221e22] transition-all group overflow-hidden relative">
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                <span className="material-symbols-outlined text-9xl text-[#caa2f7]">rocket_launch</span>
-              </div>
-              <span className="material-symbols-outlined text-[#caa2f7] text-6xl mb-12">rocket_launch</span>
               <div>
-                <h3 className="text-7xl font-headline font-black text-[#faf1f5] mb-4 tracking-tighter">50k+</h3>
-                <p className="text-[#b0a9ad] text-xl font-light">Professionals placed within Vision 2030 Giga-projects.</p>
+                <div className="text-4xl font-headline text-primary mb-2">
+                  2030
+                </div>
+                <p className="text-sm text-on-surface-variant font-medium">
+                  Vision Alignment Goal
+                </p>
+              </div>
+              <div>
+                <div className="text-4xl font-headline text-primary mb-2">
+                  100%
+                </div>
+                <p className="text-sm text-on-surface-variant font-medium">
+                  Local Content Commitment
+                </p>
               </div>
             </div>
-            <div className="bg-[#1c181c] p-12 rounded-[2.5rem] border border-[#292428] flex flex-col justify-center text-center hover:border-[#caa2f7]/30 transition-all group">
-              <h3 className="text-6xl font-headline font-black text-[#caa2f7] mb-4 group-hover:scale-110 transition-transform">85%</h3>
-              <p className="text-[10px] text-[#b0a9ad] font-bold uppercase tracking-[0.2em]">Saudi Participation Rate</p>
+          </div>
+          <div className="relative group">
+            <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-2xl group-hover:bg-primary/20 transition duration-500" />
+            <div className="relative rounded-xl shadow-2xl w-full h-[600px] bg-gradient-to-br from-primary/30 via-surface-container to-secondary/20" />
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Stats - Bento Style */}
+      <section className="py-32 bg-surface-container-low">
+        <div className="max-w-screen-2xl mx-auto px-8">
+          <div className="mb-20 text-center">
+            <h2 className="text-4xl font-headline font-bold mb-4">
+              The Talent Impact
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="md:col-span-2 bg-surface-container p-12 rounded-xl flex flex-col justify-between hover:bg-surface-bright transition-colors group">
+              <svg
+                className="text-primary w-12 h-12 mb-8 group-hover:scale-110 transition-transform"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"
+                />
+              </svg>
+              <div>
+                <h3 className="text-6xl font-headline font-bold text-on-background mb-4">
+                  {formattedUsers}
+                </h3>
+                <p className="text-on-surface-variant text-lg">
+                  Professionals registered on the platform.
+                </p>
+              </div>
             </div>
-            <div className="bg-[#613471] p-12 rounded-[2.5rem] border border-[#caa2f7]/20 flex flex-col justify-center text-center shadow-[0_20px_40px_rgba(97,52,113,0.3)]">
-              <h3 className="text-6xl font-headline font-black text-white mb-4 italic leading-none">12</h3>
-              <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Sectors Disrupted</p>
+            <div className="bg-surface-container p-12 rounded-xl flex flex-col justify-center text-center hover:bg-surface-bright transition-colors">
+              <h3 className="text-5xl font-headline font-bold text-primary mb-4">
+                {completionRate}%
+              </h3>
+              <p className="text-on-surface-variant font-label">
+                Contract Completion Rate
+              </p>
             </div>
-            <div className="bg-[#1c181c] p-16 rounded-[2.5rem] border border-[#292428] flex flex-col justify-center text-center md:col-span-2 hover:bg-[#221e22] transition-all">
-              <h3 className="text-6xl font-headline font-black text-[#faf1f5] mb-4 tracking-tighter">SAR 1.2B</h3>
-              <p className="text-[10px] text-[#b0a9ad] font-bold uppercase tracking-[0.2em]">Human Capital Value Generated</p>
+            <div className="bg-primary-container p-12 rounded-xl flex flex-col justify-center text-center">
+              <h3 className="text-5xl font-headline font-bold text-on-primary-container mb-4">
+                {uniqueSectors.size || 0}
+              </h3>
+              <p className="text-on-primary-container/80 font-label">
+                Industry Sectors Covered
+              </p>
             </div>
-            <div className="md:col-span-2 relative overflow-hidden rounded-[2.5rem] h-[350px] border border-[#292428]">
-              <img 
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" 
-                src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&q=80&w=2070" 
-                alt="Visionaries"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#000]/90 via-[#000]/40 to-transparent flex items-end p-12">
-                <p className="text-3xl font-headline italic text-white leading-tight font-light">"Reshaping the future of work in the cradle of civilization."</p>
+            <div className="bg-surface-container p-12 rounded-xl flex flex-col justify-center text-center md:col-span-2 hover:bg-surface-bright transition-colors">
+              <h3 className="text-5xl font-headline font-bold text-on-background mb-4">
+                {totalContracts || 0}
+              </h3>
+              <p className="text-on-surface-variant font-label">
+                Contracts Completed on the Platform
+              </p>
+            </div>
+            <div className="md:col-span-2 relative overflow-hidden rounded-xl h-[300px] bg-gradient-to-br from-primary/20 via-surface-container to-tertiary/10">
+              <div className="absolute inset-0 bg-black/40 flex items-center p-12">
+                <p className="text-2xl font-headline italic text-white leading-tight">
+                  &ldquo;Reshaping the future of work in the cradle of
+                  civilization.&rdquo;
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Leadership Section */}
-      <section className="py-40">
+      {/* Leadership Team */}
+      <section className="py-32 bg-surface">
         <div className="max-w-screen-2xl mx-auto px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-            <div className="max-w-2xl space-y-4">
-              <h2 className="text-5xl font-headline font-black tracking-tight uppercase leading-none">The Architects of BidJobs</h2>
-              <p className="text-[#b0a9ad] text-xl font-light leading-relaxed">Our leadership combines global tech expertise with deep-rooted understanding of the Saudi industrial landscape.</p>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+            <div className="max-w-2xl">
+              <h2 className="text-5xl font-headline font-bold mb-6">
+                The Architects <br />
+                of BidJobs.
+              </h2>
+              <p className="text-on-surface-variant text-lg leading-relaxed">
+                Our leadership combines global tech expertise with deep-rooted
+                understanding of the Saudi industrial landscape.
+              </p>
             </div>
-            <Link href="/join" className="text-[#caa2f7] font-black text-xs tracking-[0.2em] uppercase border-b-2 border-[#caa2f7]/30 pb-2 hover:border-[#caa2f7] transition-all">
-              Join the Board →
-            </Link>
+            <a
+              className="text-primary-dim font-bold border-b-2 border-primary-dim/30 pb-1 hover:border-primary-dim transition-all"
+              href="/contact"
+            >
+              Join the Board &rarr;
+            </a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              { 
-                name: "Dr. Khalid Al-Faisal", 
-                role: "Founder & Chief Visionary", 
-                desc: "Former advisor to the Ministry of Investment with 15 years in talent architecture.",
-                img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=1974"
-              },
-              { 
-                name: "Sarah Bin Saud", 
-                role: "Chief Operating Officer", 
-                desc: "Lead scaling operations for three Saudi unicorns before joining the BidJobs mission.",
-                img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1976"
-              },
-              { 
-                name: "Mark Sterling", 
-                role: "Chief Technology Officer", 
-                desc: "AI pioneer specializing in predictive talent matching algorithms and secure HR-tech.",
-                img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=1974"
-              }
-            ].map((member) => (
+            {teamMembers.map((member) => (
               <div key={member.name} className="group">
-                <div className="relative mb-10 overflow-hidden rounded-[2rem] bg-[#1c181c] border border-[#292428] aspect-[4/5]">
-                  <img 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110" 
-                    src={member.img} 
-                    alt={member.name}
+                <div className="relative mb-8 overflow-hidden rounded-xl bg-surface-container">
+                  <div
+                    className={`w-full h-[500px] bg-gradient-to-br ${member.gradient}`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#100d10] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                 </div>
-                <h3 className="text-2xl font-headline font-black text-[#faf1f5] mb-2">{member.name}</h3>
-                <p className="text-[#caa2f7] font-bold text-xs uppercase tracking-widest mb-6">{member.role}</p>
-                <p className="text-[#b0a9ad] text-sm font-light leading-relaxed">{member.desc}</p>
+                <h3 className="text-2xl font-headline font-bold text-on-background">
+                  {member.name}
+                </h3>
+                <p className="text-primary font-medium mb-4">{member.role}</p>
+                <p className="text-on-surface-variant text-sm font-light">
+                  {member.bio}
+                </p>
               </div>
             ))}
           </div>

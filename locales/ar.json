@@ -1,0 +1,32 @@
+{
+  "common": {
+    "language": "اللغة",
+    "english": "English",
+    "arabic": "العربية",
+    "switchLanguage": "تبديل اللغة"
+  },
+  "navigation": {
+    "home": "الصفحة الرئيسية",
+    "about": "من نحن",
+    "jobs": "تصفح الوظائف",
+    "pricing": "الأسعار",
+    "contact": "اتصل بنا",
+    "blog": "المدونة",
+    "signIn": "تسجيل الدخول",
+    "createProfile": "إنشاء ملف شخصي",
+    "dashboard": "لوحة التحكم",
+    "messages": "الرسائل",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "header": {
+    "welcome": "مرحبا بك في BidJobs",
+    "subtitle": "حيث يلتقي الموهوبون بالفرص"
+  },
+  "footer": {
+    "copyright": "© 2026 BidJobs. جميع الحقوق محفوظة.",
+    "terms": "الشروط والخصوصية",
+    "company": "الشركة",
+    "support": "الدعم"
+  }
+}

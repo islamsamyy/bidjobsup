@@ -1,160 +1,280 @@
-import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
+import type { Metadata } from "next";
+import { createClient } from "@/lib/supabase/server";
+import CreatePostForm from "@/components/features/community/CreatePostForm";
+import DeletePostButton from "@/components/features/community/DeletePostButton";
+import Link from "next/link";
 
-const PILLARS = [
-  {
-    icon: 'handshake',
-    title: 'Radical Transparency',
-    body: 'Salaries, expectations, and company culture — all visible before you bid. No surprises, no wasted time.',
-  },
-  {
-    icon: 'diversity_3',
-    title: 'Merit Over Pedigree',
-    body: 'Your portfolio and execution speak louder than your degree or zip code. We level the playing field.',
-  },
-  {
-    icon: 'shield',
-    title: 'Protected Negotiation',
-    body: 'Our bid system keeps both sides protected. Employers can\'t ghost; seekers can\'t lowball without visibility.',
-  },
-  {
-    icon: 'bolt',
-    title: 'Velocity First',
-    body: 'Average time from bid to first response: 48 hours. We built every workflow to remove friction.',
-  },
-]
+export const metadata: Metadata = {
+  title: "Community | BidJobs",
+};
 
-const VALUES = [
-  { stat: '—', label: 'Active Members', icon: 'group' },
-  { stat: '—', label: 'Open Roles', icon: 'work' },
-  { stat: '48h', label: 'Avg. Response Time', icon: 'timer' },
-  { stat: '92%', label: 'Placement Rate', icon: 'trending_up' },
-]
+const gradients = [
+  "bg-gradient-to-br from-primary to-secondary",
+  "bg-gradient-to-br from-secondary to-tertiary",
+  "bg-gradient-to-br from-tertiary to-primary",
+  "bg-gradient-to-br from-primary to-tertiary",
+  "bg-gradient-to-br from-secondary to-primary",
+];
+
+function Avatar({ name, gradient }: { name: string; gradient: string }) {
+  const initials = name
+    .split(" ")
+    .map((w) => w[0])
+    .join("");
+  return (
+    <div
+      className={`rounded-full flex items-center justify-center text-on-primary font-bold text-sm shrink-0 ${gradient}`}
+      aria-label={name}
+    >
+      {initials}
+    </div>
+  );
+}
+
+function SmallAvatar({ name, gradient }: { name: string; gradient: string }) {
+  const initials = name
+    .split(" ")
+    .map((w) => w[0])
+    .join("");
+  return (
+    <div
+      className={`w-8 h-8 rounded-full flex items-center justify-center text-on-primary font-bold text-xs shrink-0 ${gradient}`}
+      aria-label={name}
+    >
+      {initials}
+    </div>
+  );
+}
 
 export default async function CommunityPage() {
   const supabase = await createClient()
 
-  const [{ count: userCount }, { count: jobCount }] = await Promise.all([
-    supabase.from('users').select('*', { count: 'exact', head: true }),
-    supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'open'),
-  ])
+  // Fetch top contributors — users with the most completed contracts or reviews
+  const { data: topUsers } = await supabase
+    .from('users')
+    .select('id, full_name, username, bio, user_type')
+    .order('created_at', { ascending: true })
+    .limit(5)
 
-  const stats = [
-    { stat: userCount != null ? userCount.toLocaleString() : '—', label: 'Active Members', icon: 'group' },
-    { stat: jobCount != null ? jobCount.toLocaleString() : '—', label: 'Open Roles', icon: 'work' },
-    { stat: '48h', label: 'Avg. Response Time', icon: 'timer' },
-    { stat: '92%', label: 'Placement Rate', icon: 'trending_up' },
-  ]
+  // Get review counts for top users
+  const topContributors = await Promise.all(
+    (topUsers || []).map(async (u, i) => {
+      const { count } = await supabase
+        .from('reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('reviewee_id', u.id)
+      return {
+        ...u,
+        reviewCount: count || 0,
+        gradient: gradients[i % gradients.length],
+      }
+    })
+  )
+  topContributors.sort((a, b) => b.reviewCount - a.reviewCount)
+
+  // Get distinct job categories for trending topics
+  const { data: jobCategories } = await supabase
+    .from('jobs')
+    .select('category')
+    .not('category', 'is', null)
+
+  const categoryCounts: Record<string, number> = {}
+  jobCategories?.forEach((j) => {
+    if (j.category) {
+      categoryCounts[j.category] = (categoryCounts[j.category] || 0) + 1
+    }
+  })
+  const trendingTopics = Object.entries(categoryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+
+  // Get current user for post form
+  const { data: { user: authUser } } = await supabase.auth.getUser()
+  let currentProfile: { id: number; full_name: string } | null = null
+  if (authUser) {
+    const { data } = await supabase
+      .from('users')
+      .select('id, full_name')
+      .eq('auth_id', authUser.id)
+      .single()
+    currentProfile = data
+  }
+
+  // Fetch community posts with author info
+  const { data: posts } = await supabase
+    .from('community_posts')
+    .select('id, content, created_at, user_id, author:user_id(id, full_name, username, avatar_url, user_type)')
+    .order('created_at', { ascending: false })
+    .limit(20)
 
   return (
-    <main className="max-w-screen-2xl mx-auto px-8 pt-32 pb-40">
-      {/* Hero */}
-      <section className="text-center mb-32 relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-[#caa2f7]/5 rounded-full blur-[100px] pointer-events-none" />
-        <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-black tracking-[0.2em] uppercase mb-8">
-          The BidJobs Network
-        </span>
-        <h1 className="font-headline text-7xl md:text-9xl font-black tracking-tighter leading-[0.9] text-[#faf1f5] mb-8">
-          Built for the<br />
-          <span className="text-[#caa2f7] italic font-light drop-shadow-[0_0_30px_rgba(202,162,247,0.3)]">
-            Uncommon.
-          </span>
+    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10">
+      {/* Feed Header */}
+      <header className="mb-12">
+        <h1 className="font-headline text-5xl mb-4 text-on-surface">
+          The Intelligence
         </h1>
-        <p className="text-xl text-[#b0a9ad] max-w-2xl mx-auto leading-relaxed font-light mb-12">
-          BidJobs is not a job board. It is a curated ecosystem where elite talent and serious employers negotiate directly — no recruiters, no noise, no compromise.
+        <p className="font-body text-on-surface-variant max-w-lg leading-relaxed">
+          Exclusive insights and high-stakes conversations from the world&apos;s
+          most elite digital architects and strategy leads.
         </p>
-        <div className="flex flex-wrap gap-4 justify-center">
-          <Link
-            href="/sign-up"
-            className="px-10 py-4 rounded-xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-[#caa2f7]/20 hover:brightness-110 active:scale-95 transition-all"
-          >
-            Join the Network
-          </Link>
-          <Link
-            href="/jobs/browse"
-            className="px-10 py-4 rounded-xl border border-[#4b474a] text-[#faf1f5] font-black text-xs uppercase tracking-[0.2em] hover:bg-[#1c181c] transition-all"
-          >
-            Browse Roles
-          </Link>
-        </div>
-      </section>
+      </header>
 
-      {/* Stats Bar */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-32">
-        {stats.map((s) => (
-          <div key={s.label} className="bg-[#1c181c] border border-[#292428] rounded-2xl p-8 text-center group hover:border-[#caa2f7]/20 transition-all">
-            <span className="material-symbols-outlined text-[#caa2f7] text-3xl mb-4 block group-hover:scale-110 transition-transform">
-              {s.icon}
-            </span>
-            <div className="font-headline text-4xl font-black text-[#faf1f5] mb-1">{s.stat}</div>
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[#b0a9ad]">{s.label}</div>
+      <div className="flex gap-10">
+        {/* Main Feed */}
+        <div className="flex-1 min-w-0">
+          {/* Create Post Module */}
+          {currentProfile ? (
+            <CreatePostForm userName={currentProfile.full_name} />
+          ) : (
+            <div className="mb-12 bg-surface-container/60 backdrop-blur-xl rounded-xl p-6 border border-white/5 text-center">
+              <p className="text-on-surface-variant font-body mb-3">Join the conversation</p>
+              <Link
+                href="/sign-in"
+                className="inline-block px-6 py-2 bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-on-primary transition-all rounded-full font-bold text-sm"
+              >
+                Sign in to post
+              </Link>
+            </div>
+          )}
+
+          {/* Feed Posts */}
+          <div className="space-y-8">
+            {posts && posts.length > 0 ? (
+              posts.map((post, i) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const author = post.author as any
+                const authorName = author?.full_name || author?.username || 'Anonymous'
+                const timeAgo = getTimeAgo(post.created_at)
+                const isOwn = currentProfile?.id === post.user_id
+
+                return (
+                  <article key={post.id} className="bg-surface-container/60 backdrop-blur-xl rounded-xl overflow-hidden border border-white/5">
+                    <div className="p-8">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="flex gap-4">
+                          {author?.avatar_url ? (
+                            <img
+                              src={author.avatar_url}
+                              alt={authorName}
+                              className="w-14 h-14 rounded-full object-cover border-2 border-primary/30"
+                            />
+                          ) : (
+                            <Avatar
+                              name={authorName}
+                              gradient={`w-14 h-14 ${gradients[i % gradients.length]} border-2 border-primary/30`}
+                            />
+                          )}
+                          <div>
+                            <h3 className="font-headline text-xl text-primary">
+                              {authorName}
+                            </h3>
+                            <span className="text-xs text-neutral-500 font-body">
+                              {author?.user_type === 'employer' ? 'Employer' : 'Professional'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-neutral-600 font-body text-sm">{timeAgo}</span>
+                          {isOwn && <DeletePostButton postId={post.id} />}
+                        </div>
+                      </div>
+                      <p className="font-body text-lg text-on-surface/90 leading-relaxed whitespace-pre-wrap">
+                        {post.content}
+                      </p>
+                    </div>
+                  </article>
+                )
+              })
+            ) : (
+              <article className="bg-surface-container/60 backdrop-blur-xl rounded-xl overflow-hidden border border-white/5">
+                <div className="p-8 text-center py-16">
+                  <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                    <span className="material-symbols-outlined text-primary text-4xl">forum</span>
+                  </div>
+                  <h3 className="font-headline text-3xl font-bold text-on-surface mb-4">
+                    No posts yet
+                  </h3>
+                  <p className="font-body text-on-surface-variant max-w-md mx-auto leading-relaxed">
+                    Be the first to share an insight with the community.
+                  </p>
+                </div>
+              </article>
+            )}
           </div>
-        ))}
-      </section>
-
-      {/* Pillars */}
-      <section className="mb-32">
-        <div className="text-center mb-16">
-          <h2 className="font-headline text-5xl font-black text-[#faf1f5] mb-4">Our Principles</h2>
-          <p className="text-[#b0a9ad] text-lg font-light">What makes BidJobs different from every other platform.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {PILLARS.map((pillar) => (
-            <div key={pillar.title} className="group bg-[#1c181c] border border-[#292428] rounded-2xl p-10 hover:border-[#caa2f7]/20 hover:bg-[#221e22] transition-all duration-500">
-              <div className="w-14 h-14 rounded-xl bg-[#100d10] border border-[#292428] flex items-center justify-center text-[#caa2f7] mb-6 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined">{pillar.icon}</span>
+
+        {/* Right Sidebar */}
+        <aside className="hidden lg:block w-72 shrink-0">
+          <div className="sticky top-28">
+            <div className="mb-10">
+              <h4 className="font-headline text-primary text-sm uppercase tracking-widest mb-6 border-b border-primary/20 pb-2">
+                Trending Categories
+              </h4>
+              <div className="space-y-6">
+                {trendingTopics.length > 0 ? (
+                  trendingTopics.map(([category, count], i) => (
+                    <div key={category}>
+                      <span className="text-xs text-neutral-500 font-body">
+                        {String(i + 1).padStart(2, '0')} / {category.toUpperCase()}
+                      </span>
+                      <h5 className="font-body font-bold text-on-surface hover:text-primary cursor-pointer transition-colors">
+                        {category}
+                      </h5>
+                      <p className="text-xs text-neutral-600 mt-1">
+                        {count} active listing{count !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-neutral-500">No categories yet</p>
+                )}
               </div>
-              <h3 className="font-headline text-2xl font-bold text-[#faf1f5] mb-4">{pillar.title}</h3>
-              <p className="text-[#b0a9ad] leading-relaxed">{pillar.body}</p>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* How it Works */}
-      <section className="mb-32">
-        <div className="text-center mb-16">
-          <h2 className="font-headline text-5xl font-black text-[#faf1f5] mb-4">How it Works</h2>
-          <p className="text-[#b0a9ad] text-lg font-light">Three steps from discovery to signed contract.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { step: '01', title: 'Build Your Profile', body: 'Showcase your portfolio, set your rates, and define the kind of work you want. Your profile is your pitch.' },
-            { step: '02', title: 'Find & Bid', body: 'Browse curated opportunities and submit a targeted bid — your rate, your timeline, your terms.' },
-            { step: '03', title: 'Close the Deal', body: 'Communicate directly with the employer through our secure messaging system and finalize the engagement.' },
-          ].map((step) => (
-            <div key={step.step} className="relative bg-[#1c181c] border border-[#292428] rounded-2xl p-10 hover:border-[#caa2f7]/20 transition-all">
-              <div className="font-headline text-7xl font-black text-[#292428] mb-4">{step.step}</div>
-              <h3 className="font-headline text-2xl font-bold text-[#faf1f5] mb-4">{step.title}</h3>
-              <p className="text-[#b0a9ad] leading-relaxed">{step.body}</p>
+            <div>
+              <h4 className="font-headline text-primary text-sm uppercase tracking-widest mb-6 border-b border-primary/20 pb-2">
+                Platform Members
+              </h4>
+              <div className="space-y-4">
+                {topContributors.slice(0, 3).map((user) => (
+                  <div key={user.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <SmallAvatar
+                        name={user.full_name || user.username || 'User'}
+                        gradient={user.gradient}
+                      />
+                      <span className="text-sm font-body font-semibold">
+                        {user.full_name || user.username || 'User'}
+                      </span>
+                    </div>
+                    <span className="text-xs font-headline italic text-primary">
+                      {user.reviewCount} review{user.reviewCount !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                ))}
+                {topContributors.length === 0 && (
+                  <p className="text-sm text-neutral-500">No members yet</p>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
 
-      {/* CTA */}
-      <section className="text-center bg-gradient-to-br from-[#1c181c] to-[#100d10] border border-[#caa2f7]/10 rounded-[2rem] p-20">
-        <h2 className="font-headline text-5xl font-black text-[#faf1f5] mb-6">
-          Ready to Join?
-        </h2>
-        <p className="text-[#b0a9ad] text-lg font-light mb-10 max-w-xl mx-auto">
-          Whether you are hiring or bidding, the network is open. No gatekeepers. No waiting lists.
-        </p>
-        <div className="flex flex-wrap gap-4 justify-center">
-          <Link
-            href="/sign-up"
-            className="px-10 py-4 rounded-xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-[#caa2f7]/20 hover:brightness-110 active:scale-95 transition-all"
-          >
-            Create Free Account
-          </Link>
-          <Link
-            href="/blog"
-            className="px-10 py-4 rounded-xl border border-[#4b474a] text-[#faf1f5] font-black text-xs uppercase tracking-[0.2em] hover:bg-[#1c181c] transition-all"
-          >
-            Read Our Editorial
-          </Link>
-        </div>
-      </section>
-    </main>
-  )
+function getTimeAgo(dateStr: string) {
+  const now = Date.now()
+  const then = new Date(dateStr).getTime()
+  const diff = now - then
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 30) return `${days}d ago`
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }

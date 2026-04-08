@@ -67,11 +67,16 @@ export default async function LandingPage() {
     redirect(`/jobs/browse?q=${query || ''}&l=${location || ''}`);
   }
 
+  // Calculate placement rate from contracts vs total bids
+  const { count: contractsCount } = await supabase
+    .from('contracts')
+    .select('*', { count: 'exact', head: true })
+
   const stats = [
     { label: "Active Jobs", val: `${(jobsCount || 0).toLocaleString()}+` },
     { label: "Partner Companies", val: `${(companiesCount || 0).toLocaleString()}+` },
     { label: "Job Seekers", val: `${(seekersCount || 0).toLocaleString()}+` },
-    { label: "Placement Rate", val: "92%" }
+    { label: "Successful Hires", val: `${(contractsCount || 0).toLocaleString()}+` }
   ];
 
   return (

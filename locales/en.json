@@ -1,0 +1,32 @@
+{
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "arabic": "العربية",
+    "switchLanguage": "Switch Language"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About Us",
+    "jobs": "Browse Jobs",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "blog": "Blog",
+    "signIn": "Sign In",
+    "createProfile": "Create Profile",
+    "dashboard": "Dashboard",
+    "messages": "Messages",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "header": {
+    "welcome": "Welcome to BidJobs",
+    "subtitle": "Where Elite Talent Meets Opportunity"
+  },
+  "footer": {
+    "copyright": "© 2026 BidJobs. All rights reserved.",
+    "terms": "Terms & Privacy",
+    "company": "Company",
+    "support": "Support"
+  }
+}

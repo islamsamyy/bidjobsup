@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { analyzeCV } from "@/lib/actions/ats";
 
 export default function ATSOptimizePage() {
   const router = useRouter();
@@ -10,19 +11,30 @@ export default function ATSOptimizePage() {
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"upload" | "paste">("upload");
+  const [error, setError] = useState<string | null>(null);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!cvText || !jobDescription) {
-      alert("Please provide both CV and job description");
+    setError(null);
+
+    if (!cvText.trim() || !jobDescription.trim()) {
+      setError("Please provide both CV and job description");
       return;
     }
+
     setLoading(true);
-    // Simulate API call - will be replaced with actual backend
-    setTimeout(() => {
+    try {
+      const results = await analyzeCV(cvText, jobDescription);
+
+      // Store results in sessionStorage for results page
+      sessionStorage.setItem("atsResults", JSON.stringify(results));
+
       router.push("/ats-optimize/results");
+    } catch (err: any) {
+      setError(err.message || "Failed to analyze CV. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -148,11 +160,24 @@ export default function ATSOptimizePage() {
             </p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 text-red-300 flex items-start gap-3">
+              <span className="material-symbols-outlined flex-shrink-0">
+                error
+              </span>
+              <div>
+                <p className="font-semibold">Error</p>
+                <p className="text-sm mt-1">{error}</p>
+              </div>
+            </div>
+          )}
+
           {/* Submit Button */}
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               type="submit"
-              disabled={loading || !cvText || !jobDescription}
+              disabled={loading || !cvText.trim() || !jobDescription.trim()}
               className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary-container font-bold py-4 px-6 rounded-xl hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (

@@ -1,91 +1,79 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const mockResults = {
-  matchScore: 78,
-  atsScore: 82,
-  keywordMatchPercentage: 75,
-  missingKeywords: [
-    "Project Management",
-    "Agile",
-    "Scrum",
-    "JIRA",
-    "Leadership",
-  ],
-  presentKeywords: [
-    "React",
-    "JavaScript",
-    "Node.js",
-    "Database Design",
-    "REST APIs",
-  ],
-  recommendations: [
-    {
-      title: "Add Missing Skills",
-      description:
-        "Include 'Project Management' and 'Agile/Scrum' in your experience section",
-      priority: "high",
-      icon: "flag",
-    },
-    {
-      title: "Use Job Title Keywords",
-      description: "Mirror the exact job title terminology from the posting",
-      priority: "high",
-      icon: "bookmark",
-    },
-    {
-      title: "Optimize Formatting",
-      description:
-        "Use standard section headers and bullet points for better ATS parsing",
-      priority: "medium",
-      icon: "info",
-    },
-    {
-      title: "Add Quantifiable Results",
-      description: "Include metrics and percentages in your achievements",
-      priority: "medium",
-      icon: "trending_up",
-    },
-    {
-      title: "Simplify Formatting",
-      description: "Avoid tables, graphics, and complex layouts",
-      priority: "low",
-      icon: "design_services",
-    },
-  ],
-  sections: [
-    {
-      name: "Contact Information",
-      score: 95,
-      status: "excellent",
-    },
-    {
-      name: "Professional Summary",
-      score: 70,
-      status: "good",
-    },
-    {
-      name: "Work Experience",
-      score: 80,
-      status: "good",
-    },
-    {
-      name: "Skills",
-      score: 85,
-      status: "excellent",
-    },
-    {
-      name: "Education",
-      score: 90,
-      status: "excellent",
-    },
-  ],
-};
+interface ATSAnalysisResult {
+  matchScore: number
+  atsScore: number
+  keywordMatchPercentage: number
+  presentKeywords: string[]
+  missingKeywords: string[]
+  sections: Array<{
+    name: string
+    score: number
+    status: 'excellent' | 'good' | 'fair' | 'poor'
+  }>
+  recommendations: Array<{
+    title: string
+    description: string
+    priority: 'high' | 'medium' | 'low'
+    icon: string
+  }>
+}
 
 export default function ATSResultsPage() {
-  const [expandedTip, setExpandedTip] = useState<number | null>(null);
+  const [expandedTip, setExpandedTip] = useState<number | null>(null)
+  const [results, setResults] = useState<ATSAnalysisResult | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Retrieve results from sessionStorage
+    const storedResults = sessionStorage.getItem("atsResults")
+    if (storedResults) {
+      try {
+        setResults(JSON.parse(storedResults))
+      } catch (err) {
+        console.error("Failed to parse results:", err)
+      }
+    }
+    setLoading(false)
+  }, [])
+
+  if (loading) {
+    return (
+      <main className="min-h-screen pt-28 pb-20 px-5 md:px-10 lg:px-14 flex items-center justify-center">
+        <div className="text-center">
+          <span className="material-symbols-outlined text-5xl text-primary animate-spin mb-4 block">
+            hourglass_top
+          </span>
+          <p className="text-on-surface-variant">Loading results...</p>
+        </div>
+      </main>
+    )
+  }
+
+  if (!results) {
+    return (
+      <main className="min-h-screen pt-28 pb-20 px-5 md:px-10 lg:px-14">
+        <div className="max-w-5xl mx-auto text-center py-12">
+          <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 block">
+            error
+          </span>
+          <h1 className="text-3xl font-bold text-on-surface mb-4">No Analysis Results</h1>
+          <p className="text-on-surface-variant mb-8">
+            Please go back and complete the ATS analysis first.
+          </p>
+          <Link
+            href="/ats-optimize"
+            className="inline-block bg-primary text-on-primary-container font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all"
+          >
+            Back to Analyzer
+          </Link>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen pt-28 pb-20 px-5 md:px-10 lg:px-14">
@@ -134,7 +122,7 @@ export default function ATSResultsPage() {
                     stroke="url(#gradient)"
                     strokeWidth="8"
                     fill="none"
-                    strokeDasharray={`${(mockResults.matchScore / 100) * 314} 314`}
+                    strokeDasharray={`${(results.matchScore / 100) * 314} 314`}
                   />
                   <defs>
                     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -145,14 +133,14 @@ export default function ATSResultsPage() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="text-3xl font-bold text-primary">
-                    {mockResults.matchScore}%
+                    {results.matchScore}%
                   </div>
                   <div className="text-xs text-on-surface-variant">Match</div>
                 </div>
               </div>
               <h3 className="font-bold text-on-surface">Overall Match</h3>
               <p className="text-sm text-on-surface-variant mt-2">
-                Your CV matches the job description well
+                Your CV matches the job description
               </p>
             </div>
 
@@ -175,7 +163,7 @@ export default function ATSResultsPage() {
                     stroke="url(#gradient2)"
                     strokeWidth="8"
                     fill="none"
-                    strokeDasharray={`${(mockResults.atsScore / 100) * 314} 314`}
+                    strokeDasharray={`${(results.atsScore / 100) * 314} 314`}
                   />
                   <defs>
                     <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -186,14 +174,14 @@ export default function ATSResultsPage() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="text-3xl font-bold text-emerald-400">
-                    {mockResults.atsScore}%
+                    {results.atsScore}%
                   </div>
                   <div className="text-xs text-on-surface-variant">ATS Score</div>
                 </div>
               </div>
               <h3 className="font-bold text-on-surface">ATS Readability</h3>
               <p className="text-sm text-on-surface-variant mt-2">
-                Your CV is ATS-friendly
+                Your CV's ATS compatibility
               </p>
             </div>
 
@@ -216,7 +204,7 @@ export default function ATSResultsPage() {
                     stroke="url(#gradient3)"
                     strokeWidth="8"
                     fill="none"
-                    strokeDasharray={`${(mockResults.keywordMatchPercentage / 100) * 314} 314`}
+                    strokeDasharray={`${(results.keywordMatchPercentage / 100) * 314} 314`}
                   />
                   <defs>
                     <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -227,14 +215,14 @@ export default function ATSResultsPage() {
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="text-3xl font-bold text-yellow-400">
-                    {mockResults.keywordMatchPercentage}%
+                    {results.keywordMatchPercentage}%
                   </div>
                   <div className="text-xs text-on-surface-variant">Keywords</div>
                 </div>
               </div>
               <h3 className="font-bold text-on-surface">Keyword Match</h3>
               <p className="text-sm text-on-surface-variant mt-2">
-                75% of keywords found
+                Job description match
               </p>
             </div>
           </div>
@@ -246,31 +234,37 @@ export default function ATSResultsPage() {
             Section Breakdown
           </h2>
           <div className="space-y-4">
-            {mockResults.sections.map((section) => (
+            {results.sections.map((section) => (
               <div key={section.name} className="flex items-center gap-4">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold text-on-surface">
                       {section.name}
                     </h3>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                          section.status === "excellent"
-                            ? "bg-emerald-500/20 text-emerald-300"
-                            : "bg-primary/20 text-primary"
-                        }`}
-                      >
-                        {section.score}
-                      </div>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                        section.status === 'excellent'
+                          ? 'bg-emerald-500/20 text-emerald-300'
+                          : section.status === 'good'
+                            ? 'bg-primary/20 text-primary'
+                            : section.status === 'fair'
+                              ? 'bg-yellow-500/20 text-yellow-300'
+                              : 'bg-red-500/20 text-red-300'
+                      }`}
+                    >
+                      {section.score}
                     </div>
                   </div>
                   <div className="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        section.status === "excellent"
-                          ? "bg-emerald-500"
-                          : "bg-primary"
+                        section.status === 'excellent'
+                          ? 'bg-emerald-500'
+                          : section.status === 'good'
+                            ? 'bg-primary'
+                            : section.status === 'fair'
+                              ? 'bg-yellow-500'
+                              : 'bg-red-500'
                       }`}
                       style={{ width: `${section.score}%` }}
                     />
@@ -289,10 +283,10 @@ export default function ATSResultsPage() {
               <span className="material-symbols-outlined text-emerald-400">
                 check_circle
               </span>
-              Keywords Found ({mockResults.presentKeywords.length})
+              Keywords Found ({results.presentKeywords.length})
             </h3>
             <div className="flex flex-wrap gap-3">
-              {mockResults.presentKeywords.map((keyword) => (
+              {results.presentKeywords.map((keyword: string) => (
                 <div
                   key={keyword}
                   className="px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-lg text-sm font-medium"
@@ -301,6 +295,9 @@ export default function ATSResultsPage() {
                 </div>
               ))}
             </div>
+            {results.presentKeywords.length === 0 && (
+              <p className="text-on-surface-variant">No matching keywords found</p>
+            )}
           </div>
 
           {/* Missing Keywords */}
@@ -309,10 +306,10 @@ export default function ATSResultsPage() {
               <span className="material-symbols-outlined text-orange-400">
                 warning
               </span>
-              Missing Keywords ({mockResults.missingKeywords.length})
+              Missing Keywords ({results.missingKeywords.length})
             </h3>
             <div className="flex flex-wrap gap-3">
-              {mockResults.missingKeywords.map((keyword) => (
+              {results.missingKeywords.map((keyword: string) => (
                 <div
                   key={keyword}
                   className="px-4 py-2 bg-orange-500/20 border border-orange-500/30 text-orange-300 rounded-lg text-sm font-medium"
@@ -321,6 +318,9 @@ export default function ATSResultsPage() {
                 </div>
               ))}
             </div>
+            {results.missingKeywords.length === 0 && (
+              <p className="text-on-surface-variant">All keywords matched!</p>
+            )}
           </div>
         </div>
 
@@ -330,7 +330,7 @@ export default function ATSResultsPage() {
             Recommendations
           </h2>
           <div className="space-y-3">
-            {mockResults.recommendations.map((rec, idx) => (
+            {results.recommendations.map((rec, idx) => (
               <div
                 key={idx}
                 className="border border-outline-variant/10 rounded-xl overflow-hidden transition-all"
@@ -340,16 +340,16 @@ export default function ATSResultsPage() {
                     setExpandedTip(expandedTip === idx ? null : idx)
                   }
                   className={`w-full p-6 flex items-start gap-4 hover:bg-surface-container-high transition-colors ${
-                    expandedTip === idx ? "bg-surface-container-high" : ""
+                    expandedTip === idx ? 'bg-surface-container-high' : ''
                   }`}
                 >
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      rec.priority === "high"
-                        ? "bg-red-500/20 text-red-300"
-                        : rec.priority === "medium"
-                          ? "bg-yellow-500/20 text-yellow-300"
-                          : "bg-blue-500/20 text-blue-300"
+                      rec.priority === 'high'
+                        ? 'bg-red-500/20 text-red-300'
+                        : rec.priority === 'medium'
+                          ? 'bg-yellow-500/20 text-yellow-300'
+                          : 'bg-blue-500/20 text-blue-300'
                     }`}
                   >
                     <span className="material-symbols-outlined">
@@ -364,7 +364,7 @@ export default function ATSResultsPage() {
                   </div>
                   <span
                     className={`material-symbols-outlined transition-transform ${
-                      expandedTip === idx ? "rotate-180" : ""
+                      expandedTip === idx ? 'rotate-180' : ''
                     }`}
                   >
                     expand_more

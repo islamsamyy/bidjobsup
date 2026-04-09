@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createBrowserClient } from '@supabase/ssr'
 import { Star, Trash2 } from 'lucide-react'
 import { deleteReview } from '@/lib/actions/reviews'
 
@@ -26,21 +26,35 @@ export default function ReviewsList({ talentId, currentUserId }: ReviewsListProp
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const supabase = await createClient()
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
         const { data, error } = await supabase
           .from('reviews')
-          .select(`
-            id,
-            rating,
-            comment,
-            created_at,
-            reviewer:reviewer_id(full_name, avatar_url)
-          `)
+          .select('id, rating, comment, created_at, reviewer_id')
           .eq('reviewee_id', talentId)
           .order('created_at', { ascending: false })
 
         if (!error && data) {
-          setReviews(data)
+          // Fetch reviewer info for all reviews
+          const reviewerIds = [...new Set(data.map(r => r.reviewer_id))]
+          const { data: reviewers } = await supabase
+            .from('users')
+            .select('id, full_name, avatar_url')
+            .in('id', reviewerIds)
+
+          const reviewerMap: Record<number, any> = {}
+          reviewers?.forEach(r => {
+            reviewerMap[r.id] = r
+          })
+
+          const reviewsWithReviewers = data.map(r => ({
+            ...r,
+            reviewer: reviewerMap[r.reviewer_id]
+          }))
+
+          setReviews(reviewsWithReviewers)
           if (data.length > 0) {
             const avg = data.reduce((sum, r) => sum + r.rating, 0) / data.length
             setAverageRating(parseFloat(avg.toFixed(1)))

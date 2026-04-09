@@ -33,38 +33,41 @@ export async function createJob(formData: FormData) {
   const jobType = (formData.get('job_type') as 'full-time' | 'part-time' | 'contract' | 'project') || 'full-time'
   const experienceLevel = (formData.get('experience_level') as 'entry' | 'intermediate' | 'expert') || 'expert'
   const duration = (formData.get('duration') as any) || '1_week_to_1_month'
-  const skillsRaw = formData.get('skills') as string
-  const skills_required = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean) : []
 
   // 3. Insert Job into Database
+  const jobData: any = {
+    employer_id: profile.id,
+    employer_auth_id: user.id,
+    title,
+    description: description || 'No description provided.',
+    category: category || 'General',
+    budget_min: budgetMin,
+    budget_max: budgetMax,
+    budget_type: budgetType,
+    job_type: jobType,
+    experience_level: experienceLevel,
+    duration,
+    status: 'open',
+  }
+
   const { data: insertedJob, error } = await supabase
     .from('jobs')
-    .insert({
-      employer_id: profile.id,
-      employer_auth_id: user.id,
-      title,
-      description: description || 'No description provided.',
-      category: category || 'General',
-      budget_min: budgetMin,
-      budget_max: budgetMax,
-      budget_type: budgetType,
-      job_type: jobType,
-      experience_level: experienceLevel,
-      duration,
-      skills_required,
-      status: 'open',
-    })
+    .insert([jobData])
     .select()
-    .single()
 
   if (error) {
     console.error('Error creating job:', error)
-    // In a real app we'd return the error to the client, but for simplicity we can redirect with a query param
-    redirect('/dashboard/employer/post-job?error=Failed to create job')
+    console.error('Job data attempted:', jobData)
+    throw new Error(`Database error: ${error.message || 'Failed to create job'}`)
+  }
+
+  if (!insertedJob || insertedJob.length === 0) {
+    throw new Error('Job created but no data returned')
   }
 
   // 4. Redirect on success
   revalidatePath('/dashboard/employer')
   revalidatePath('/dashboard/employer/listings')
+  revalidatePath('/jobs/browse')
   redirect(`/dashboard/employer/listings`)
 }

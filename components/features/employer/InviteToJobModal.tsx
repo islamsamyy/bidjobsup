@@ -13,14 +13,12 @@ interface InviteToJobModalProps {
   talentId: number
   talentName: string
   jobs: Job[]
-  onSuccess: () => void
 }
 
 export default function InviteToJobModal({
   talentId,
   talentName,
   jobs,
-  onSuccess,
 }: InviteToJobModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null)
@@ -45,7 +43,7 @@ export default function InviteToJobModal({
         setSelectedJobId(null)
         setMessage('')
         setIsOpen(false)
-        onSuccess()
+        // Success - invite sent
       } else {
         setError(result.error || 'Failed to send invite')
       }

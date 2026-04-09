@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { InteractiveHomePage, StatCard, JobCard } from "@/components/features/InteractiveHomePage";
 
 export const metadata: Metadata = {
   title: "BidJobs — Where Elite Talent Meets Opportunity",
@@ -111,6 +112,7 @@ export default async function LandingPage() {
 
   return (
     <>
+      <InteractiveHomePage />
       <section className="relative pt-24 pb-32 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#caa2f7]/5 rounded-full blur-[120px] -z-10 animate-pulse-glow"></div>
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#eab3fa]/5 rounded-full blur-[100px] -z-10"></div>
@@ -160,33 +162,90 @@ export default async function LandingPage() {
             </form>
           </div>
 
-          <div className="relative group perspective-1000">
-            <div className="absolute -top-12 -right-12 w-64 h-64 bg-[#caa2f7]/10 rounded-full blur-[80px] group-hover:bg-[#caa2f7]/20 transition-colors duration-700"></div>
-            <div className="relative z-10 rounded-[2.5rem] overflow-hidden border border-[#caa2f7]/10 shadow-[0_40px_100px_rgba(0,0,0,0.6)] group-hover:rotate-0 transition-transform duration-700 hover:scale-[1.02] cursor-pointer">
-              <img 
-                alt="Elite Workspace" 
-                className="w-full h-[650px] object-cover grayscale hover:grayscale-0 transition-all duration-700" 
-                src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=2070"
-              />
-              
-              <div className="absolute bottom-12 -left-12 z-20 p-8 bg-[#100d10]/80 backdrop-blur-2xl rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.5)] border border-[#caa2f7]/20 max-w-[280px] group-hover:translate-x-4 transition-transform duration-500">
-                <div className="flex items-center gap-5 mb-6">
-                  <div className="w-14 h-14 rounded-full bg-[#613471] flex items-center justify-center shadow-[0_0_15px_rgba(202,162,247,0.2)]">
-                    <span className="material-symbols-outlined text-[#caa2f7] text-3xl">trending_up</span>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-[#b0a9ad] uppercase tracking-widest font-bold">Active Projects</p>
-                    <p className="font-headline font-bold text-[#faf1f5] text-lg">NEOM High-Speed Link</p>
-                  </div>
+          <div className="relative group perspective-1000 h-[650px] flex items-center justify-center">
+            {/* Animated background orbs */}
+            <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#caa2f7]/15 rounded-full blur-[100px] group-hover:bg-[#caa2f7]/25 transition-colors duration-1000 animate-pulse"></div>
+            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-[#613471]/15 rounded-full blur-[100px] group-hover:bg-[#613471]/25 transition-colors duration-1000 animate-pulse delay-500"></div>
+
+            {/* BidJobs Logo SVG Container */}
+            <div className="relative z-10 flex flex-col items-center justify-center gap-12">
+              <style>{`
+                @keyframes float {
+                  0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+                  50% { transform: translateY(-20px) rotateZ(5deg); }
+                }
+                @keyframes glow {
+                  0%, 100% { filter: drop-shadow(0 0 20px rgba(202, 162, 247, 0.3)); }
+                  50% { filter: drop-shadow(0 0 40px rgba(202, 162, 247, 0.6)); }
+                }
+                .animate-float {
+                  animation: float 6s ease-in-out infinite;
+                }
+                .animate-glow {
+                  animation: glow 3s ease-in-out infinite;
+                }
+              `}</style>
+
+              <svg
+                className="animate-float animate-glow w-64 h-64"
+                viewBox="0 0 240 240"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Palm Leaves */}
+                <path d="M120 20 Q130 50 125 80" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.8"/>
+                <path d="M120 20 Q110 50 115 80" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.8"/>
+                <path d="M120 20 Q145 45 160 70" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.7"/>
+                <path d="M120 20 Q95 45 80 70" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.7"/>
+                <path d="M120 20 Q155 55 170 95" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.6"/>
+                <path d="M120 20 Q85 55 70 95" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.6"/>
+                <path d="M120 20 Q160 70 160 120" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.5"/>
+                <path d="M120 20 Q80 70 80 120" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.5"/>
+
+                {/* Building */}
+                <rect x="90" y="100" width="60" height="80" fill="#caa2f7" opacity="0.9"/>
+                <rect x="95" y="105" width="50" height="70" fill="#100d10"/>
+
+                {/* Windows */}
+                {[0, 1, 2].map((row) => (
+                  [0, 1, 2, 3].map((col) => (
+                    <rect
+                      key={`window-${row}-${col}`}
+                      x={97 + col * 12}
+                      y={107 + row * 18}
+                      width="10"
+                      height="10"
+                      fill="#caa2f7"
+                      opacity="0.6"
+                    />
+                  ))
+                ))}
+              </svg>
+
+              <div className="text-center max-w-md">
+                <h3 className="text-3xl font-headline font-bold text-[#caa2f7] mb-2">BidJobs Platform</h3>
+                <p className="text-sm text-[#b0a9ad]">Where elite talent builds tomorrow's vision</p>
+              </div>
+            </div>
+
+            {/* Floating stat card */}
+            <div className="absolute bottom-12 -left-12 z-20 p-8 bg-[#100d10]/80 backdrop-blur-2xl rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.5)] border border-[#caa2f7]/20 max-w-[280px] group-hover:translate-x-4 transition-transform duration-500 hover:scale-105">
+              <div className="flex items-center gap-5 mb-6">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#caa2f7] to-[#613471] flex items-center justify-center shadow-[0_0_15px_rgba(202,162,247,0.3)] animate-pulse">
+                  <span className="material-symbols-outlined text-white text-3xl">trending_up</span>
                 </div>
-                <div className="flex -space-x-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[#100d10] bg-[#292428] overflow-hidden">
-                      <img src={`https://i.pravatar.cc/100?u=user${i}`} alt="user" />
-                    </div>
-                  ))}
-                  <div className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-[#100d10] bg-[#caa2f7] text-[10px] font-black text-[#431f6b]">12k+</div>
+                <div>
+                  <p className="text-[10px] text-[#b0a9ad] uppercase tracking-widest font-bold">Active Projects</p>
+                  <p className="font-headline font-bold text-[#faf1f5] text-lg">NEOM High-Speed Link</p>
                 </div>
+              </div>
+              <div className="flex -space-x-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-10 h-10 rounded-full border-2 border-[#100d10] bg-gradient-to-br from-[#caa2f7] to-[#613471] overflow-hidden hover:scale-110 transition-transform">
+                    <img src={`https://i.pravatar.cc/100?u=user${i}`} alt="user" />
+                  </div>
+                ))}
+                <div className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-[#100d10] bg-[#caa2f7] text-[10px] font-black text-[#431f6b] hover:scale-110 transition-transform">12k+</div>
               </div>
             </div>
           </div>
@@ -197,12 +256,7 @@ export default async function LandingPage() {
         <div className="max-w-screen-2xl mx-auto px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-16 text-center">
             {stats.map((stat) => (
-              <div key={stat.label} className="group">
-                <h3 className="font-headline text-5xl font-black text-[#caa2f7] mb-3 group-hover:scale-110 transition-transform">
-                  {stat.val}
-                </h3>
-                <p className="text-[#b0a9ad] font-bold text-[10px] uppercase tracking-[0.2em]">{stat.label}</p>
-              </div>
+              <StatCard key={stat.label} value={stat.val} label={stat.label} />
             ))}
           </div>
         </div>
@@ -264,39 +318,11 @@ export default async function LandingPage() {
           <div className="space-y-6">
             {featuredJobs && featuredJobs.length > 0 ? (
               featuredJobs.map((job, i) => (
-                <Link 
+                <Link
                   href={`/jobs/${job.id}`}
-                  key={i} 
-                  className="group flex flex-col md:flex-row items-center justify-between p-10 bg-[#1c181c] border border-[#292428] rounded-[2.5rem] hover:bg-[#221e22] hover:border-[#caa2f7]/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#caa2f7]/50"
+                  key={i}
                 >
-                  <div className="flex items-center gap-8 mb-8 md:mb-0">
-                    <div className="w-20 h-20 rounded-[1.5rem] bg-[#100d10] flex items-center justify-center text-3xl shadow-inner group-hover:scale-105 transition-transform overflow-hidden shrink-0">
-                      {job.employer?.avatar_url ? (
-                        <img src={job.employer.avatar_url} alt={job.employer?.company_name || job.employer?.full_name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="material-symbols-outlined text-[#caa2f7] text-4xl">corporate_fare</span>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold mb-2 group-hover:text-[#caa2f7] transition-colors">{job.title}</h3>
-                      <p className="text-[#b0a9ad] text-sm flex items-center gap-3">
-                        <span className="font-bold text-[#faf1f5]/80">{job.employer?.company_name || job.employer?.full_name}</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#4b474a]"></span>
-                        {job.employer?.location || "Remote"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-10 w-full md:w-auto justify-between md:justify-end mt-4 md:mt-0">
-                    <div className="hidden sm:flex flex-col gap-2 items-end">
-                      <span className="px-4 py-1.5 rounded-full bg-[#613471]/30 text-[#f1bfff] text-[10px] font-black tracking-widest whitespace-nowrap">
-                        {job.budget_min && job.budget_max ? `$${(job.budget_min as number).toLocaleString()} - $${(job.budget_max as number).toLocaleString()}` : "Elite Salary"}
-                      </span>
-                      <span className="text-[10px] text-[#b0a9ad] uppercase tracking-[0.2em] font-bold capitalize">{job.budget_type === 'hourly' ? 'Contract' : 'Full-time'}</span>
-                    </div>
-                    <div className="bg-[#faf1f5] hover:bg-[#caa2f7] text-[#100d10] font-black px-12 py-4 rounded-xl transition-all duration-300 shadow-[0_10px_30px_rgba(202,162,247,0.1)] group-hover:shadow-[0_10px_30px_rgba(202,162,247,0.3)] whitespace-nowrap text-center">
-                      APPLY ROLE
-                    </div>
-                  </div>
+                  <JobCard job={job} index={i} />
                 </Link>
               ))
             ) : (

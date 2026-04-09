@@ -5,12 +5,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
+import { useLanguage } from '@/app/providers/LanguageProvider'
 
 interface SignInFormProps {
   initialMessage?: string
 }
 
 export default function SignInForm({ initialMessage }: SignInFormProps) {
+  const { t, dir } = useLanguage()
   const [serverError, setServerError] = useState<string | null>(initialMessage || null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -45,14 +47,13 @@ export default function SignInForm({ initialMessage }: SignInFormProps) {
   }
 
   return (
-    <div className="glass border border-outline-variant/15 rounded-xl p-10 md:p-12 shadow-[0_32px_64px_rgba(0,0,0,0.5)]">
+    <div className="glass border border-outline-variant/15 rounded-xl p-10 md:p-12 shadow-[0_32px_64px_rgba(0,0,0,0.5)]" dir={dir}>
       <div className="mb-10 text-center md:text-left">
         <h1 className="font-headline text-4xl text-on-surface mb-3 tracking-tight">
-          Welcome Back.
+          {t('auth.signIn')}
         </h1>
         <p className="text-on-surface-variant font-body text-sm tracking-wide leading-relaxed">
-          Access the exclusive Vision 2030 talent ecosystem.
-          Your next architectural milestone awaits.
+          {t('auth.haveAccount') || 'Access the exclusive Vision 2030 talent ecosystem. Your next architectural milestone awaits.'}
         </p>
       </div>
 
@@ -70,13 +71,13 @@ export default function SignInForm({ initialMessage }: SignInFormProps) {
             className="block font-body text-[10px] uppercase tracking-[0.2em] text-on-surface-variant px-1"
             htmlFor="email"
           >
-            Email Address
+            {t('forms.labels.email')}
           </label>
           <div className="relative group">
             <input
               className={`input-inset w-full transition-all ${errors.email ? 'border-error/50 focus:border-error' : ''}`}
               id="email"
-              placeholder="name@domain.com"
+              placeholder={t('forms.placeholders.email')}
               type="email"
               autoComplete="email"
               {...register('email')}
@@ -97,13 +98,13 @@ export default function SignInForm({ initialMessage }: SignInFormProps) {
               className="block font-body text-[10px] uppercase tracking-[0.2em] text-on-surface-variant px-1"
               htmlFor="password"
             >
-              Password
+              {t('forms.labels.password')}
             </label>
             <Link
               className="text-secondary text-[10px] uppercase tracking-widest hover:text-primary transition-colors duration-300"
               href="/forgot-password"
             >
-              Forgot?
+              {t('auth.forgotPassword')}
             </Link>
           </div>
           <div className="relative group">
@@ -133,10 +134,10 @@ export default function SignInForm({ initialMessage }: SignInFormProps) {
           {isLoading ? (
             <>
               <span className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
-              Authenticating...
+              {t('common.loading')}
             </>
           ) : (
-            'Sign In'
+            t('buttons.signIn')
           )}
         </button>
       </form>
@@ -145,7 +146,7 @@ export default function SignInForm({ initialMessage }: SignInFormProps) {
       <div className="flex items-center gap-4 my-10">
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-outline-variant/20 to-outline-variant/40" />
         <span className="font-body text-[10px] uppercase tracking-widest text-on-surface-variant/40">
-          Or continue with
+          {dir === 'rtl' ? 'أو استمر باستخدام' : 'Or continue with'}
         </span>
         <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent via-outline-variant/20 to-outline-variant/40" />
       </div>
@@ -185,12 +186,12 @@ export default function SignInForm({ initialMessage }: SignInFormProps) {
 
       {/* Footer Link */}
       <p className="text-center font-body text-xs text-on-surface-variant/60 tracking-wide">
-        New to the collective?{' '}
+        {t('auth.noAccount')}{' '}
         <Link
           className="text-secondary font-semibold hover:text-primary transition-colors ml-1 underline decoration-secondary/20 underline-offset-4"
           href="/join"
         >
-          Create account
+          {t('buttons.createAccount')}
         </Link>
       </p>
     </div>

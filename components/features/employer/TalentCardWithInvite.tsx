@@ -82,7 +82,6 @@ export default function TalentCardWithInvite({ bid, employerJobs }: TalentCardWi
             talentId={bid.seeker.id}
             talentName={bid.seeker.full_name || bid.seeker.username || 'Talent'}
             jobs={employerJobs.map((j: any) => ({ id: j.id, title: j.title || 'Job' }))}
-            onSuccess={() => setInviteCount(inviteCount + 1)}
           />
         )}
 

@@ -20,8 +20,25 @@ export async function login(formData: FormData) {
     redirect(`/sign-in?message=${encodeURIComponent(error.message)}`)
   }
 
+  // Get user's role to redirect to correct dashboard
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('user_type')
+      .eq('auth_id', user.id)
+      .single()
+
+    revalidatePath('/', 'layout')
+    if (profile?.user_type === 'employer') {
+      redirect('/dashboard/employer')
+    } else {
+      redirect('/dashboard/seeker')
+    }
+  }
+
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/dashboard/seeker')
 }
 
 export async function signup(formData: FormData) {
@@ -56,8 +73,26 @@ export async function signup(formData: FormData) {
       if (signInError) {
         redirect(`/sign-in?message=${encodeURIComponent(signInError.message)}`)
       }
+
+      // Get user's role to redirect to correct dashboard
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('user_type')
+          .eq('auth_id', user.id)
+          .single()
+
+        revalidatePath('/', 'layout')
+        if (profile?.user_type === 'employer') {
+          redirect('/dashboard/employer')
+        } else {
+          redirect('/dashboard/seeker')
+        }
+      }
+
       revalidatePath('/', 'layout')
-      redirect('/dashboard')
+      redirect('/dashboard/seeker')
     } else {
       console.error(signUpError)
       redirect(`/sign-up?message=${encodeURIComponent(signUpError.message)}`)

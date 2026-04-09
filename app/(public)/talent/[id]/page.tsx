@@ -5,6 +5,7 @@ import ReviewForm from '@/components/features/ReviewForm'
 import ReviewsList from '@/components/features/ReviewsList'
 import InviteToJobModal from '@/components/features/employer/InviteToJobModal'
 import TalentPortfolioSection from '@/components/features/TalentPortfolioSection'
+import ContactTalentModal from '@/components/features/ContactTalentModal'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -125,24 +126,27 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
                   talentId={parseInt(id)}
                   talentName={profile.full_name || 'Talent'}
                   jobs={employerJobs}
-                  onSuccess={() => {
-                    // Could refresh page or show toast notification
-                  }}
                 />
               )}
 
-              <button className="w-full mt-10 py-5 rounded-2xl bg-gradient-to-br from-[#caa2f7] to-[#613471] text-[#431f6b] font-black text-xs uppercase tracking-widest shadow-xl shadow-[#caa2f7]/10 hover:brightness-110 active:scale-95 transition-all">
-                Book Consultation
-              </button>
+              {currentUser && (
+                <ContactTalentModal
+                  talentId={parseInt(id)}
+                  talentName={profile.full_name || 'Talent'}
+                />
+              )}
             </div>
 
             {/* Social / Links */}
-            <div className="bg-[#1c181c]/50 border border-[#292428] rounded-3xl p-6 flex justify-around">
-               {['language', 'share', 'contact_support'].map(icon => (
-                 <button key={icon} className="w-12 h-12 rounded-xl bg-white/5 border border-[#292428] flex items-center justify-center text-[#b0a9ad] hover:text-[#caa2f7] hover:border-[#caa2f7]/40 transition-all">
-                   <span className="material-symbols-outlined text-xl">{icon}</span>
-                 </button>
-               ))}
+            <div className="bg-[#1c181c]/50 border border-[#292428] rounded-3xl p-6 flex justify-around gap-2">
+               <button className="flex-1 w-12 h-12 rounded-xl bg-white/5 border border-[#292428] flex items-center justify-center text-[#b0a9ad] hover:text-[#caa2f7] hover:border-[#caa2f7]/40 transition-all" title="Share Profile">
+                 <span className="material-symbols-outlined text-xl">share</span>
+               </button>
+               {currentUser && (
+                 <div className="flex-1 w-12 h-12 rounded-xl bg-white/5 border border-[#292428] flex items-center justify-center text-[#b0a9ad]">
+                   <span className="material-symbols-outlined text-xl">mail</span>
+                 </div>
+               )}
             </div>
           </aside>
 
@@ -225,9 +229,6 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
                 <ReviewForm
                   revieweeId={parseInt(id)}
                   jobId={0}
-                  onSuccess={() => {
-                    // Reviews will auto-refresh on page revalidation
-                  }}
                 />
               </section>
             )}

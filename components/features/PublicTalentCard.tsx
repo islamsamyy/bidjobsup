@@ -150,9 +150,6 @@ export default function PublicTalentCard({ talent }: TalentCardProps) {
             talentId={talent.id}
             talentName={talent.full_name || 'Talent'}
             jobs={employerJobs}
-            onSuccess={() => {
-              // Success feedback handled by modal
-            }}
           />
         )}
 

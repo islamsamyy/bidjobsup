@@ -7,10 +7,9 @@ import { Star } from 'lucide-react'
 interface ReviewFormProps {
   revieweeId: number
   jobId: number
-  onSuccess: () => void
 }
 
-export default function ReviewForm({ revieweeId, jobId, onSuccess }: ReviewFormProps) {
+export default function ReviewForm({ revieweeId, jobId }: ReviewFormProps) {
   const [rating, setRating] = useState(5)
   const [comment, setComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -37,7 +36,7 @@ export default function ReviewForm({ revieweeId, jobId, onSuccess }: ReviewFormP
       if (result.success) {
         setRating(5)
         setComment('')
-        onSuccess()
+        // Review submitted successfully
       } else {
         setError(result.error || 'Failed to submit review')
       }

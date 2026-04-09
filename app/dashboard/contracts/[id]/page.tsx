@@ -233,9 +233,6 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
               <ReviewForm
                 revieweeId={otherParty?.id}
                 jobId={contract.job_id}
-                onSuccess={() => {
-                  // Reviews list will auto-refresh on page revalidation
-                }}
               />
             </div>
           )}

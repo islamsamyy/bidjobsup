@@ -19,6 +19,11 @@ export default function PostJobPage() {
       await createJob(formData)
       // NOTE: the server action will redirect to /dashboard/employer/listings on success
     } catch (err: any) {
+      // Server actions that redirect will throw NEXT_REDIRECT
+      if (err?.message?.includes('NEXT_REDIRECT')) {
+        return // Let the redirect happen
+      }
+      console.error('Post job error:', err)
       setError(err.message || 'Failed to post job')
       setLoading(false)
     }

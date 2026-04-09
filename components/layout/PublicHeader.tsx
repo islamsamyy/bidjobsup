@@ -6,54 +6,54 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LanguageSwitcher } from "@/components/features/LanguageSwitcher";
 import NotificationBell from "@/components/features/NotificationBell";
+import { useLanguage } from "@/app/providers/LanguageProvider";
 
 /* ─────────────────────────────────────────────────────────────────
    NAV STRUCTURE
 ───────────────────────────────────────────────────────────────── */
-const NAV = [
+const getNavItems = (t: (key: string) => string) => [
   {
-    label: "Hire Talent",
+    label: t("header.hireTalent"),
     icon: "person_search",
     items: [
-      { label: "Find Talent",    href: "/talent",           icon: "person_search", desc: "Browse our elite specialist directory" },
-      { label: "Post Mandate",   href: "/join",             icon: "stars",         desc: "Join as an employer" },
-      { label: "Arabic Version", href: "/home-ar",          icon: "translate",     desc: "النسخة العربية" },
+      { label: t("header.findTalent"),    href: "/talent",           icon: "person_search", desc: t("header.browseOurEliteSpecialistDirectory") },
+      { label: t("header.postJob"),   href: "/join",             icon: "stars",         desc: t("header.postANewJobMandate") },
     ],
   },
   {
-    label: "Find Work",
+    label: t("header.findWork"),
     icon: "work",
     items: [
-      { label: "Browse Jobs",    href: "/jobs/browse",  icon: "grid_view",     desc: "Explore all open roles" },
-      { label: "Job Listings",   href: "/jobs/list",    icon: "view_list",     desc: "Full job catalogue with filters" },
-      { label: "Search Jobs",    href: "/jobs/search",  icon: "search",        desc: "Find by keyword or skill" },
+      { label: t("header.browseJobs"),    href: "/jobs/browse",  icon: "grid_view",     desc: t("header.exploreAllOpenRoles") },
+      { label: t("header.jobListings"),   href: "/jobs/list",    icon: "view_list",     desc: t("header.fullJobCatalogueWithFilters") },
+      { label: t("header.searchJobs"),    href: "/jobs/search",  icon: "search",        desc: t("header.findByKeywordOrSkill") },
     ],
   },
   {
-    label: "Tools",
+    label: t("header.tools"),
     icon: "build",
     items: [
-      { label: "ATS Optimizer",  href: "/ats-optimize",  icon: "verified_user", desc: "Optimize your CV for ATS systems" },
-      { label: "Talent Finder",  href: "/talent",        icon: "person_search", desc: "Find and hire top talent" },
+      { label: t("header.atsOptimizer"),  href: "/ats-optimize",  icon: "verified_user", desc: t("header.optimizeYourCVForATSSystems") },
+      { label: t("header.talentFinder"),  href: "/talent",        icon: "person_search", desc: t("header.findAndHireTopTalent") },
     ],
   },
   {
-    label: "Community",
+    label: t("header.community"),
     icon: "groups",
     items: [
-      { label: "Editorial Blog", href: "/blog",           icon: "article",       desc: "Strategy, insights & market intel" },
-      { label: "Community Hub",  href: "/community",      icon: "forum",         desc: "Our mission & network values" },
-      { label: "Vision 2030",    href: "/vision-2030",    icon: "flag",          desc: "Saudi national alignment" },
+      { label: t("header.editorialBlog"), href: "/blog",           icon: "article",       desc: t("header.strategyInsightsMarketIntel") },
+      { label: t("header.communityHub"),  href: "/community",      icon: "forum",         desc: t("header.ourMissionNetworkValues") },
+      { label: t("header.vision2030"),    href: "/vision-2030",    icon: "flag",          desc: t("header.saudiNationalAlignment") },
     ],
   },
   {
-    label: "Company",
+    label: t("header.company"),
     icon: "corporate_fare",
     items: [
-      { label: "About Us",       href: "/about",          icon: "info",          desc: "Our mission & team" },
-      { label: "Pricing",        href: "/pricing",        icon: "payments",      desc: "Plans for every level" },
-      { label: "Contact",        href: "/contact",        icon: "mail",          desc: "Get in touch with us" },
-      { label: "Terms & Privacy",href: "/terms",          icon: "policy",        desc: "Legal & privacy docs" },
+      { label: t("header.aboutUs"),       href: "/about",          icon: "info",          desc: t("header.ourMissionTeam") },
+      { label: t("header.plans"),        href: "/pricing",        icon: "payments",      desc: t("header.plansForEveryLevel") },
+      { label: t("header.contact"),        href: "/contact",        icon: "mail",          desc: t("header.getInTouchWithUs") },
+      { label: t("header.termsPrivacy"),href: "/terms",          icon: "policy",        desc: t("header.legalPrivacyDocs") },
     ],
   },
 ];
@@ -69,6 +69,8 @@ export default function PublicHeader({
   initialProfile?: any;
 }) {
   const pathname = usePathname();
+  const { t, dir } = useLanguage();
+  const NAV = getNavItems(t);
   const [user, setUser] = useState<any>(initialUser ?? null);
   const [profile, setProfile] = useState<any>(initialProfile ?? null);
   const [loading, setLoading] = useState(!initialUser);
@@ -132,7 +134,7 @@ export default function PublicHeader({
   /* ─────────────────────────────────────────────────────────── */
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-[#100d10]/80 backdrop-blur-2xl border-b border-[#292428]/40">
+      <nav className="fixed top-0 left-0 w-full z-50 bg-[#100d10]/80 backdrop-blur-2xl border-b border-[#292428]/40" dir={dir}>
         <div className="flex justify-between items-center w-full px-5 md:px-10 xl:px-14 py-3.5 max-w-screen-2xl mx-auto">
 
           {/* Logo */}
@@ -222,7 +224,7 @@ export default function PublicHeader({
               <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: pathname === "/pricing" ? "'FILL' 1" : "'FILL' 0" }}>
                 payments
               </span>
-              Pricing
+              {t("navigation.pricing")}
             </Link>
           </div>
 
@@ -241,7 +243,7 @@ export default function PublicHeader({
                   className="flex items-center gap-2 bg-gradient-to-br from-[#caa2f7] to-[#b690e3] text-[#431f6b] font-black py-2 px-5 rounded-full shadow-[0_8px_20px_rgba(202,162,247,0.2)] hover:scale-[0.98] hover:shadow-none transition-all text-[10px] tracking-[0.18em] uppercase"
                 >
                   <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-                  Dashboard
+                  {t("buttons.getDashboard")}
                 </Link>
                 <Link
                   href="/dashboard"
@@ -262,13 +264,13 @@ export default function PublicHeader({
                   href="/sign-in"
                   className="text-[10px] font-black tracking-[0.18em] uppercase text-[#b0a9ad] hover:text-[#faf1f5] transition-colors px-3 py-2"
                 >
-                  Sign In
+                  {t("buttons.signIn")}
                 </Link>
                 <Link
                   href="/join"
                   className="bg-gradient-to-br from-[#caa2f7] to-[#b690e3] text-[#431f6b] font-black py-2.5 px-6 rounded-xl shadow-[0_8px_20px_rgba(202,162,247,0.2)] hover:scale-[0.98] hover:shadow-none transition-all text-[10px] tracking-[0.18em] uppercase whitespace-nowrap"
                 >
-                  Join Elite
+                  {t("buttons.joinElite")}
                 </Link>
               </div>
             )}
@@ -297,7 +299,7 @@ export default function PublicHeader({
           />
 
           {/* Drawer panel */}
-          <div className="absolute top-0 right-0 h-full w-80 max-w-[90vw] bg-[#1c181c] border-l border-[#292428]/60 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+          <div className="absolute top-0 right-0 h-full w-80 max-w-[90vw] bg-[#1c181c] border-l border-[#292428]/60 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300" dir={dir}>
 
             {/* Drawer header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-[#292428]/40">
@@ -381,7 +383,7 @@ export default function PublicHeader({
                 >
                   payments
                 </span>
-                <span className="text-[10px] font-black tracking-[0.18em] uppercase">Pricing</span>
+                <span className="text-[10px] font-black tracking-[0.18em] uppercase">{t("navigation.pricing")}</span>
               </Link>
             </div>
 
@@ -396,7 +398,7 @@ export default function PublicHeader({
                     className="flex items-center gap-3 w-full bg-gradient-to-br from-[#caa2f7] to-[#b690e3] text-[#431f6b] font-black py-3.5 px-5 rounded-xl text-[10px] tracking-[0.18em] uppercase"
                   >
                     <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-                    Go to Dashboard
+                    {t("buttons.goToDashboard")}
                   </Link>
                   <div className="flex items-center gap-3 px-1">
                     <div className="w-9 h-9 rounded-full border border-[#292428] overflow-hidden bg-surface-container flex items-center justify-center shrink-0">
@@ -421,13 +423,13 @@ export default function PublicHeader({
                     className="flex items-center justify-center gap-2 w-full bg-gradient-to-br from-[#caa2f7] to-[#b690e3] text-[#431f6b] font-black py-3.5 px-5 rounded-xl text-[10px] tracking-[0.18em] uppercase"
                   >
                     <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-                    Join Elite
+                    {t("buttons.joinElite")}
                   </Link>
                   <Link
                     href="/sign-in"
                     className="flex items-center justify-center w-full border border-[#292428]/60 text-[#b0a9ad] hover:text-[#faf1f5] font-black py-3.5 px-5 rounded-xl text-[10px] tracking-[0.18em] uppercase transition-colors"
                   >
-                    Sign In
+                    {t("buttons.signIn")}
                   </Link>
                 </>
               )}

@@ -46,28 +46,30 @@ export async function createReview({
     return { error: 'You cannot review yourself.' }
   }
 
-  // Verify the job exists and reviewer was involved
-  const { data: job } = await supabase
-    .from('jobs')
-    .select('employer_id, status')
-    .eq('id', jobId)
-    .single()
-
-  if (!job) return { error: 'Job not found.' }
-
-  // Check if reviewer is involved in this job (either employer or accepted seeker)
-  if (job.employer_id !== reviewer.id) {
-    // If reviewer is not the employer, they must be an accepted seeker for this job
-    const { data: bid } = await supabase
-      .from('bids')
-      .select('id')
-      .eq('job_id', jobId)
-      .eq('bidder_id', reviewer.id)
-      .eq('status', 'accepted')
+  // Verify the job exists and reviewer was involved (only if jobId provided)
+  if (jobId && jobId > 0) {
+    const { data: job } = await supabase
+      .from('jobs')
+      .select('employer_id, status')
+      .eq('id', jobId)
       .single()
 
-    if (!bid) {
-      return { error: 'You are not involved in this job.' }
+    if (!job) return { error: 'Job not found.' }
+
+    // Check if reviewer is involved in this job (either employer or accepted seeker)
+    if (job.employer_id !== reviewer.id) {
+      // If reviewer is not the employer, they must be an accepted seeker for this job
+      const { data: bid } = await supabase
+        .from('bids')
+        .select('id')
+        .eq('job_id', jobId)
+        .eq('bidder_id', reviewer.id)
+        .eq('status', 'accepted')
+        .single()
+
+      if (!bid) {
+        return { error: 'You are not involved in this job.' }
+      }
     }
   }
 

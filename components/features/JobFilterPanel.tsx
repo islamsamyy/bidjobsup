@@ -5,13 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
 
 interface JobFilterPanelProps {
-  onSearch?: (filters: {
-    budget_min?: number
-    budget_max?: number
-    job_type?: string
-    experience_level?: string
-    sort?: string
-  }) => void
   defaultValues?: {
     budget_min?: number
     budget_max?: number
@@ -21,7 +14,7 @@ interface JobFilterPanelProps {
   }
 }
 
-export default function JobFilterPanel({ onSearch, defaultValues = {} }: JobFilterPanelProps) {
+export default function JobFilterPanel({ defaultValues = {} }: JobFilterPanelProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
@@ -70,17 +63,6 @@ export default function JobFilterPanel({ onSearch, defaultValues = {} }: JobFilt
     startTransition(() => {
       router.push(`/jobs/browse?${params.toString()}`)
     })
-
-    // Also call legacy onSearch if provided
-    if (onSearch) {
-      const filters: any = {}
-      if (budgetMin > 0) filters.budget_min = budgetMin
-      if (budgetMax < 100000) filters.budget_max = budgetMax
-      if (jobType) filters.job_type = jobType
-      if (experienceLevel) filters.experience_level = experienceLevel
-      if (sort) filters.sort = sort
-      onSearch(filters)
-    }
   }
 
   const activeFilterCount = Object.entries(defaultValues).filter(([, v]) => v).length

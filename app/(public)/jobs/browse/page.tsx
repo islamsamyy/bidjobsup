@@ -244,9 +244,6 @@ export default async function BrowseJobsPage({ searchParams }: PageProps) {
             experience_level: experienceLevel || undefined,
             sort: sort || 'newest'
           }}
-          onSearch={(filters) => {
-            // This is handled by form submission, so we just need the component to render
-          }}
         />
       </section>
 

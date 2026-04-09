@@ -83,9 +83,15 @@ export async function signup(formData: FormData) {
     }
   }
 
-  // 3. Revalidate and redirect to dashboard route center
+  // 3. Revalidate and redirect to role-based dashboard
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+
+  // Redirect to appropriate dashboard based on user type
+  if (userType === 'employer') {
+    redirect('/dashboard/employer')
+  } else {
+    redirect('/dashboard/seeker')
+  }
 }
 
 export async function logout() {

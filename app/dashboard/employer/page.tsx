@@ -1,13 +1,15 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import AnalyticsCharts from '@/components/features/analytics/AnalyticsCharts'
+import { getEmployerAnalytics } from '@/lib/actions/analytics'
 
 export const dynamic = 'force-dynamic'
 
 export default async function EmployerDashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   if (!user) {
     redirect('/sign-in')
   }
@@ -18,7 +20,7 @@ export default async function EmployerDashboardPage() {
     .select('*')
     .eq('auth_id', user.id)
     .single()
-    
+
   if (!profile) {
     redirect('/sign-in')
   }
@@ -29,7 +31,7 @@ export default async function EmployerDashboardPage() {
     .select('*', { count: 'exact', head: true })
     .eq('employer_id', profile.id)
     .eq('status', 'open')
-    
+
   // 3. Get total applicants across all employer's jobs
   const { count: applicantsCount } = await supabase
     .from('bids')
@@ -56,9 +58,12 @@ export default async function EmployerDashboardPage() {
     .order('created_at', { ascending: false })
     .limit(5)
 
-  // 7. Calculate profile completeness
+  // 7. Fetch analytics data
+  const analyticsResult = await getEmployerAnalytics()
+
+  // 8. Calculate profile completeness
   const isProfileComplete = !!(profile.full_name && profile.bio && profile.company_name)
-  
+
   const firstName = profile.full_name?.split(' ')[0] || profile.username || 'Partner'
 
   // Determine time-based greeting
@@ -149,6 +154,18 @@ export default async function EmployerDashboardPage() {
           <div className="text-sm font-body text-on-surface-variant">Total Roles Posted</div>
         </div>
       </div>
+
+      {/* Analytics Charts */}
+      {analyticsResult.data && (
+        <div>
+          <h2 className="text-3xl font-bold text-on-surface mb-8">Analytics & Insights</h2>
+          <AnalyticsCharts
+            applicationsOverTime={analyticsResult.data.applicationsOverTime}
+            jobsByCategory={analyticsResult.data.jobsByCategory}
+            applicationStatus={analyticsResult.data.applicationStatus}
+          />
+        </div>
+      )}
 
       {/* Activity & Recommendations */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

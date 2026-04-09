@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import ReviewForm from '@/components/features/ReviewForm'
+import ReviewsList from '@/components/features/ReviewsList'
 
 export const dynamic = 'force-dynamic'
 
@@ -212,6 +214,31 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
               )}
             </div>
           </div>
+
+          {/* Reviews */}
+          <div>
+            <h2 className="font-headline text-2xl font-bold text-on-surface mb-6">Feedback</h2>
+            <ReviewsList
+              talentId={otherParty?.id}
+              currentUserId={currentUser.id}
+            />
+          </div>
+
+          {/* Leave Review for Completed Contract */}
+          {contract.status === 'completed' && (
+            <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-8">
+              <h2 className="font-headline text-2xl font-bold text-on-surface mb-6">
+                {isEmployer ? 'Review this freelancer' : 'Review this employer'}
+              </h2>
+              <ReviewForm
+                revieweeId={otherParty?.id}
+                jobId={contract.job_id}
+                onSuccess={() => {
+                  // Reviews list will auto-refresh on page revalidation
+                }}
+              />
+            </div>
+          )}
 
           {/* Communication */}
           <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-8">

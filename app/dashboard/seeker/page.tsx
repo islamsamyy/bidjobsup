@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { markAllNotificationsAsRead } from '@/lib/actions/notifications'
+import AnalyticsCharts from '@/components/features/analytics/AnalyticsCharts'
+import { getSeekerAnalytics } from '@/lib/actions/analytics'
 
 export const dynamic = 'force-dynamic'
 
@@ -75,9 +77,12 @@ export default async function SeekerDashboardPage() {
     .eq('bidder_id', profile.id)
     .eq('status', 'accepted')
 
+  // 8. Fetch analytics data
+  const analyticsResult = await getSeekerAnalytics()
+
   const totalBids = activeAppsCount || 0
-  const successRate = totalBids > 0 
-    ? Math.round(((acceptedBidsCount || 0) / totalBids) * 100) + '%' 
+  const successRate = totalBids > 0
+    ? Math.round(((acceptedBidsCount || 0) / totalBids) * 100) + '%'
     : '—'
 
   const firstName = profile.full_name?.split(' ')[0] || profile.username || 'Talent'
@@ -174,6 +179,18 @@ export default async function SeekerDashboardPage() {
           <div className="text-sm font-body text-on-surface-variant">Saved Jobs</div>
         </div>
       </div>
+
+      {/* Analytics Charts */}
+      {analyticsResult.data && (
+        <div>
+          <h2 className="text-3xl font-bold text-on-surface mb-8">Analytics & Insights</h2>
+          <AnalyticsCharts
+            applicationsOverTime={analyticsResult.data.applicationsOverTime}
+            jobsByCategory={analyticsResult.data.jobsByCategory}
+            applicationStatus={analyticsResult.data.applicationStatus}
+          />
+        </div>
+      )}
 
       {/* Activity & Recommendations */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

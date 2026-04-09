@@ -2,7 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ReviewForm from '@/components/features/ReviewForm'
+import ReviewsList from '@/components/features/ReviewsList'
 import InviteToJobModal from '@/components/features/employer/InviteToJobModal'
+import TalentPortfolioSection from '@/components/features/TalentPortfolioSection'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -193,19 +195,38 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
               </div>
             </section>
 
-            {/* Review Section */}
+            {/* Portfolio Section */}
+            <TalentPortfolioSection
+              userId={parseInt(id)}
+              talentName={profile.full_name || 'Talent'}
+            />
+
+            {/* Reviews Section */}
+            <section>
+              <div className="flex items-center gap-4 mb-6">
+                <span className="h-px flex-grow bg-gradient-to-r from-transparent to-[#292428]" />
+                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#caa2f7]">Reviews & Feedback</h2>
+                <span className="h-px w-12 bg-[#292428]" />
+              </div>
+              <ReviewsList
+                talentId={parseInt(id)}
+                currentUserId={currentUser?.id}
+              />
+            </section>
+
+            {/* Leave Review Section */}
             {currentUser && currentUser.id !== parseInt(id) && (
               <section>
                 <div className="flex items-center gap-4 mb-6">
                   <span className="h-px flex-grow bg-gradient-to-r from-transparent to-[#292428]" />
-                  <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#caa2f7]">Leave a Review</h2>
+                  <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#caa2f7]">Share Your Experience</h2>
                   <span className="h-px w-12 bg-[#292428]" />
                 </div>
                 <ReviewForm
                   revieweeId={parseInt(id)}
-                  jobId={0} // Placeholder - in real app would be the job ID from completed contract
+                  jobId={0}
                   onSuccess={() => {
-                    // Could show success toast or refresh reviews
+                    // Reviews will auto-refresh on page revalidation
                   }}
                 />
               </section>

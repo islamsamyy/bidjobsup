@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import CreateProfileForm from '@/components/features/auth/CreateProfileForm'
+import { createClient } from '@/lib/supabase/server'
+import PublicHeader from '@/components/layout/PublicHeader'
 
 export const metadata = {
   title: 'Create Account | BidJobs — Vision 2030 Talent Ecosystem',
@@ -15,34 +17,24 @@ export default async function SignUpPage({
   const message = params?.message
   const role = params?.role === 'employer' ? 'employer' : 'jobseeker'
 
+  // Fetch initial user state for header
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  let initialProfile = null
+  if (user) {
+    const { data } = await supabase
+      .from('users')
+      .select('*')
+      .eq('auth_id', user.id)
+      .single()
+    initialProfile = data
+  }
+
   return (
     <div className="bg-surface text-on-surface font-body min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
-      {/* Top Navigation */}
-      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-20 bg-[#100d10]/70 backdrop-blur-xl">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span
-              className="material-symbols-outlined text-on-primary-fixed text-xl"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              domain
-            </span>
-          </div>
-          <span className="text-2xl font-headline font-bold text-primary tracking-tight drop-shadow-[0_0_8px_rgba(202,162,247,0.2)]">
-            BidJobs
-          </span>
-        </Link>
-        <div className="hidden md:flex gap-8 items-center">
-          <Link
-            href="/contact"
-            className="text-on-surface-variant font-body text-xs uppercase tracking-widest hover:text-primary transition-colors"
-          >
-            Support
-          </Link>
-        </div>
-      </header>
+      <PublicHeader initialUser={user} initialProfile={initialProfile} />
 
-      <main className="relative flex-grow flex items-center justify-center pt-24 pb-12 overflow-hidden">
+      <main className="relative flex-grow flex items-center justify-center pt-40 pb-12 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
           <div

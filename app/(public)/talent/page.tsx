@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import TalentCard from '@/components/features/TalentCard'
+import PublicTalentCard from '@/components/features/PublicTalentCard'
 import Link from 'next/link'
 
 export const metadata = {
@@ -121,7 +121,24 @@ export default async function FindTalentPage({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {talentsWithRatings?.map((talent: any) => (
-              <TalentCard key={talent.id} talent={talent} />
+              <PublicTalentCard
+                key={talent.id}
+                talent={{
+                  id: talent.id,
+                  full_name: talent.full_name,
+                  username: talent.username,
+                  bio: talent.bio,
+                  avatar_url: talent.avatar_url,
+                  location: talent.location,
+                  hourly_rate: talent.hourly_rate,
+                  experience_level: talent.experience_level,
+                  industry: talent.industry,
+                  skills: talent.skills,
+                  role: talent.role || 'user',
+                  avgRating: talent.avgRating,
+                  reviewCount: talent.reviewCount,
+                }}
+              />
             ))}
           </div>
         )}

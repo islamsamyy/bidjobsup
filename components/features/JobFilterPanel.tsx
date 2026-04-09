@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
 
 interface JobFilterPanelProps {
-  onSearch: (filters: {
+  onSearch?: (filters: {
     budget_min?: number
     budget_max?: number
     job_type?: string
@@ -21,6 +22,10 @@ interface JobFilterPanelProps {
 }
 
 export default function JobFilterPanel({ onSearch, defaultValues = {} }: JobFilterPanelProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
+
   const [isOpen, setIsOpen] = useState(false)
   const [budgetMin, setBudgetMin] = useState(defaultValues.budget_min || 0)
   const [budgetMax, setBudgetMax] = useState(defaultValues.budget_max || 100000)
@@ -29,13 +34,53 @@ export default function JobFilterPanel({ onSearch, defaultValues = {} }: JobFilt
   const [sort, setSort] = useState(defaultValues.sort || 'newest')
 
   const handleApplyFilters = () => {
-    const filters: any = {}
-    if (budgetMin > 0) filters.budget_min = budgetMin
-    if (budgetMax < 100000) filters.budget_max = budgetMax
-    if (jobType) filters.job_type = jobType
-    if (experienceLevel) filters.experience_level = experienceLevel
-    if (sort) filters.sort = sort
-    onSearch(filters)
+    // Update URL params
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (budgetMin > 0) {
+      params.set('budget_min', budgetMin.toString())
+    } else {
+      params.delete('budget_min')
+    }
+
+    if (budgetMax < 100000) {
+      params.set('budget_max', budgetMax.toString())
+    } else {
+      params.delete('budget_max')
+    }
+
+    if (jobType) {
+      params.set('job_type', jobType)
+    } else {
+      params.delete('job_type')
+    }
+
+    if (experienceLevel) {
+      params.set('experience_level', experienceLevel)
+    } else {
+      params.delete('experience_level')
+    }
+
+    if (sort !== 'newest') {
+      params.set('sort', sort)
+    } else {
+      params.delete('sort')
+    }
+
+    startTransition(() => {
+      router.push(`/jobs/browse?${params.toString()}`)
+    })
+
+    // Also call legacy onSearch if provided
+    if (onSearch) {
+      const filters: any = {}
+      if (budgetMin > 0) filters.budget_min = budgetMin
+      if (budgetMax < 100000) filters.budget_max = budgetMax
+      if (jobType) filters.job_type = jobType
+      if (experienceLevel) filters.experience_level = experienceLevel
+      if (sort) filters.sort = sort
+      onSearch(filters)
+    }
   }
 
   const activeFilterCount = Object.entries(defaultValues).filter(([, v]) => v).length
@@ -132,9 +177,10 @@ export default function JobFilterPanel({ onSearch, defaultValues = {} }: JobFilt
           {/* Apply Button */}
           <button
             onClick={handleApplyFilters}
-            className="w-full bg-primary text-on-primary px-6 py-3 rounded-lg font-black uppercase tracking-widest text-xs shadow-lg hover:scale-[1.02] transition-all"
+            disabled={isPending}
+            className="w-full bg-primary text-on-primary px-6 py-3 rounded-lg font-black uppercase tracking-widest text-xs shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Apply Filters
+            {isPending ? 'Applying...' : 'Apply Filters'}
           </button>
         </div>
       )}

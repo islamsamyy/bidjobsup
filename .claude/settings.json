@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(ls -1 e:/bidjob/*.md)",
-      "Bash(curl -s http://localhost:3000)"
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(git add:*)",
+      "Bash(git commit -m 'fix: update JobFilterPanel to use URL routing instead of callback:*)"
     ]
   }
 }

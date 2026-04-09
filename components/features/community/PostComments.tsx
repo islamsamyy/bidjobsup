@@ -19,14 +19,12 @@ interface PostCommentsProps {
   postId: number
   initialComments: Comment[]
   currentUserId: number
-  canDelete: (userId: number) => boolean
 }
 
 export default function PostComments({
   postId,
   initialComments,
   currentUserId,
-  canDelete,
 }: PostCommentsProps) {
   const [comments, setComments] = useState(initialComments)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -89,7 +87,7 @@ export default function PostComments({
                       {comment.content}
                     </p>
                   </div>
-                  {canDelete(comment.user_id) && (
+                  {currentUserId === comment.user_id && (
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
                       className="shrink-0 text-stone-600 hover:text-error transition-colors"

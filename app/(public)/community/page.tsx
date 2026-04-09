@@ -49,108 +49,143 @@ function SmallAvatar({ name, gradient }: { name: string; gradient: string }) {
 }
 
 export default async function CommunityPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  // Fetch top contributors — users with the most completed contracts or reviews
-  const { data: topUsers } = await supabase
-    .from('users')
-    .select('id, full_name, username, bio, user_type')
-    .order('created_at', { ascending: true })
-    .limit(5)
+  let topContributors: any[] = [];
+  let trendingTopics: [string, number][] = [];
+  let currentProfile: any = null;
+  let postsWithEngagement: any[] = [];
 
-  // Get review counts for top users
-  const topContributors = await Promise.all(
-    (topUsers || []).map(async (u, i) => {
-      const { count } = await supabase
-        .from('reviews')
-        .select('*', { count: 'exact', head: true })
-        .eq('reviewee_id', u.id)
-      return {
-        ...u,
-        reviewCount: count || 0,
-        gradient: gradients[i % gradients.length],
+  try {
+    // Fetch top contributors — users with the most completed contracts or reviews
+    const { data: topUsers } = await supabase
+      .from("users")
+      .select("id, full_name, username, bio, user_type")
+      .order("created_at", { ascending: true })
+      .limit(5);
+
+    // Get review counts for top users
+    topContributors = await Promise.all(
+      (topUsers || []).map(async (u, i) => {
+        const { count } = await supabase
+          .from("reviews")
+          .select("*", { count: "exact", head: true })
+          .eq("reviewee_id", u.id);
+        return {
+          ...u,
+          reviewCount: count || 0,
+          gradient: gradients[i % gradients.length],
+        };
+      })
+    );
+    topContributors.sort((a, b) => b.reviewCount - a.reviewCount);
+
+    // Get distinct job categories for trending topics
+    const { data: jobCategories } = await supabase
+      .from("jobs")
+      .select("category")
+      .not("category", "is", null);
+
+    const categoryCounts: Record<string, number> = {};
+    jobCategories?.forEach((j) => {
+      if (j.category) {
+        categoryCounts[j.category] = (categoryCounts[j.category] || 0) + 1;
       }
-    })
-  )
-  topContributors.sort((a, b) => b.reviewCount - a.reviewCount)
+    });
+    trendingTopics = Object.entries(categoryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
 
-  // Get distinct job categories for trending topics
-  const { data: jobCategories } = await supabase
-    .from('jobs')
-    .select('category')
-    .not('category', 'is', null)
-
-  const categoryCounts: Record<string, number> = {}
-  jobCategories?.forEach((j) => {
-    if (j.category) {
-      categoryCounts[j.category] = (categoryCounts[j.category] || 0) + 1
+    // Get current user for post form
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser) {
+      const { data } = await supabase
+        .from("users")
+        .select("id, full_name")
+        .eq("auth_id", authUser.id)
+        .single();
+      currentProfile = data;
     }
-  })
-  const trendingTopics = Object.entries(categoryCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
 
-  // Get current user for post form
-  const { data: { user: authUser } } = await supabase.auth.getUser()
-  let currentProfile: { id: number; full_name: string } | null = null
-  if (authUser) {
-    const { data } = await supabase
-      .from('users')
-      .select('id, full_name')
-      .eq('auth_id', authUser.id)
-      .single()
-    currentProfile = data
+    // Fetch community posts
+    const { data: posts, error: postsError } = await supabase
+      .from("community_posts")
+      .select("id, content, created_at, user_id")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (!postsError && posts) {
+      // Fetch author info for posts
+      const postUserIds = [...new Set((posts || []).map((p) => p.user_id))];
+      const { data: authorsData } = await supabase
+        .from("users")
+        .select("id, full_name, username, avatar_url, user_type")
+        .in("id", postUserIds);
+
+      const authorsById: Record<number, any> = {};
+      authorsData?.forEach((author) => {
+        authorsById[author.id] = author;
+      });
+
+      // Fetch engagement for each post
+      postsWithEngagement = await Promise.all(
+        (posts || []).map(async (post) => {
+          // Get like count
+          const { count: likeCount } = await supabase
+            .from("community_post_likes")
+            .select("*", { count: "exact", head: true })
+            .eq("post_id", post.id);
+
+          // Check if current user liked this post
+          let isLiked = false;
+          if (currentProfile) {
+            const { data: liked } = await supabase
+              .from("community_post_likes")
+              .select("id")
+              .eq("post_id", post.id)
+              .eq("user_id", currentProfile.id)
+              .single();
+            isLiked = !!liked;
+          }
+
+          // Get comments
+          const { data: comments } = await supabase
+            .from("community_post_comments")
+            .select("id, content, created_at, user_id")
+            .eq("post_id", post.id)
+            .order("created_at", { ascending: true });
+
+          // Fetch comment authors
+          const commentUserIds = [...new Set((comments || []).map((c) => c.user_id))];
+          const { data: commentAuthors } = await supabase
+            .from("users")
+            .select("id, full_name, avatar_url")
+            .in("id", commentUserIds.length > 0 ? commentUserIds : [-1]);
+
+          const commentAuthorsMap: Record<number, any> = {};
+          commentAuthors?.forEach((author) => {
+            commentAuthorsMap[author.id] = author;
+          });
+
+          return {
+            ...post,
+            author: authorsById[post.user_id],
+            likeCount: likeCount || 0,
+            isLiked,
+            comments: (comments || []).map((c: any) => ({
+              id: c.id,
+              content: c.content,
+              created_at: c.created_at,
+              user_id: c.user_id,
+              user: commentAuthorsMap[c.user_id],
+            })),
+          };
+        })
+      );
+    }
+  } catch (err) {
+    console.error("Community page error:", err);
   }
-
-  // Fetch community posts with author info
-  const { data: posts } = await supabase
-    .from('community_posts')
-    .select('id, content, created_at, user_id, author:user_id(id, full_name, username, avatar_url, user_type)')
-    .order('created_at', { ascending: false })
-    .limit(20)
-
-  // Fetch likes, comments, and user's like status for each post
-  const postsWithEngagement = await Promise.all(
-    (posts || []).map(async (post) => {
-      // Get like count
-      const { count: likeCount } = await supabase
-        .from('community_post_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('post_id', post.id)
-
-      // Check if current user liked this post
-      let isLiked = false
-      if (currentProfile) {
-        const { data: liked } = await supabase
-          .from('community_post_likes')
-          .select('id')
-          .eq('post_id', post.id)
-          .eq('user_id', currentProfile.id)
-          .single()
-        isLiked = !!liked
-      }
-
-      // Get comments with author info
-      const { data: comments } = await supabase
-        .from('community_post_comments')
-        .select('id, content, created_at, user_id, user:user_id(id, full_name, avatar_url)')
-        .eq('post_id', post.id)
-        .order('created_at', { ascending: true })
-
-      return {
-        ...post,
-        likeCount: likeCount || 0,
-        isLiked,
-        comments: (comments || []).map((c: any) => ({
-          id: c.id,
-          content: c.content,
-          created_at: c.created_at,
-          user_id: c.user_id,
-          user: c.user,
-        })),
-      }
-    })
-  )
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10">
@@ -187,14 +222,16 @@ export default async function CommunityPage() {
           <div className="space-y-8">
             {postsWithEngagement && postsWithEngagement.length > 0 ? (
               postsWithEngagement.map((post, i) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const author = post.author as any
-                const authorName = author?.full_name || author?.username || 'Anonymous'
-                const timeAgo = getTimeAgo(post.created_at)
-                const isOwn = currentProfile?.id === post.user_id
+                const author = post.author as any;
+                const authorName = author?.full_name || author?.username || "Anonymous";
+                const timeAgo = getTimeAgo(post.created_at);
+                const isOwn = currentProfile?.id === post.user_id;
 
                 return (
-                  <article key={post.id} className="bg-surface-container/60 backdrop-blur-xl rounded-xl overflow-hidden border border-white/5">
+                  <article
+                    key={post.id}
+                    className="bg-surface-container/60 backdrop-blur-xl rounded-xl overflow-hidden border border-white/5"
+                  >
                     <div className="p-8">
                       <div className="flex justify-between items-start mb-6">
                         <div className="flex gap-4">
@@ -215,7 +252,7 @@ export default async function CommunityPage() {
                               {authorName}
                             </h3>
                             <span className="text-xs text-neutral-500 font-body">
-                              {author?.user_type === 'employer' ? 'Employer' : 'Professional'}
+                              {author?.user_type === "employer" ? "Employer" : "Professional"}
                             </span>
                           </div>
                         </div>
@@ -238,7 +275,8 @@ export default async function CommunityPage() {
                           />
                         )}
                         <div className="text-xs text-neutral-500 font-body">
-                          {post.comments.length} Comment{post.comments.length !== 1 ? 's' : ''}
+                          {post.comments.length} Comment
+                          {post.comments.length !== 1 ? "s" : ""}
                         </div>
                       </div>
 
@@ -248,18 +286,19 @@ export default async function CommunityPage() {
                           postId={post.id}
                           initialComments={post.comments}
                           currentUserId={currentProfile.id}
-                          canDelete={(userId: number) => currentProfile.id === userId}
                         />
                       )}
                     </div>
                   </article>
-                )
+                );
               })
             ) : (
               <article className="bg-surface-container/60 backdrop-blur-xl rounded-xl overflow-hidden border border-white/5">
                 <div className="p-8 text-center py-16">
                   <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                    <span className="material-symbols-outlined text-primary text-4xl">forum</span>
+                    <span className="material-symbols-outlined text-primary text-4xl">
+                      forum
+                    </span>
                   </div>
                   <h3 className="font-headline text-3xl font-bold text-on-surface mb-4">
                     No posts yet
@@ -285,13 +324,13 @@ export default async function CommunityPage() {
                   trendingTopics.map(([category, count], i) => (
                     <div key={category}>
                       <span className="text-xs text-neutral-500 font-body">
-                        {String(i + 1).padStart(2, '0')} / {category.toUpperCase()}
+                        {String(i + 1).padStart(2, "0")} / {category.toUpperCase()}
                       </span>
                       <h5 className="font-body font-bold text-on-surface hover:text-primary cursor-pointer transition-colors">
                         {category}
                       </h5>
                       <p className="text-xs text-neutral-600 mt-1">
-                        {count} active listing{count !== 1 ? 's' : ''}
+                        {count} active listing{count !== 1 ? "s" : ""}
                       </p>
                     </div>
                   ))
@@ -310,15 +349,15 @@ export default async function CommunityPage() {
                   <div key={user.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <SmallAvatar
-                        name={user.full_name || user.username || 'User'}
+                        name={user.full_name || user.username || "User"}
                         gradient={user.gradient}
                       />
                       <span className="text-sm font-body font-semibold">
-                        {user.full_name || user.username || 'User'}
+                        {user.full_name || user.username || "User"}
                       </span>
                     </div>
                     <span className="text-xs font-headline italic text-primary">
-                      {user.reviewCount} review{user.reviewCount !== 1 ? 's' : ''}
+                      {user.reviewCount} review{user.reviewCount !== 1 ? "s" : ""}
                     </span>
                   </div>
                 ))}
@@ -335,15 +374,18 @@ export default async function CommunityPage() {
 }
 
 function getTimeAgo(dateStr: string) {
-  const now = Date.now()
-  const then = new Date(dateStr).getTime()
-  const diff = now - then
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  if (days < 30) return `${days}d ago`
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = now - then;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }

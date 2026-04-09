@@ -436,6 +436,209 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ATS Optimizer Service */}
+      <section className="py-32 bg-[#1c181c]/30">
+        <div className="max-w-screen-2xl mx-auto px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-bold tracking-[0.2em] uppercase">
+                  SMART TOOLS
+                </span>
+                <h2 className="font-headline text-5xl font-bold tracking-tight">
+                  Optimize Your Profile for ATS Systems
+                </h2>
+              </div>
+              <p className="text-[#b0a9ad] text-lg font-light leading-relaxed">
+                Our AI-powered ATS Optimizer analyzes your resume and portfolio against the latest applicant tracking systems. Get real-time feedback on keywords, formatting, and content optimization to ensure your profile ranks at the top of employer searches.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-4">
+                  <span className="material-symbols-outlined text-[#caa2f7] text-2xl">check_circle</span>
+                  <span className="text-[#faf1f5]">AI-powered keyword analysis</span>
+                </li>
+                <li className="flex items-center gap-4">
+                  <span className="material-symbols-outlined text-[#caa2f7] text-2xl">check_circle</span>
+                  <span className="text-[#faf1f5]">Real-time ATS compatibility scoring</span>
+                </li>
+                <li className="flex items-center gap-4">
+                  <span className="material-symbols-outlined text-[#caa2f7] text-2xl">check_circle</span>
+                  <span className="text-[#faf1f5]">Actionable improvement recommendations</span>
+                </li>
+                <li className="flex items-center gap-4">
+                  <span className="material-symbols-outlined text-[#caa2f7] text-2xl">check_circle</span>
+                  <span className="text-[#faf1f5]">Competitive performance benchmarking</span>
+                </li>
+              </ul>
+              <div>
+                <Link
+                  href="/ats-optimize"
+                  className="inline-block px-10 py-4 rounded-xl bg-[#caa2f7] text-[#431f6b] font-black text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(202,162,247,0.2)] hover:scale-[1.05] transition-all"
+                >
+                  TRY ATS OPTIMIZER FREE
+                </Link>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute -top-12 -right-12 w-80 h-80 bg-[#caa2f7]/10 rounded-full blur-[100px]"></div>
+              <div className="relative z-10 p-12 rounded-[2rem] bg-[#100d10] border border-[#caa2f7]/20 backdrop-blur-xl">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 pb-6 border-b border-[#292428]">
+                    <span className="material-symbols-outlined text-[#caa2f7] text-3xl">assessment</span>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-[#4b474a] font-bold">Your ATS Score</p>
+                      <p className="font-headline text-3xl font-bold text-[#caa2f7]">92/100</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-bold text-[#b0a9ad]">Keyword Optimization</span>
+                      <span className="text-xs font-bold text-[#caa2f7]">88%</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#292428] rounded-full overflow-hidden">
+                      <div className="w-[88%] h-full bg-[#caa2f7] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-bold text-[#b0a9ad]">Formatting</span>
+                      <span className="text-xs font-bold text-[#caa2f7]">95%</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#292428] rounded-full overflow-hidden">
+                      <div className="w-[95%] h-full bg-[#caa2f7] rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-bold text-[#b0a9ad]">Content Quality</span>
+                      <span className="text-xs font-bold text-[#caa2f7]">92%</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#292428] rounded-full overflow-hidden">
+                      <div className="w-[92%] h-full bg-[#caa2f7] rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Vision 2030 Section */}
+      <section className="py-32">
+        <div className="max-w-screen-2xl mx-auto px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="relative order-2 lg:order-1">
+              <div className="absolute -bottom-12 -left-12 w-96 h-96 bg-gradient-to-br from-[#caa2f7] to-[#eab3fa] opacity-10 rounded-full blur-[120px]"></div>
+              <div className="relative z-10 rounded-[2rem] overflow-hidden border border-[#caa2f7]/20 shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=2070"
+                  alt="Vision 2030"
+                  className="w-full h-[400px] object-cover"
+                />
+              </div>
+            </div>
+            <div className="space-y-8 order-1 lg:order-2">
+              <div className="space-y-4">
+                <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-bold tracking-[0.2em] uppercase">
+                  OUR MISSION
+                </span>
+                <h2 className="font-headline text-5xl font-bold tracking-tight">
+                  Building Saudi Arabia's Digital Future
+                </h2>
+              </div>
+              <div className="space-y-4">
+                <p className="text-[#b0a9ad] text-lg font-light leading-relaxed">
+                  BidJobs is committed to realizing Vision 2030 by empowering Saudi Arabia's most talented professionals and innovative organizations. We connect elite specialists with world-leading enterprises transforming the Kingdom's economy.
+                </p>
+                <p className="text-[#b0a9ad] text-lg font-light leading-relaxed">
+                  From NEOM's groundbreaking architecture to emerging tech startups, we're the trusted network enabling Saudi talent to shape the future of work, innovation, and economic growth.
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="text-center">
+                  <p className="font-headline text-3xl font-bold text-[#caa2f7] mb-2">2030</p>
+                  <p className="text-[10px] uppercase tracking-widest text-[#4b474a] font-bold">Vision Target</p>
+                </div>
+                <div className="text-center">
+                  <p className="font-headline text-3xl font-bold text-[#caa2f7] mb-2">100%</p>
+                  <p className="text-[10px] uppercase tracking-widest text-[#4b474a] font-bold">Saudi-Focused</p>
+                </div>
+                <div className="text-center">
+                  <p className="font-headline text-3xl font-bold text-[#caa2f7] mb-2">500K+</p>
+                  <p className="text-[10px] uppercase tracking-widest text-[#4b474a] font-bold">Opportunities</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-32 bg-[#1c181c]/30">
+        <div className="max-w-screen-2xl mx-auto px-8">
+          <div className="text-center mb-20 space-y-4">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-[#613471]/30 border border-[#caa2f7]/20 text-[#f1bfff] text-[10px] font-bold tracking-[0.2em] uppercase">
+              SUCCESS STORIES
+            </span>
+            <h2 className="font-headline text-5xl font-bold tracking-tight">What Elite Talent Say</h2>
+            <p className="text-[#b0a9ad] text-lg font-light max-w-2xl mx-auto">
+              Hear from professionals and organizations transforming their careers and businesses through BidJobs.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Sarah Al-Rashid",
+                role: "UX Architect",
+                company: "NEOM",
+                content: "BidJobs connected me with NEOM when I was ready to impact Vision 2030. The platform's vetting process gave me confidence in the opportunities.",
+                avatar: "https://i.pravatar.cc/150?u=sarah1"
+              },
+              {
+                name: "Mohammed Al-Khaldi",
+                role: "Tech Lead",
+                company: "STC Digital",
+                content: "Finding specialized talent used to be impossible. BidJobs gave us access to Saudi Arabia's best engineers in just days.",
+                avatar: "https://i.pravatar.cc/150?u=mohammed1"
+              },
+              {
+                name: "Fatima Al-Saud",
+                role: "Innovation Director",
+                company: "Red Sea Global",
+                content: "The quality of talent on BidJobs is exceptional. We've built our entire digital team through this platform.",
+                avatar: "https://i.pravatar.cc/150?u=fatima1"
+              }
+            ].map((testimonial, i) => (
+              <div
+                key={i}
+                className="p-8 bg-[#1c181c] rounded-[2rem] border border-[#292428] hover:border-[#caa2f7]/20 transition-all duration-300 group"
+              >
+                <div className="flex items-center gap-4 mb-6">
+                  <img
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    className="w-14 h-14 rounded-full object-cover border-2 border-[#caa2f7]/20"
+                  />
+                  <div>
+                    <h4 className="font-bold text-[#faf1f5] group-hover:text-[#caa2f7] transition-colors">{testimonial.name}</h4>
+                    <p className="text-[10px] text-[#4b474a] uppercase tracking-widest font-bold">{testimonial.role}</p>
+                  </div>
+                </div>
+                <p className="text-[#b0a9ad] leading-relaxed mb-6 italic">
+                  "{testimonial.content}"
+                </p>
+                <div className="flex items-center gap-2 text-[10px] text-[#caa2f7] font-bold uppercase tracking-widest">
+                  <span className="material-symbols-outlined text-sm">verified</span>
+                  {testimonial.company}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-40">
         <div className="max-w-5xl mx-auto px-8">

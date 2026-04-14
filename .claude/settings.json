@@ -5,7 +5,8 @@
       "Bash(curl -s http://localhost:3000)",
       "Bash(git add:*)",
       "Bash(git commit -m 'fix: update JobFilterPanel to use URL routing instead of callback:*)",
-      "Bash(bash /tmp/run_migrations.sh)"
+      "Bash(bash /tmp/run_migrations.sh)",
+      "Bash(find \"e:\\\\bidjob\\\\supabase\\\\migrations\" -name \"*.sql\" -exec basename {} \\\\;)"
     ],
     "additionalDirectories": [
       "\\tmp"

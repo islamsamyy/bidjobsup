@@ -6,7 +6,8 @@
       "Bash(git add:*)",
       "Bash(git commit -m 'fix: update JobFilterPanel to use URL routing instead of callback:*)",
       "Bash(bash /tmp/run_migrations.sh)",
-      "Bash(find \"e:\\\\bidjob\\\\supabase\\\\migrations\" -name \"*.sql\" -exec basename {} \\\\;)"
+      "Bash(find \"e:\\\\bidjob\\\\supabase\\\\migrations\" -name \"*.sql\" -exec basename {} \\\\;)",
+      "mcp__claude_ai_Supabase__apply_migration"
     ],
     "additionalDirectories": [
       "\\tmp"

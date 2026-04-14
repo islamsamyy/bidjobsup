@@ -23,7 +23,7 @@ export default async function DiscoveryFeedPage() {
   }
 
   // Fetch all public posts with pagination
-  const { data: posts } = await supabase
+  const { data: postsData } = await supabase
     .from('profile_posts')
     .select(`
       id,
@@ -47,8 +47,15 @@ export default async function DiscoveryFeedPage() {
     .order('created_at', { ascending: false })
     .limit(50)
 
+  const posts = postsData?.map(p => ({
+    ...p,
+    user: p.user && Array.isArray(p.user) ? p.user[0] : p.user,
+    post_likes: p.post_likes && Array.isArray(p.post_likes) ? p.post_likes : [],
+    saved_posts: p.saved_posts && Array.isArray(p.saved_posts) ? p.saved_posts : [],
+  }))
+
   // Fetch comments for all posts
-  const { data: comments } = await supabase
+  const { data: commentsData } = await supabase
     .from('post_comments')
     .select(`
       id,
@@ -61,6 +68,12 @@ export default async function DiscoveryFeedPage() {
     .in('post_id', (posts || []).map(p => p.id))
     .is('deleted_at', null)
     .limit(300)
+
+  const comments = commentsData?.map(c => ({
+    ...c,
+    user: c.user && Array.isArray(c.user) ? c.user[0] : c.user,
+    comment_likes: c.comment_likes && Array.isArray(c.comment_likes) ? c.comment_likes : [],
+  }))
 
   return (
     <main className="max-w-4xl mx-auto px-4 md:px-8 py-12">

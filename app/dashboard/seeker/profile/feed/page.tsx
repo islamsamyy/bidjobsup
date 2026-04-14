@@ -28,7 +28,7 @@ export default async function ProfileFeedPage({
   }
 
   // Fetch user's posts
-  const { data: posts } = await supabase
+  const { data: postsData } = await supabase
     .from('profile_posts')
     .select(`
       id,
@@ -53,8 +53,15 @@ export default async function ProfileFeedPage({
     .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: false })
 
+  const posts = postsData?.map(p => ({
+    ...p,
+    user: p.user && Array.isArray(p.user) ? p.user[0] : p.user,
+    post_likes: p.post_likes && Array.isArray(p.post_likes) ? p.post_likes : [],
+    saved_posts: p.saved_posts && Array.isArray(p.saved_posts) ? p.saved_posts : [],
+  }))
+
   // Fetch post comments with user info
-  const { data: comments } = await supabase
+  const { data: commentsData } = await supabase
     .from('post_comments')
     .select(`
       id,
@@ -67,6 +74,12 @@ export default async function ProfileFeedPage({
     .in('post_id', (posts || []).map(p => p.id))
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
+
+  const comments = commentsData?.map(c => ({
+    ...c,
+    user: c.user && Array.isArray(c.user) ? c.user[0] : c.user,
+    comment_likes: c.comment_likes && Array.isArray(c.comment_likes) ? c.comment_likes : [],
+  }))
 
   return (
     <main className="max-w-4xl mx-auto px-4 md:px-8 py-12">
@@ -94,7 +107,6 @@ export default async function ProfileFeedPage({
       {/* Create Post Section */}
       <div className="mb-12 glass border border-outline-variant/15 rounded-xl p-8">
         <h2 className="text-xl font-semibold text-on-surface mb-6">Create a Post</h2>
-        <ProfileFeedClient.CreatePost userId={currentUser.id} />
       </div>
 
       {/* Posts List */}
@@ -113,7 +125,7 @@ export default async function ProfileFeedPage({
             </p>
           </div>
         ) : (
-          <ProfileFeedClient.PostsList
+          <ProfileFeedClient
             posts={posts || []}
             comments={comments || []}
             currentUserId={currentUser.id}

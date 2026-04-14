@@ -31,7 +31,7 @@ interface Comment {
   comment_likes?: Array<{ id: number }>
 }
 
-export const CreatePost = ({ userId }: { userId: number }) => {
+const CreatePost = ({ userId }: { userId: number }) => {
   const { t, dir } = useLanguage()
   const [content, setContent] = useState('')
   const [postType, setPostType] = useState<'text' | 'project' | 'achievement'>('text')
@@ -145,7 +145,7 @@ export const CreatePost = ({ userId }: { userId: number }) => {
   )
 }
 
-export const PostsList = ({
+const PostsList = ({
   posts,
   comments,
   currentUserId,
@@ -386,4 +386,16 @@ export const PostsList = ({
       })}
     </div>
   )
+}
+
+export default function ProfileFeedClientWrapper({
+  posts,
+  comments,
+  currentUserId,
+}: {
+  posts: Post[]
+  comments: Comment[]
+  currentUserId: number
+}) {
+  return <PostsList posts={posts} comments={comments} currentUserId={currentUserId} />
 }

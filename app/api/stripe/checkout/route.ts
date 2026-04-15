@@ -1,5 +1,6 @@
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
+import { getURL } from '@/lib/utils/getURL'
 import { NextRequest } from 'next/server'
 
 const PRICE_IDS: Record<string, string | undefined> = {
@@ -55,14 +56,14 @@ export async function POST(req: NextRequest) {
         .eq('auth_id', user.id)
     }
 
-    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL!
+    const baseUrl = getURL('', req.headers.get('origin') || undefined)
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/dashboard?checkout=success`,
-      cancel_url: `${origin}/dashboard?checkout=cancelled`,
+      success_url: getURL('/dashboard?checkout=success', req.headers.get('origin') || undefined),
+      cancel_url: getURL('/dashboard?checkout=cancelled', req.headers.get('origin') || undefined),
       metadata: { supabase_uid: user.id, planId },
       subscription_data: {
         metadata: { supabase_uid: user.id, planId },

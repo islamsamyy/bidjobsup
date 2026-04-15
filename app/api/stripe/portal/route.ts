@@ -1,5 +1,6 @@
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
+import { getURL } from '@/lib/utils/getURL'
 import { NextRequest } from 'next/server'
 
 export async function POST(req: NextRequest) {
@@ -29,11 +30,9 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'No active subscription found' }, { status: 400 })
     }
 
-    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL!
-
     const session = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
-      return_url: `${origin}/dashboard/employer/billing`,
+      return_url: getURL('/dashboard/employer/billing', req.headers.get('origin') || undefined),
     })
 
     return Response.json({ url: session.url })

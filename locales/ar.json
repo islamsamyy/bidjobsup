@@ -885,5 +885,158 @@
     "messageContractor": "رسالة إلى المقاول",
     "paymentProgress": "تقدم الدفع",
     "noContracts": "لا توجد عقود حتى الآن"
+  },
+  "homePage": {
+    "title": "بيدجوبز — حيث يلتقي الموهوبون بالفرص",
+    "headline": "ابنِ مستقبلك.\nغيّر العالم.",
+    "subtitle": "تواصل مع أعرق المؤسسات السعودية. من عجائب العمارة في نيوم إلى الحدود الرقمية في STC، يبدأ مسارك المهني النخبوي هنا.",
+    "empoweringVision2030": "دعم رؤية السعودية 2030",
+    "searchPlaceholder": "عنوان الوظيفة أو المهارات أو الشركة",
+    "locationPlaceholder": "المدينة أو العمل من المنزل",
+    "searchButton": "البحث عن الوظائف",
+    "stats": {
+      "activeJobs": "الوظائف المفتوحة",
+      "partnerCompanies": "الشركات الشريكة",
+      "jobSeekers": "الباحثون عن عمل",
+      "successfulHires": "عمليات التوظيف الناجحة"
+    },
+    "featuredJobs": "الفرص المميزة",
+    "featuredTalent": "الموهوبون المميزون",
+    "viewProfile": "عرض الملف الشخصي",
+    "browseAllJobs": "استعرض جميع الوظائف",
+    "browseTalent": "استعرض الموهوبين",
+    "testimonials": "ماذا يقول مجتمعنا",
+    "cta": {
+      "jobseekerTitle": "هل أنت مستعد للعثور على وظيفتك المثالية؟",
+      "jobseekerDescription": "انضم إلى آلاف المتخصصين والشركات على BidJobs.",
+      "joinNow": "انضم الآن",
+      "orSignIn": "أو قم بتسجيل الدخول",
+      "employerTitle": "وظّف أفضل الموهوبين اليوم",
+      "employerDescription": "انشر وظيفة وتواصل مع متخصصين ماهرين معتمدين.",
+      "postJob": "نشر وظيفة"
+    }
+  },
+  "pricingPage": {
+    "title": "تسعير بسيط وشفاف",
+    "subtitle": "اختر الخطة المثالية لاحتياجاتك",
+    "plans": {
+      "starter": "مبتدئ",
+      "professional": "احترافي",
+      "enterprise": "مؤسسي"
+    },
+    "features": "الميزات",
+    "getStarted": "ابدأ الآن",
+    "contactSales": "تواصل مع المبيعات"
+  },
+  "aboutPage": {
+    "title": "عن BidJobs",
+    "subtitle": "تمكين مستقبل العمل",
+    "mission": "مهمتنا",
+    "vision": "رؤيتنا",
+    "values": "قيمنا"
+  },
+  "contactPage": {
+    "title": "تواصل معنا",
+    "subtitle": "نود أن نسمع منك",
+    "name": "اسمك",
+    "email": "بريدك الإلكتروني",
+    "subject": "الموضوع",
+    "message": "الرسالة",
+    "sendMessage": "إرسال الرسالة",
+    "contactInfo": "معلومات الاتصال",
+    "phone": "الهاتف",
+    "address": "العنوان"
+  },
+  "jobsPage": {
+    "title": "استعرض الوظائف",
+    "subtitle": "استكشف الفرص التي تتطابق مع مهاراتك",
+    "searchJobs": "البحث عن الوظائف",
+    "noJobs": "لم يتم العثور على وظائف",
+    "noJobsDescription": "حاول تعديل مرشحاتك أو شروط البحث",
+    "posted": "تم النشر",
+    "applicants": "المتقدمون",
+    "apply": "قدم الآن",
+    "saveJob": "حفظ الوظيفة",
+    "savedJob": "محفوظة",
+    "jobDetails": "تفاصيل الوظيفة",
+    "budget": "الميزانية",
+    "duration": "المدة",
+    "experienceLevel": "مستوى الخبرة",
+    "skills": "المهارات المطلوبة",
+    "applyForJob": "تقديم طلب لهذه الوظيفة",
+    "applicationSent": "تم إرسال الطلب بنجاح"
+  },
+  "talentPage": {
+    "title": "استعرض الموهوبين",
+    "subtitle": "ابحث عن المستقل المثالي لمشروعك",
+    "searchTalent": "البحث عن موهوبين",
+    "noTalent": "لم يتم العثور على موهوبين",
+    "noTalentDescription": "حاول تعديل مرشحاتك أو شروط البحث",
+    "hire": "وظّف",
+    "viewProfile": "عرض الملف الشخصي",
+    "rating": "التقييم",
+    "reviews": "المراجعات",
+    "hourlyRate": "السعر بالساعة",
+    "skills": "المهارات",
+    "location": "الموقع",
+    "inviteToJob": "دعوة للعمل"
+  },
+  "communityPage": {
+    "title": "المجتمع",
+    "subtitle": "انضم إلى مجتمعنا المهني",
+    "discussions": "النقاشات",
+    "create": "إنشاء نقاش",
+    "latestPosts": "أحدث المنشورات",
+    "trending": "متجه الآن",
+    "myPosts": "منشوراتي",
+    "reply": "رد",
+    "likes": "الإعجابات"
+  },
+  "blogPage": {
+    "title": "المدونة والموارد",
+    "subtitle": "رؤى صناعية وتلميحات الحياة المهنية",
+    "latestArticles": "أحدث المقالات",
+    "readMore": "اقرأ المزيد",
+    "author": "الكاتب",
+    "publishedOn": "تم النشر في"
+  },
+  "vision2030Page": {
+    "title": "رؤية السعودية 2030",
+    "subtitle": "دعم التحول الاقتصادي للملكة العربية السعودية",
+    "description": "BidJobs ملتزمة بدعم رؤية السعودية 2030 من خلال الابتكار الرقمي وخلق فرص العمل."
+  },
+  "termsPage": {
+    "title": "شروط الخدمة",
+    "subtitle": "يرجى قراءة شروطنا بعناية"
+  },
+  "privacyPage": {
+    "title": "سياسة الخصوصية",
+    "subtitle": "خصوصيتك مهمة لنا"
+  },
+  "authPages": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "signInTitle": "أهلا وسهلا",
+    "signInSubtitle": "قم بتسجيل الدخول إلى حسابك للمتابعة",
+    "signUpTitle": "أنشئ حسابك",
+    "signUpSubtitle": "انضم إلى BidJobs وابدأ رحلتك المهنية",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "haveAccount": "هل لديك حساب بالفعل؟",
+    "signInButton": "تسجيل الدخول",
+    "signUpButton": "إنشاء حساب",
+    "agreeToTerms": "أوافق على شروط الخدمة وسياسة الخصوصية",
+    "selectRole": "اختر دورك",
+    "jobSeeker": "باحث عن عمل",
+    "employer": "صاحب عمل",
+    "both": "كلاهما",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "checkEmail": "تحقق من بريدك الإلكتروني للحصول على رابط إعادة تعيين كلمة المرور"
   }
 }

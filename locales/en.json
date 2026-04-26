@@ -885,5 +885,158 @@
     "messageContractor": "Message Contractor",
     "paymentProgress": "Payment Progress",
     "noContracts": "No contracts yet"
+  },
+  "homePage": {
+    "title": "BidJobs — Where Elite Talent Meets Opportunity",
+    "headline": "BUILD YOUR FUTURE.\nSHAPE THE WORLD.",
+    "subtitle": "Connect with Saudi Arabia's most prestigious organizations. From NEOM's architectural marvels to STC's digital frontiers, your elite career starts here.",
+    "empoweringVision2030": "EMPOWERING SAUDI VISION 2030",
+    "searchPlaceholder": "Job title, skills, or company",
+    "locationPlaceholder": "City or Remote",
+    "searchButton": "Search Jobs",
+    "stats": {
+      "activeJobs": "Active Jobs",
+      "partnerCompanies": "Partner Companies",
+      "jobSeekers": "Job Seekers",
+      "successfulHires": "Successful Hires"
+    },
+    "featuredJobs": "Featured Opportunities",
+    "featuredTalent": "Featured Talent",
+    "viewProfile": "View Profile",
+    "browseAllJobs": "Browse All Jobs",
+    "browseTalent": "Browse Talent",
+    "testimonials": "What Our Community Says",
+    "cta": {
+      "jobseekerTitle": "Ready to Land Your Dream Role?",
+      "jobseekerDescription": "Join thousands of skilled professionals and companies on BidJobs.",
+      "joinNow": "Join Now",
+      "orSignIn": "Or Sign In",
+      "employerTitle": "Hire Top Talent Today",
+      "employerDescription": "Post a job and connect with pre-vetted, skilled professionals.",
+      "postJob": "Post a Job"
+    }
+  },
+  "pricingPage": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the perfect plan for your needs",
+    "plans": {
+      "starter": "Starter",
+      "professional": "Professional",
+      "enterprise": "Enterprise"
+    },
+    "features": "Features",
+    "getStarted": "Get Started",
+    "contactSales": "Contact Sales"
+  },
+  "aboutPage": {
+    "title": "About BidJobs",
+    "subtitle": "Empowering the Future of Work",
+    "mission": "Our Mission",
+    "vision": "Our Vision",
+    "values": "Our Values"
+  },
+  "contactPage": {
+    "title": "Get in Touch",
+    "subtitle": "We'd love to hear from you",
+    "name": "Your Name",
+    "email": "Your Email",
+    "subject": "Subject",
+    "message": "Message",
+    "sendMessage": "Send Message",
+    "contactInfo": "Contact Information",
+    "phone": "Phone",
+    "address": "Address"
+  },
+  "jobsPage": {
+    "title": "Browse Jobs",
+    "subtitle": "Explore opportunities that match your skills",
+    "searchJobs": "Search Jobs",
+    "noJobs": "No jobs found",
+    "noJobsDescription": "Try adjusting your filters or search terms",
+    "posted": "Posted",
+    "applicants": "Applicants",
+    "apply": "Apply Now",
+    "saveJob": "Save Job",
+    "savedJob": "Saved",
+    "jobDetails": "Job Details",
+    "budget": "Budget",
+    "duration": "Duration",
+    "experienceLevel": "Experience Level",
+    "skills": "Required Skills",
+    "applyForJob": "Apply for This Job",
+    "applicationSent": "Application sent successfully"
+  },
+  "talentPage": {
+    "title": "Browse Talent",
+    "subtitle": "Find the perfect freelancer for your project",
+    "searchTalent": "Search Talent",
+    "noTalent": "No talent found",
+    "noTalentDescription": "Try adjusting your filters or search terms",
+    "hire": "Hire",
+    "viewProfile": "View Profile",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "hourlyRate": "Hourly Rate",
+    "skills": "Skills",
+    "location": "Location",
+    "inviteToJob": "Invite to Job"
+  },
+  "communityPage": {
+    "title": "Community",
+    "subtitle": "Join our professional community",
+    "discussions": "Discussions",
+    "create": "Create Discussion",
+    "latestPosts": "Latest Posts",
+    "trending": "Trending",
+    "myPosts": "My Posts",
+    "reply": "Reply",
+    "likes": "Likes"
+  },
+  "blogPage": {
+    "title": "Blog & Resources",
+    "subtitle": "Industry insights and career tips",
+    "latestArticles": "Latest Articles",
+    "readMore": "Read More",
+    "author": "Author",
+    "publishedOn": "Published on"
+  },
+  "vision2030Page": {
+    "title": "Saudi Vision 2030",
+    "subtitle": "Supporting Saudi Arabia's Economic Transformation",
+    "description": "BidJobs is committed to supporting Saudi Arabia's Vision 2030 through digital innovation and job creation."
+  },
+  "termsPage": {
+    "title": "Terms of Service",
+    "subtitle": "Please read our terms carefully"
+  },
+  "privacyPage": {
+    "title": "Privacy Policy",
+    "subtitle": "Your privacy is important to us"
+  },
+  "authPages": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signInTitle": "Welcome Back",
+    "signInSubtitle": "Sign in to your account to continue",
+    "signUpTitle": "Create Your Account",
+    "signUpSubtitle": "Join BidJobs and start your career journey",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signInButton": "Sign In",
+    "signUpButton": "Create Account",
+    "agreeToTerms": "I agree to the Terms of Service and Privacy Policy",
+    "selectRole": "Select your role",
+    "jobSeeker": "Job Seeker",
+    "employer": "Employer",
+    "both": "Both",
+    "resetPassword": "Reset Password",
+    "sendResetLink": "Send Reset Link",
+    "checkEmail": "Check your email for a password reset link"
   }
 }

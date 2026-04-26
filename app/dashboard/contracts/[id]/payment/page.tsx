@@ -9,15 +9,15 @@ export default async function PaymentReleasePage({ params }: { params: Promise<{
   const supabase = await createClient()
   const { id } = await params
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase!.auth.getUser()
   if (authError || !user) {
     redirect('/sign-in')
   }
 
-  const { data: currentUser } = await supabase
+  const { data: currentUser } = await supabase!
     .from('users')
     .select('id, user_type')
-    .eq('auth_id', user.id)
+    .eq('auth_id', user?.id)
     .single()
 
   if (!currentUser) {
@@ -25,7 +25,7 @@ export default async function PaymentReleasePage({ params }: { params: Promise<{
   }
 
   // Fetch contract details
-  const { data: contract, error } = await supabase
+  const { data: contract, error } = await supabase!
     .from('contracts')
     .select(`
       *,
@@ -41,27 +41,27 @@ export default async function PaymentReleasePage({ params }: { params: Promise<{
   }
 
   // Check access - only employer can manage payments
-  const isEmployer = contract.employer_id === currentUser.id
+  const isEmployer = contract.employer_id === currentUser?.id
   if (!isEmployer) {
     notFound()
   }
 
   // Fetch escrow information
-  const { data: escrow } = await supabase
+  const { data: escrow } = await supabase!
     .from('escrow')
     .select('*')
     .eq('contract_id', contract.id)
     .single()
 
   // Fetch milestones
-  const { data: milestones } = await supabase
+  const { data: milestones } = await supabase!
     .from('milestones')
     .select('*')
     .eq('contract_id', contract.id)
     .order('order_index')
 
   // Fetch payments
-  const { data: payments } = await supabase
+  const { data: payments } = await supabase!
     .from('payments')
     .select('*')
     .eq('contract_id', contract.id)
@@ -127,7 +127,7 @@ export default async function PaymentReleasePage({ params }: { params: Promise<{
         escrow={escrow}
         milestones={milestones || []}
         payments={payments || []}
-        currentUserId={currentUser.id}
+        currentUserId={currentUser?.id}
       />
     </main>
   )

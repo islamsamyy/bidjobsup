@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black tracking-[0.18em] uppercase text-[#b0a9ad] hover:text-[#faf1f5] hover:bg-white/5 transition-all duration-200"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black tracking-[0.18em] uppercase text-on-surface-variant hover:text-on-surface hover:bg-on-surface/5 transition-all duration-200"
         aria-label="Switch language"
       >
         <span className="material-symbols-outlined text-[15px]">translate</span>
@@ -31,14 +31,14 @@ export function LanguageSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-44 bg-[#1c181c]/95 backdrop-blur-xl border border-[#292428]/60 rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden z-50">
+        <div className="absolute right-0 mt-3 w-44 bg-surface-container/95 backdrop-blur-xl border border-outline-variant/40 rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden z-50">
           <div className="p-2 space-y-0.5">
             <button
               onClick={() => { setLocale('en'); setIsOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 locale === 'en'
                   ? 'bg-primary/10 text-primary'
-                  : 'hover:bg-white/5 text-[#b0a9ad] hover:text-[#faf1f5]'
+                  : 'hover:bg-on-surface/5 text-on-surface-variant hover:text-on-surface'
               }`}
             >
               <span className="text-base">🇺🇸</span>
@@ -52,7 +52,7 @@ export function LanguageSwitcher() {
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 locale === 'ar'
                   ? 'bg-primary/10 text-primary'
-                  : 'hover:bg-white/5 text-[#b0a9ad] hover:text-[#faf1f5]'
+                  : 'hover:bg-on-surface/5 text-on-surface-variant hover:text-on-surface'
               }`}
             >
               <span className="text-base">🇸🇦</span>

@@ -1,6 +1,9 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/get-user'
+import { toActionError } from '@/lib/errors'
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface Contract {
   id: number
@@ -19,17 +22,9 @@ export interface Contract {
   paid_amount: number
   created_at: string
   updated_at: string
-  job?: {
-    title: string
-  }
-  freelancer?: {
-    full_name: string
-    avatar_url: string | null
-  }
-  employer?: {
-    full_name: string
-    avatar_url: string | null
-  }
+  job?: { title: string }
+  freelancer?: { full_name: string; avatar_url: string | null }
+  employer?: { full_name: string; avatar_url: string | null }
 }
 
 export interface Milestone {
@@ -48,331 +43,211 @@ export interface Milestone {
   updated_at: string
 }
 
-/**
- * Get all contracts for the current user
- */
-export async function getUserContracts(
-  filterStatus?: string
-): Promise<{
+// ─── Internal helper ──────────────────────────────────────────────────────────
+
+function isParticipant(
+  contract: Pick<Contract, 'freelancer_id' | 'employer_id'>,
+  userId: number
+) {
+  return contract.freelancer_id === userId || contract.employer_id === userId
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+
+export async function getUserContracts(filterStatus?: string): Promise<{
   contracts: Contract[]
   error?: string
 }> {
   try {
-    const supabase = await createClient()
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return { contracts: [], error: 'Not authenticated' }
-    }
-
-    const { data: profile } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile) {
-      return { contracts: [], error: 'Profile not found' }
-    }
+    const auth = await getAuthUser()
+    if (!auth.ok) return { contracts: [], error: auth.error }
+    const { user, supabase } = auth
 
     let query = supabase
       .from('contracts')
-      .select(
-        `*,
+      .select(`
+        *,
         job:job_id(title),
         freelancer:freelancer_id(full_name, avatar_url),
-        employer:employer_id(full_name, avatar_url)`
-      )
-      .or(`freelancer_id.eq.${profile.id},employer_id.eq.${profile.id}`)
+        employer:employer_id(full_name, avatar_url)
+      `)
+      .or(`freelancer_id.eq.${user?.id},employer_id.eq.${user?.id}`)
 
-    if (filterStatus) {
-      query = query.eq('status', filterStatus)
-    }
+    if (filterStatus) query = query.eq('status', filterStatus)
 
     const { data, error } = await query.order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('Error fetching contracts:', error)
-      return { contracts: [], error: error.message }
-    }
-
-    return { contracts: data || [] }
-  } catch (err: any) {
-    console.error('Error in getUserContracts:', err)
-    return { contracts: [], error: err.message }
+    if (error) return { contracts: [], error: error.message }
+    return { contracts: (data as Contract[]) || [] }
+  } catch (err) {
+    return toActionError(err) as any
   }
 }
 
-/**
- * Get contract details with all milestones
- */
-export async function getContractDetails(
-  contractId: number
-): Promise<{
+export async function getContractDetails(contractId: number): Promise<{
   contract: Contract | null
   milestones: Milestone[]
   error?: string
 }> {
   try {
-    const supabase = await createClient()
+    const auth = await getAuthUser()
+    if (!auth.ok) return { contract: null, milestones: [], error: auth.error }
+    const { user, supabase } = auth
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return { contract: null, milestones: [], error: 'Not authenticated' }
-    }
-
-    // Fetch contract
-    const { data: contract, error: contractError } = await supabase
+    const { data: contract, error: contractError } = await supabase!
       .from('contracts')
-      .select(
-        `*,
+      .select(`
+        *,
         job:job_id(title),
         freelancer:freelancer_id(full_name, avatar_url),
-        employer:employer_id(full_name, avatar_url)`
-      )
+        employer:employer_id(full_name, avatar_url)
+      `)
       .eq('id', contractId)
       .single()
 
     if (contractError || !contract) {
       return { contract: null, milestones: [], error: 'Contract not found' }
     }
-
-    // Verify user has access to this contract
-    const { data: profile } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile || (contract.freelancer_id !== profile.id && contract.employer_id !== profile.id)) {
+    if (!isParticipant(contract, user?.id)) {
       return { contract: null, milestones: [], error: 'Unauthorized' }
     }
 
-    // Fetch milestones
-    const { data: milestones, error: milestonesError } = await supabase
+    const { data: milestones, error: milestonesError } = await supabase!
       .from('milestones')
       .select('*')
       .eq('contract_id', contractId)
       .order('order_index', { ascending: true })
 
-    if (milestonesError) {
-      console.error('Error fetching milestones:', milestonesError)
-      return { contract, milestones: [], error: milestonesError.message }
-    }
-
-    return { contract, milestones: milestones || [] }
-  } catch (err: any) {
-    console.error('Error in getContractDetails:', err)
-    return { contract: null, milestones: [], error: err.message }
+    if (milestonesError) return { contract, milestones: [], error: milestonesError.message }
+    return { contract, milestones: (milestones as Milestone[]) || [] }
+  } catch (err) {
+    return toActionError(err) as any
   }
 }
 
-/**
- * Update milestone status
- */
 export async function updateMilestoneStatus(
   milestoneId: number,
   status: string,
   notes?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient()
+    const auth = await getAuthUser()
+    if (!auth.ok) return { success: false, error: auth.error }
+    const { user, supabase } = auth
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return { success: false, error: 'Not authenticated' }
-    }
-
-    // Verify user has access
-    const { data: milestone } = await supabase
+    const { data: milestone } = await supabase!
       .from('milestones')
       .select('contract_id')
       .eq('id', milestoneId)
       .single()
 
-    if (!milestone) {
-      return { success: false, error: 'Milestone not found' }
-    }
+    if (!milestone) return { success: false, error: 'Milestone not found' }
 
-    const { data: contract } = await supabase
+    const { data: contract } = await supabase!
       .from('contracts')
       .select('freelancer_id, employer_id')
       .eq('id', milestone.contract_id)
       .single()
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile || (contract?.freelancer_id !== profile.id && contract?.employer_id !== profile.id)) {
+    if (!contract || !isParticipant(contract, user?.id)) {
       return { success: false, error: 'Unauthorized' }
     }
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       status,
       updated_at: new Date().toISOString(),
     }
-
-    if (status === 'submitted') {
-      updateData.submission_notes = notes || null
-    } else if (status === 'approved') {
-      updateData.approval_notes = notes || null
+    if (status === 'submitted') updateData.submission_notes = notes ?? null
+    if (status === 'approved') {
+      updateData.approval_notes = notes ?? null
       updateData.completed_date = new Date().toISOString()
     }
 
-    const { error } = await supabase
-      .from('milestones')
-      .update(updateData)
-      .eq('id', milestoneId)
-
-    if (error) {
-      console.error('Error updating milestone:', error)
-      return { success: false, error: error.message }
-    }
+    const { error } = await supabase!.from('milestones').update(updateData).eq('id', milestoneId)
+    if (error) return { success: false, error: error.message }
 
     return { success: true }
-  } catch (err: any) {
-    console.error('Error in updateMilestoneStatus:', err)
-    return { success: false, error: err.message }
+  } catch (err) {
+    return toActionError(err) as any
   }
 }
 
-/**
- * Update contract status
- */
 export async function updateContractStatus(
   contractId: number,
   status: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient()
+    const auth = await getAuthUser()
+    if (!auth.ok) return { success: false, error: auth.error }
+    const { user, supabase } = auth
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return { success: false, error: 'Not authenticated' }
-    }
-
-    const { data: contract } = await supabase
+    const { data: contract } = await supabase!
       .from('contracts')
       .select('freelancer_id, employer_id')
       .eq('id', contractId)
       .single()
 
-    if (!contract) {
-      return { success: false, error: 'Contract not found' }
-    }
+    if (!contract) return { success: false, error: 'Contract not found' }
+    if (!isParticipant(contract, user?.id)) return { success: false, error: 'Unauthorized' }
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile || (contract.freelancer_id !== profile.id && contract.employer_id !== profile.id)) {
-      return { success: false, error: 'Unauthorized' }
-    }
-
-    const { error } = await supabase
+    const { error } = await supabase!
       .from('contracts')
-      .update({
-        status,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ status, updated_at: new Date().toISOString() })
       .eq('id', contractId)
 
-    if (error) {
-      console.error('Error updating contract:', error)
-      return { success: false, error: error.message }
-    }
-
+    if (error) return { success: false, error: error.message }
     return { success: true }
-  } catch (err: any) {
-    console.error('Error in updateContractStatus:', err)
-    return { success: false, error: err.message }
+  } catch (err) {
+    return toActionError(err) as any
   }
 }
 
-/**
- * Release payment for a milestone (mark as paid)
- */
 export async function releaseMilestonePayment(
   milestoneId: number
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient()
+    const auth = await getAuthUser()
+    if (!auth.ok) return { success: false, error: auth.error }
+    const { user, supabase } = auth
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return { success: false, error: 'Not authenticated' }
-    }
-
-    // Get milestone and contract
-    const { data: milestone } = await supabase
+    const { data: milestone } = await supabase!
       .from('milestones')
       .select('contract_id, amount')
       .eq('id', milestoneId)
       .single()
 
-    if (!milestone) {
-      return { success: false, error: 'Milestone not found' }
-    }
+    if (!milestone) return { success: false, error: 'Milestone not found' }
 
-    const { data: contract } = await supabase
+    const { data: contract } = await supabase!
       .from('contracts')
-      .select('employer_id')
+      .select('employer_id, paid_amount')
       .eq('id', milestone.contract_id)
       .single()
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', user.id)
-      .single()
-
-    // Only employer can release payment
-    if (!profile || contract?.employer_id !== profile.id) {
-      return { success: false, error: 'Only employer can release payment' }
+    if (!contract || contract.employer_id !== user?.id) {
+      return { success: false, error: 'Only the employer can release payment' }
     }
 
-    // Update milestone status
-    const { error: milestoneError } = await supabase
-      .from('milestones')
-      .update({
-        status: 'paid',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', milestoneId)
+    // Run both updates in parallel instead of sequentially
+    const [milestoneRes, contractRes] = await Promise.all([
+      supabase
+        .from('milestones')
+        .update({ status: 'paid', updated_at: new Date().toISOString() })
+        .eq('id', milestoneId),
+      supabase
+        .from('contracts')
+        .update({
+          paid_amount: (contract.paid_amount || 0) + milestone.amount,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', milestone.contract_id),
+    ])
 
-    if (milestoneError) {
-      return { success: false, error: milestoneError.message }
-    }
-
-    // Update contract paid_amount
-    const { data: existingContract } = await supabase
-      .from('contracts')
-      .select('paid_amount')
-      .eq('id', milestone.contract_id)
-      .single()
-
-    const newPaidAmount = (existingContract?.paid_amount || 0) + milestone.amount
-
-    const { error: contractError } = await supabase
-      .from('contracts')
-      .update({
-        paid_amount: newPaidAmount,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', milestone.contract_id)
-
-    if (contractError) {
-      return { success: false, error: contractError.message }
-    }
+    if (milestoneRes.error) return { success: false, error: milestoneRes.error.message }
+    if (contractRes.error) return { success: false, error: contractRes.error.message }
 
     return { success: true }
-  } catch (err: any) {
-    console.error('Error in releaseMilestonePayment:', err)
-    return { success: false, error: err.message }
+  } catch (err) {
+    return toActionError(err) as any
   }
 }

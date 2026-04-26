@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
-import { Noto_Serif, Plus_Jakarta_Sans } from "next/font/google";
+import { Noto_Serif, Plus_Jakarta_Sans, Geist } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "./providers/LanguageProvider";
+import { ThemeProvider } from "./providers/ThemeProvider";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+// Theme is handled by ThemeProvider useEffect
+// Language is handled by LanguageProvider useEffect
+// Don't set these in inline script to avoid hydration mismatch
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const notoSerif = Noto_Serif({
   variable: "--font-heading",
@@ -33,7 +41,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${notoSerif.variable} ${plusJakarta.variable} h-full`}
+      suppressHydrationWarning
+      className={cn("h-full", notoSerif.variable, plusJakarta.variable, "font-sans", geist.variable)}
     >
       <head>
         <link
@@ -41,10 +50,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col antialiased bg-background text-on-surface">
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
+      <body suppressHydrationWarning className="min-h-full flex flex-col antialiased bg-background text-on-surface">
+        <ThemeProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

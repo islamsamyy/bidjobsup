@@ -1,35 +1,13 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import Link from 'next/link'
 import { handleUnsaveJob } from './actions'
 import { markAllNotificationsAsRead } from '@/lib/actions/notifications'
 
 export default async function SavedJobsAndNotificationsPage() {
-  const supabase = await createClient()
-
-  // ✅ Fixed: Use getUser() instead of deprecated getSession()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in') // ✅ Fixed: correct route
-  }
-
-  // ✅ Fixed: Resolve internal user ID from auth_id
-  const { data: profile } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!profile) {
-    redirect('/join')
-  }
-
-  if (profile.user_type !== 'jobseeker' && profile.user_type !== 'both') {
-    redirect('/dashboard/employer')
-  }
+  const { profile, supabase } = await getAuthUserAs('jobseeker')
 
   // 1. ✅ Fixed: Query 'saved_items' (not 'favorites') using internal user ID
-  const { data: savedJobs } = await supabase
+  const { data: savedJobs } = await supabase!
     .from('saved_items')
     .select(`
       *,
@@ -41,13 +19,13 @@ export default async function SavedJobsAndNotificationsPage() {
         )
       )
     `)
-    .eq('user_id', profile.id)
+    .eq('user_id', profile?.id)
 
   // 2. ✅ Fixed: Notifications use internal user ID
-  const { data: notifications } = await supabase
+  const { data: notifications } = await supabase!
     .from('notifications')
     .select('*')
-    .eq('user_id', profile.id)
+    .eq('user_id', profile?.id)
     .order('created_at', { ascending: false })
     .limit(20)
 

@@ -9,22 +9,22 @@ export default async function EditJobPage({ params }: { params: Promise<{ jobId:
   // In Next.js 15+, params is a Promise
   const { jobId } = await params;
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase!.auth.getUser()
   if (authError || !user) {
     redirect('/sign-in')
   }
 
-  const { data: userRecord } = await supabase
+  const { data: userRecord } = await supabase!
     .from('users')
     .select('id, user_type')
-    .eq('auth_id', user.id)
+    .eq('auth_id', user?.id)
     .single()
 
   if (!userRecord || (userRecord.user_type !== 'employer' && userRecord.user_type !== 'both')) {
     redirect('/dashboard/seeker')
   }
 
-  const { data: job, error: jobError } = await supabase
+  const { data: job, error: jobError } = await supabase!
     .from('jobs')
     .select('*')
     .eq('id', jobId)

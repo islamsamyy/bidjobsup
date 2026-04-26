@@ -1,25 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import ProfileForm from '../../seeker/profile/ProfileForm'
 
 export default async function EmployerProfilePage() {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch Profile Info from the correct users table
-  const { data: profile, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (error || !profile) {
-    redirect('/dashboard')
-  }
+  const { profile } = await getAuthUserAs('employer')
 
   return (
     <main className="max-w-7xl mx-auto px-8 py-12">
@@ -28,8 +11,8 @@ export default async function EmployerProfilePage() {
       <header className="mb-20 flex flex-col md:flex-row items-center md:items-end gap-12 text-center md:text-left relative">
         <div className="relative group/avatar">
           <div className="w-48 h-48 rounded-[2.5rem] bg-surface-container-highest border-4 border-surface shadow-[0_30px_70px_rgba(0,0,0,0.4)] relative z-10 overflow-hidden group-hover/avatar:scale-[1.02] transition-transform duration-500">
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+            {profile?.avatar_url ? (
+              <img src={profile?.avatar_url as string} alt={profile?.full_name || ''} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-secondary-container">
                 <span className="material-symbols-outlined text-[64px]">domain</span>
@@ -42,7 +25,7 @@ export default async function EmployerProfilePage() {
 
         <div className="flex-grow space-y-4 pb-4">
           <h2 className="text-6xl font-headline font-black italic text-on-background leading-tight neon-glow">
-            {profile.full_name || 'Studio Narrative'}
+            {profile?.full_name || 'Studio Narrative'}
           </h2>
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-6">
             <span className="text-secondary text-sm font-black tracking-widest uppercase">
@@ -51,7 +34,7 @@ export default async function EmployerProfilePage() {
             <span className="w-1.5 h-1.5 rounded-full bg-stone-700"></span>
             <span className="text-on-surface-variant font-bold text-sm tracking-tight flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">location_on</span>
-              {profile.location || 'Global Operations'}
+              {profile?.location || 'Global Operations'}
             </span>
           </div>
         </div>
@@ -72,7 +55,7 @@ export default async function EmployerProfilePage() {
       <section className="bg-surface-container-low rounded-[3rem] p-12 md:p-20 border border-outline-variant/5 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full pointer-events-none origin-bottom-left transition-transform duration-1000"></div>
         <div className="relative z-10">
-          <ProfileForm initialData={profile} />
+          <ProfileForm initialData={profile as any} />
         </div>
       </section>
 

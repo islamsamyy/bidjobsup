@@ -1,11 +1,10 @@
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
-import { getURL } from '@/lib/utils/getURL'
 import { NextRequest } from 'next/server'
 
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
-    return Response.json({ error: 'Stripe is not configured yet.' }, { status: 503 })
+    return Response.json({ error: 'Stripe is not configured yet.', code: 'STRIPE_NOT_CONFIGURED' }, { status: 503 })
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
-      return Response.json({ error: 'Authentication required' }, { status: 401 })
+      return Response.json({ error: 'Authentication required', code: 'AUTH_ERROR' }, { status: 401 })
     }
 
     const { data: profile } = await supabase
@@ -27,17 +26,19 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (!profile?.stripe_customer_id) {
-      return Response.json({ error: 'No active subscription found' }, { status: 400 })
+      return Response.json({ error: 'No active subscription found', code: 'NO_SUBSCRIPTION' }, { status: 400 })
     }
+
+    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL!
 
     const session = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
-      return_url: getURL('/dashboard/employer/billing', req.headers.get('origin') || undefined),
+      return_url: `${origin}/dashboard/employer/billing`,
     })
 
     return Response.json({ url: session.url })
   } catch (err: any) {
     console.error('Stripe Portal Error:', err)
-    return Response.json({ error: 'Failed to open billing portal' }, { status: 500 })
+    return Response.json({ error: 'Failed to open billing portal', code: 'PORTAL_ERROR' }, { status: 500 })
   }
 }

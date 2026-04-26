@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getURL } from '@/lib/utils/getURL'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -141,7 +140,7 @@ export async function forgotPassword(formData: FormData) {
   const email = formData.get('email') as string
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: getURL('/reset-password'),
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password`,
   })
 
   if (error) {

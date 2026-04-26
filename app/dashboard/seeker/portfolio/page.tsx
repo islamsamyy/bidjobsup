@@ -40,8 +40,8 @@ export default function PortfolioPage() {
         const stored = localStorage.getItem('currentUser')
         if (stored) {
           const user = JSON.parse(stored)
-          setUserId(user.id)
-          const result = await getUserPortfolio(user.id)
+          setUserId(user?.id)
+          const result = await getUserPortfolio(user?.id)
           if (!result.error) {
             setPortfolio(result.portfolio)
           }
@@ -321,7 +321,7 @@ export default function PortfolioPage() {
             lightbulb
           </span>
           <span>
-            Featured projects appear prominently on your profile. Keep your portfolio updated
+            Featured projects appear prominently on your profile?. Keep your portfolio updated
             to attract better opportunities!
           </span>
         </p>

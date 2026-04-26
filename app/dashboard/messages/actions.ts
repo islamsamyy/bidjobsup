@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { tryGetAuth } from '@/lib/auth-utils'
 import { revalidatePath } from 'next/cache'
 import { createNotification } from '@/lib/actions/notifications'
 import { sendNewMessageEmail } from '@/lib/email'
@@ -10,40 +10,27 @@ export async function sendMessage(
   content: string,
   attachment?: { url: string; name: string; type: string }
 ) {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be signed in to contribute to a stream.' }
-  }
-
-  const { data: internalUser } = await supabase
-    .from('users')
-    .select('id, full_name')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!internalUser) {
-    return { error: 'Node identity not found in network.' }
-  }
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { profile, supabase } = auth
 
   // 0. Fetch conversation to find the recipient
-  const { data: conv } = await supabase
+  const { data: conv } = await supabase!
     .from('conversations')
-    .select('participant_1_id, participant_2_id, p1:users!participant_1_id(id, auth_id), p2:users!participant_2_id(id, auth_id)')
+    .select('participant_1_id, participant_2_id, p1:users!participant_1_id(id, auth_id, full_name), p2:users!participant_2_id(id, auth_id, full_name)')
     .eq('id', conversationId)
     .single()
 
   if (!conv) return { error: 'Conversation protocol not found.' }
 
-  const recipient = conv.participant_1_id === internalUser.id ? conv.p2 : conv.p1
+  const recipient = conv.participant_1_id === profile?.id ? conv.p2 : conv.p1
 
   // 1. Send the message
-  const { data: message, error: messageError } = await supabase
+  const { data: message, error: messageError } = await supabase!
     .from('messages')
     .insert({
       conversation_id: conversationId,
-      sender_id: internalUser.id,
+      sender_id: profile?.id,
       content,
       ...(attachment && {
         attachment_url: attachment.url,
@@ -60,7 +47,7 @@ export async function sendMessage(
   }
 
   // 2. Update conversation activity heartbeat
-  await supabase
+  await supabase!
     .from('conversations')
     .update({ last_message_at: new Date().toISOString() })
     .eq('id', conversationId)
@@ -72,16 +59,19 @@ export async function sendMessage(
       userAuthId: (recipient as any).auth_id,
       type: 'new_message',
       title: 'Incoming Encrypted Transmission',
-      content: `${internalUser.full_name || 'An agent'} sent you a message.`,
+      content: `${profile?.full_name || 'An agent'} sent you a message.`,
       link: `/dashboard/messages/${conversationId}`
     })
 
-    const { data: recipientAuth } = await supabase.auth.admin.getUserById((recipient as any).auth_id)
+    // Note: auth.admin might not be available on standard client, 
+    // but we can fetch user email if needed, or assume it's handled by trigger/edge function
+    // For now keeping the logic but using supabase from auth
+    const { data: recipientAuth } = await supabase!.auth.admin.getUserById((recipient as any).auth_id)
     if (recipientAuth?.user?.email) {
       await sendNewMessageEmail({
-        to: recipientAuth.user.email,
+        to: recipientAuth.user?.email,
         recipientName: (recipient as any).full_name || 'Agent',
-        senderName: internalUser.full_name || 'An agent',
+        senderName: profile?.full_name || 'An agent',
         preview: content,
         conversationId,
       }).catch(() => {})
@@ -93,28 +83,15 @@ export async function sendMessage(
 }
 
 export async function initializeConversation(recipientId: string) {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'Authentication required for link initialization.' }
-  }
-
-  const { data: internalUser } = await supabase
-    .from('users')
-    .select('id')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!internalUser) {
-    return { error: 'Origin node identity not found in network.' }
-  }
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { profile, supabase } = auth
 
   // 0. Resolve Recipient Internal ID if UUID was passed
   let resolvedRecipientId = parseInt(recipientId)
   if (isNaN(resolvedRecipientId)) {
     // Looks like a UUID or other string, try to resolve by auth_id
-    const { data: recp } = await supabase
+    const { data: recp } = await supabase!
       .from('users')
       .select('id')
       .eq('auth_id', recipientId)
@@ -126,10 +103,10 @@ export async function initializeConversation(recipientId: string) {
   }
 
   // 1. Check if conversation already exists (either P1-P2 or P2-P1)
-  const { data: existing } = await supabase
+  const { data: existing } = await supabase!
     .from('conversations')
     .select('id')
-    .or(`and(participant_1_id.eq.${internalUser.id},participant_2_id.eq.${resolvedRecipientId}),and(participant_1_id.eq.${resolvedRecipientId},participant_2_id.eq.${internalUser.id})`)
+    .or(`and(participant_1_id.eq.${profile?.id},participant_2_id.eq.${resolvedRecipientId}),and(participant_1_id.eq.${resolvedRecipientId},participant_2_id.eq.${profile?.id})`)
     .single()
 
   if (existing) {
@@ -137,10 +114,10 @@ export async function initializeConversation(recipientId: string) {
   }
 
   // 2. Initialize new mission thread
-  const { data: conversation, error: convError } = await supabase
+  const { data: conversation, error: convError } = await supabase!
     .from('conversations')
     .insert({
-      participant_1_id: internalUser.id,
+      participant_1_id: profile?.id,
       participant_2_id: resolvedRecipientId,
       last_message_at: new Date().toISOString()
     })
@@ -154,3 +131,4 @@ export async function initializeConversation(recipientId: string) {
 
   return { success: true, conversationId: conversation.id }
 }
+

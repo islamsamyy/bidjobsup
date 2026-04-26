@@ -1,29 +1,14 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth-utils'
 import Link from 'next/link'
+import { PageHeader } from '../components/PageHeader'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ContractsPage() {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: currentUser } = await supabase
-    .from('users')
-    .select('id, user_type, full_name')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!currentUser) {
-    redirect('/join')
-  }
+  const { profile: currentUser, supabase } = await getAuthUser()
 
   // Fetch contracts where user is either employer or freelancer
-  const { data: contracts, error } = await supabase
+  const { data: contracts } = await supabase!
     .from('contracts')
     .select(`
       *,
@@ -31,15 +16,15 @@ export default async function ContractsPage() {
       freelancer:freelancer_id(id, full_name, avatar_url),
       employer:employer_id(id, full_name, company_name, avatar_url)
     `)
-    .or(`freelancer_id.eq.${currentUser.id},employer_id.eq.${currentUser.id}`)
+    .or(`freelancer_id.eq.${currentUser?.id},employer_id.eq.${currentUser?.id}`)
     .order('created_at', { ascending: false })
 
-  const isEmployer = currentUser.user_type === 'employer' || currentUser.user_type === 'both'
+  const isEmployer = currentUser?.user_type === 'employer' || currentUser?.user_type === 'both'
 
   // Helper to determine user role in contract
   const getUserRole = (contract: any) => {
-    if (contract.freelancer_id === currentUser.id) return 'freelancer'
-    if (contract.employer_id === currentUser.id) return 'employer'
+    if (contract.freelancer_id === currentUser?.id) return 'freelancer'
+    if (contract.employer_id === currentUser?.id) return 'employer'
     return null
   }
 
@@ -61,15 +46,9 @@ export default async function ContractsPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-8 py-12">
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="font-headline text-5xl font-bold tracking-tight mb-2 text-on-surface">
-          Active Contracts
-        </h1>
-        <p className="text-on-surface-variant font-body text-lg">
-          {isEmployer ? 'Manage your ongoing contracts and freelancer relationships' : 'View your active projects and milestones'}
-        </p>
-      </div>
+      <PageHeader titleKey="contractsPage.title" subtitleKey="contractsPage.subtitle" className="mb-12" />
+      {/* Hidden role flag for downstream logic */}
+      <span hidden data-is-employer={isEmployer ? 'true' : 'false'} />
 
       {/* Contracts Grid */}
       {contracts && contracts.length > 0 ? (

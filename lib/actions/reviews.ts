@@ -1,7 +1,8 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getAuthUser } from '@/lib/supabase/get-user'
+import { toActionError } from '@/lib/errors'
 
 export async function createReview({
   revieweeId,
@@ -14,112 +15,76 @@ export async function createReview({
   rating: number
   comment: string
 }) {
-  // Validate input
-  if (!rating || rating < 1 || rating > 5) {
-    return { error: 'Rating must be between 1 and 5.' }
-  }
-  if (!comment || comment.trim().length === 0) {
-    return { error: 'Comment cannot be empty.' }
-  }
-  if (comment.length > 1000) {
-    return { error: 'Comment must be under 1000 characters.' }
-  }
+  try {
+    if (!rating || rating < 1 || rating > 5) return { error: 'Rating must be between 1 and 5.' }
+    if (!comment?.trim()) return { error: 'Comment cannot be empty.' }
+    if (comment.length > 1000) return { error: 'Comment must be under 1000 characters.' }
 
-  const supabase = await createClient()
+    const auth = await getAuthUser()
+    if (!auth.ok) return { error: auth.error }
+    const { user, supabase } = auth
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'Not authenticated.' }
-  }
+    if (user?.id === revieweeId) return { error: 'You cannot review yourself.' }
 
-  // Get reviewer ID
-  const { data: reviewer } = await supabase
-    .from('users')
-    .select('id')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!reviewer) return { error: 'Reviewer profile not found.' }
-
-  // Ensure reviewer is not reviewing themselves
-  if (reviewer.id === revieweeId) {
-    return { error: 'You cannot review yourself.' }
-  }
-
-  // Verify the job exists and reviewer was involved (only if jobId provided)
-  if (jobId && jobId > 0) {
-    const { data: job } = await supabase
-      .from('jobs')
-      .select('employer_id, status')
-      .eq('id', jobId)
-      .single()
-
-    if (!job) return { error: 'Job not found.' }
-
-    // Check if reviewer is involved in this job (either employer or accepted seeker)
-    if (job.employer_id !== reviewer.id) {
-      // If reviewer is not the employer, they must be an accepted seeker for this job
-      const { data: bid } = await supabase
-        .from('bids')
-        .select('id')
-        .eq('job_id', jobId)
-        .eq('bidder_id', reviewer.id)
-        .eq('status', 'accepted')
+    if (jobId > 0) {
+      const { data: job } = await supabase!
+        .from('jobs')
+        .select('employer_id')
+        .eq('id', jobId)
         .single()
 
-      if (!bid) {
-        return { error: 'You are not involved in this job.' }
+      if (!job) return { error: 'Job not found.' }
+
+      if (job.employer_id !== user?.id) {
+        const { data: bid } = await supabase!
+          .from('bids')
+          .select('id')
+          .eq('job_id', jobId)
+          .eq('bidder_id', user?.id)
+          .eq('status', 'accepted')
+          .single()
+
+        if (!bid) return { error: 'You are not involved in this job.' }
       }
     }
-  }
 
-  // Create review
-  const { error } = await supabase
-    .from('reviews')
-    .insert({
-      reviewer_id: reviewer.id,
+    const { error } = await supabase!.from('reviews').insert({
+      reviewer_id: user?.id,
       reviewee_id: revieweeId,
       job_id: jobId,
       rating,
       comment: comment.trim(),
     })
 
-  if (error) {
-    if (error.code === '23505') {
-      return { error: 'You have already reviewed this person for this job.' }
+    if (error) {
+      if (error.code === '23505') return { error: 'You already reviewed this person for this job.' }
+      return { error: 'Failed to create review.' }
     }
-    return { error: 'Failed to create review.' }
-  }
 
-  revalidatePath(`/talent/${revieweeId}`)
-  return { success: true }
+    revalidatePath(`/talent/${revieweeId}`)
+    return { success: true }
+  } catch (err) {
+    return toActionError(err) as any
+  }
 }
 
 export async function deleteReview(reviewId: number) {
-  const supabase = await createClient()
+  try {
+    const auth = await getAuthUser()
+    if (!auth.ok) return { error: auth.error }
+    const { user, supabase } = auth
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'Not authenticated.' }
+    const { error } = await supabase!
+      .from('reviews')
+      .delete()
+      .eq('id', reviewId)
+      .eq('reviewer_id', user?.id)
+
+    if (error) return { error: 'Failed to delete review.' }
+
+    revalidatePath('/community')
+    return { success: true }
+  } catch (err) {
+    return toActionError(err) as any
   }
-
-  const { data: reviewer } = await supabase
-    .from('users')
-    .select('id')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!reviewer) return { error: 'User not found.' }
-
-  // Only allow reviewer to delete their own review
-  const { error } = await supabase
-    .from('reviews')
-    .delete()
-    .eq('id', reviewId)
-    .eq('reviewer_id', reviewer.id)
-
-  if (error) return { error: 'Failed to delete review.' }
-
-  revalidatePath('/community')
-  return { success: true }
 }

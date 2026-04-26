@@ -17,13 +17,16 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('language') as Locale | null;
-      if (saved && locales.includes(saved)) return saved;
+  const [locale, setLocaleState] = useState<Locale>(defaultLocale);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('language') as Locale | null;
+    if (saved && locales.includes(saved)) {
+      setLocaleState(saved);
     }
-    return defaultLocale;
-  });
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = locale;

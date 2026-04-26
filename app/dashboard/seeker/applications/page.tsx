@@ -1,29 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import Link from 'next/link'
 import { handleWithdrawBid } from './actions'
 
 export default async function SeekerApplicationsPage() {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch Seeker Profile to get internal ID
-  const { data: profile } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (profile?.user_type !== 'jobseeker' && profile?.user_type !== 'both') {
-    redirect('/dashboard/employer')
-  }
+  const { profile, supabase } = await getAuthUserAs('jobseeker')
 
   // 2. Fetch Bids for this seeker using internal ID
-  const { data: bids, error } = await supabase
+  const { data: bids, error } = await supabase!
     .from('bids')
     .select(`
       *,
@@ -39,7 +22,7 @@ export default async function SeekerApplicationsPage() {
         )
       )
     `)
-    .eq('bidder_id', profile.id)
+    .eq('bidder_id', profile?.id)
     .order('created_at', { ascending: false })
 
   const stats = {

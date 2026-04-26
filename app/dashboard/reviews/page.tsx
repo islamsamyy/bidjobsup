@@ -1,30 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect, notFound } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth-utils'
 import Link from 'next/link'
 import ReviewManagementClient from './client'
+import { PageHeader } from '../components/PageHeader'
+import { TranslatedText } from '../components/TranslatedText'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ReviewsPage() {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: currentUser } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!currentUser) {
-    redirect('/join')
-  }
+  const { profile: currentUser, supabase } = await getAuthUser()
 
   // Fetch all reviews received by current user
-  const { data: reviewsData, error } = await supabase
+  const { data: reviewsData, error } = await supabase!
     .from('reviews')
     .select(`
       id,
@@ -36,7 +22,7 @@ export default async function ReviewsPage() {
       reviewer:reviewer_id(id, full_name, avatar_url, email),
       job:job_id(id, title)
     `)
-    .eq('reviewee_id', currentUser.id)
+    .eq('reviewee_id', currentUser?.id)
     .order('created_at', { ascending: false })
 
   const reviews = reviewsData?.map(r => ({
@@ -67,13 +53,9 @@ export default async function ReviewsPage() {
           <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">
             arrow_back
           </span>
-          <span className="text-xs font-bold uppercase tracking-widest">Back to Dashboard</span>
+          <TranslatedText textKey="atsHistory.backToDashboard" className="text-xs font-bold uppercase tracking-widest" />
         </Link>
-
-        <h1 className="font-headline text-5xl font-bold text-on-surface mb-2">Reviews & Ratings</h1>
-        <p className="text-on-surface-variant text-lg">
-          Manage and view all reviews you&apos;ve received from clients and collaborators
-        </p>
+        <PageHeader titleKey="reviewsPage.title" subtitleKey="reviewsPage.subtitle" className="" />
       </div>
 
       {/* Summary Cards */}
@@ -153,7 +135,7 @@ export default async function ReviewsPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            <ReviewManagementClient reviews={reviews || []} currentUserId={currentUser.id} />
+            <ReviewManagementClient reviews={reviews || []} currentUserId={Number(currentUser?.id)} />
           </div>
         )}
       </div>

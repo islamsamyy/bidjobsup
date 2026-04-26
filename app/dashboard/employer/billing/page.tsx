@@ -1,3 +1,4 @@
+import { getAuthUserAs } from '@/lib/auth-utils'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import StripeCheckoutButton from '@/components/features/StripeCheckoutButton'
@@ -67,23 +68,7 @@ async function getStripeInvoices(stripeCustomerId: string | null) {
 }
 
 export default async function EmployerBillingPage() {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch Employer Profile
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (profile?.user_type !== 'employer' && profile?.user_type !== 'both') {
-    redirect('/dashboard/seeker')
-  }
+  const { profile } = await getAuthUserAs('employer')
 
   // Fetch real Stripe data
   const [invoices, subscription] = await Promise.all([

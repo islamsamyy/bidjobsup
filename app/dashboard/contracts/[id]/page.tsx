@@ -1,5 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect, notFound } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth-utils'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ReviewForm from '@/components/features/ReviewForm'
 import ReviewsList from '@/components/features/ReviewsList'
@@ -7,26 +7,11 @@ import ReviewsList from '@/components/features/ReviewsList'
 export const dynamic = 'force-dynamic'
 
 export default async function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
   const { id } = await params
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: currentUser } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!currentUser) {
-    redirect('/join')
-  }
+  const { profile: currentUser, supabase } = await getAuthUser()
 
   // Fetch contract details
-  const { data: contract, error } = await supabase
+  const { data: contract, error } = await supabase!
     .from('contracts')
     .select(`
       *,
@@ -42,12 +27,12 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
   }
 
   // Check access
-  const isAccessible = contract.freelancer_id === currentUser.id || contract.employer_id === currentUser.id
+  const isAccessible = contract.freelancer_id === currentUser?.id || contract.employer_id === currentUser?.id
   if (!isAccessible) {
     notFound()
   }
 
-  const isEmployer = contract.employer_id === currentUser.id
+  const isEmployer = contract.employer_id === currentUser?.id
   const otherParty = isEmployer ? contract.freelancer : contract.employer
 
   return (
@@ -219,8 +204,8 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
           <div>
             <h2 className="font-headline text-2xl font-bold text-on-surface mb-6">Feedback</h2>
             <ReviewsList
-              talentId={otherParty?.id}
-              currentUserId={currentUser.id}
+              talentId={Number(otherParty?.id)}
+              currentUserId={Number(currentUser?.id)}
             />
           </div>
 

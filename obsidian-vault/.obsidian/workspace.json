@@ -1,0 +1,198 @@
+{
+  "main": {
+    "id": "a43d27d6a2c119b0",
+    "type": "split",
+    "children": [
+      {
+        "id": "19a0a14ccc0dd805",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e4723ec4ef201960",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "God-Nodes.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "God-Nodes"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "2d80e7f27921c44f",
+    "type": "split",
+    "children": [
+      {
+        "id": "92f72e14625070c8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "310d97343c41bdca",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "c4580b0f84b90c41",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "dc082d9e90a7c681",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e268e026f7155344",
+    "type": "split",
+    "children": [
+      {
+        "id": "5c33b33fb218e7e5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b20a421525d291d1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "God-Nodes.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for God-Nodes"
+            }
+          },
+          {
+            "id": "077a5581e5f9e83d",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "God-Nodes.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from God-Nodes"
+            }
+          },
+          {
+            "id": "4e87ebe4ebdbc755",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "ea8d0a4aee2bcc07",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "d4616c24fcdc2931",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "God-Nodes.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of God-Nodes"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "e4723ec4ef201960",
+  "lastOpenFiles": [
+    "Community-5-Admin-Dashboard.md",
+    "Analysis/System-Architecture.md",
+    "Community-0-Jobs-Contacts.md",
+    "Communities/Community 3.md",
+    "README.md",
+    "God-Nodes.md",
+    "Communities/Community 5.md",
+    "Communities",
+    "Communities-Index.md"
+  ]
+}

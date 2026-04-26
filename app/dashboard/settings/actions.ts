@@ -1,21 +1,20 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { tryGetAuth } from '@/lib/auth-utils'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 // ── Change Password ───────────────────────────────────────────────────────────
 export async function changePassword(currentPassword: string, newPassword: string) {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return { error: 'Not authenticated' }
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { supabase } = auth
 
   if (newPassword.length < 8) {
     return { error: 'New password must be at least 8 characters.' }
   }
 
-  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  const { error } = await supabase!.auth.updateUser({ password: newPassword })
   if (error) return { error: error.message }
 
   return { success: true }
@@ -23,16 +22,15 @@ export async function changePassword(currentPassword: string, newPassword: strin
 
 // ── Change Email ──────────────────────────────────────────────────────────────
 export async function changeEmail(newEmail: string) {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return { error: 'Not authenticated' }
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { supabase } = auth
 
   if (!newEmail || !newEmail.includes('@')) {
     return { error: 'Please enter a valid email address.' }
   }
 
-  const { error } = await supabase.auth.updateUser({ email: newEmail })
+  const { error } = await supabase!.auth.updateUser({ email: newEmail })
   if (error) return { error: error.message }
 
   return { success: true, message: 'Verification email sent to your new address.' }
@@ -45,15 +43,14 @@ export async function updateNotificationPrefs(prefs: {
   email_new_message: boolean
   email_weekly_digest: boolean
 }) {
-  const supabase = await createClient()
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { user, supabase } = auth
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return { error: 'Not authenticated' }
-
-  const { error } = await supabase
+  const { error } = await supabase!
     .from('users')
     .update({ notification_prefs: prefs })
-    .eq('auth_id', user.id)
+    .eq('auth_id', user?.id)
 
   if (error) return { error: error.message }
 
@@ -67,15 +64,14 @@ export async function updatePrivacySettings(settings: {
   show_hourly_rate: boolean
   show_location: boolean
 }) {
-  const supabase = await createClient()
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { user, supabase } = auth
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return { error: 'Not authenticated' }
-
-  const { error } = await supabase
+  const { error } = await supabase!
     .from('users')
     .update({ privacy_settings: settings })
-    .eq('auth_id', user.id)
+    .eq('auth_id', user?.id)
 
   if (error) return { error: error.message }
 
@@ -89,16 +85,16 @@ export async function deleteAccount(confirmText: string) {
     return { error: 'Please type DELETE to confirm.' }
   }
 
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return { error: 'Not authenticated' }
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { user, supabase } = auth
 
   // Delete user record from users table
-  await supabase.from('users').delete().eq('auth_id', user.id)
+  await supabase!.from('users').delete().eq('auth_id', user?.id)
 
   // Sign out
-  await supabase.auth.signOut()
+  await supabase!.auth.signOut()
 
   redirect('/')
 }
+

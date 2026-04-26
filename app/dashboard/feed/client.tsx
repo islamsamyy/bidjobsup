@@ -89,7 +89,7 @@ export default function DiscoveryFeedClient({
       {/* Filters */}
       <div className="glass border border-outline-variant/15 rounded-xl p-6">
         <p className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-3">
-          Filter by type
+          {t('discoveryFeed.filterByType')}
         </p>
         <div className="flex gap-2 flex-wrap">
           {(['all', 'text', 'project', 'achievement'] as const).map(type => (
@@ -102,7 +102,7 @@ export default function DiscoveryFeedClient({
                   : 'bg-surface-container hover:bg-surface-bright text-on-surface'
               }`}
             >
-              {type === 'all' ? 'All Posts' : type.charAt(0).toUpperCase() + type.slice(1)}
+              {type === 'all' ? t('common.all') : type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
         </div>
@@ -116,7 +116,7 @@ export default function DiscoveryFeedClient({
               search
             </span>
             <p className="text-on-surface-variant">
-              No posts found with this filter.
+              {t('discoveryFeed.noResults')}
             </p>
           </div>
         ) : (
@@ -132,8 +132,8 @@ export default function DiscoveryFeedClient({
                   <Link href={`/talent/${post.user?.id}`}>
                     {post.user?.avatar_url ? (
                       <img
-                        src={post.user.avatar_url}
-                        alt={post.user.full_name}
+                        src={post.user?.avatar_url}
+                        alt={post.user?.full_name}
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0 hover:opacity-80 transition-opacity"
                       />
                     ) : (
@@ -153,7 +153,7 @@ export default function DiscoveryFeedClient({
                       {post.user?.full_name}
                     </Link>
                     {post.user?.headline && (
-                      <p className="text-on-surface-variant text-sm">{post.user.headline}</p>
+                      <p className="text-on-surface-variant text-sm">{post.user?.headline}</p>
                     )}
                     <p className="text-on-surface-variant text-xs mt-1">
                       {formatDate(post.created_at)}
@@ -201,7 +201,7 @@ export default function DiscoveryFeedClient({
                       className="inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors font-semibold text-sm"
                     >
                       <span className="material-symbols-outlined text-sm">open_in_new</span>
-                      View Project
+                      {t('discoveryFeed.viewProject')}
                     </a>
                   )}
                 </div>
@@ -209,12 +209,10 @@ export default function DiscoveryFeedClient({
                 {/* Post Stats */}
                 <div className="flex gap-4 text-on-surface-variant text-sm mb-6 pb-6 border-b border-outline-variant/10">
                   <span>
-                    <span className="font-semibold text-on-surface">{post.likes_count}</span> Like
-                    {post.likes_count !== 1 ? 's' : ''}
+                    <span className="font-semibold text-on-surface">{post.likes_count}</span> {t('profileFeed.likes').replace('{{count}}', post.likes_count !== 1 ? 's' : '')}
                   </span>
                   <span>
-                    <span className="font-semibold text-on-surface">{postCommentsList.length}</span> Comment
-                    {postCommentsList.length !== 1 ? 's' : ''}
+                    <span className="font-semibold text-on-surface">{postCommentsList.length}</span> {t('profileFeed.comments').replace('{{count}}', postCommentsList.length !== 1 ? 's' : '')}
                   </span>
                 </div>
 
@@ -230,7 +228,7 @@ export default function DiscoveryFeedClient({
                     } disabled:opacity-50`}
                   >
                     <span className="material-symbols-outlined text-sm">thumb_up</span>
-                    Like
+                    {t('common.like')}
                   </button>
                   <button
                     onClick={() => savePost(post.id)}
@@ -242,7 +240,7 @@ export default function DiscoveryFeedClient({
                     } disabled:opacity-50`}
                   >
                     <span className="material-symbols-outlined text-sm">bookmark</span>
-                    Save
+                    {t('common.save')}
                   </button>
                 </div>
 
@@ -253,8 +251,8 @@ export default function DiscoveryFeedClient({
                       <div key={comment.id} className="flex gap-2">
                         {comment.user?.avatar_url ? (
                           <img
-                            src={comment.user.avatar_url}
-                            alt={comment.user.full_name}
+                            src={comment.user?.avatar_url}
+                            alt={comment.user?.full_name}
                             className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                           />
                         ) : (
@@ -283,7 +281,7 @@ export default function DiscoveryFeedClient({
                     type="text"
                     value={postComments[post.id] || ''}
                     onChange={e => setPostComments(prev => ({ ...prev, [post.id]: e.target.value }))}
-                    placeholder="Add a comment..."
+                    placeholder={t('profileFeed.addComment')}
                     className="input-inset flex-1"
                     maxLength={1000}
                   />

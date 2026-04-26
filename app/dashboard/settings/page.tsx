@@ -1,23 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/auth-utils'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import SettingsClient from './SettingsClient'
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
+  const { profile, user } = await getAuthUser()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) redirect('/sign-in')
-
-  const { data: profile } = await supabase
-    .from('users')
-    .select('full_name, user_type, notification_prefs, privacy_settings')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!profile) redirect('/sign-in')
-
-  const profileRoute = profile.user_type === 'employer'
+  const profileRoute = profile?.user_type === 'employer'
     ? '/dashboard/employer/profile'
     : '/dashboard/seeker/profile'
 
@@ -46,7 +35,7 @@ export default async function SettingsPage() {
             </h1>
             <p className="text-on-surface-variant mt-3 text-sm italic max-w-lg leading-relaxed">
               Manage your security, notification preferences, and privacy controls for{' '}
-              <span className="text-on-surface font-bold">{profile.full_name || user.email}</span>.
+              <span className="text-on-surface font-bold">{profile?.full_name || user?.email}</span>.
             </p>
           </div>
           <div className="shrink-0 w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -76,7 +65,7 @@ export default async function SettingsPage() {
         </div>
       </header>
 
-      <SettingsClient profile={profile as any} email={user.email!} />
+      <SettingsClient profile={profile as any} email={user?.email!} />
 
       {/* Footer note */}
       <div className="mt-12 pt-8 border-t border-outline-variant/10 flex items-center gap-3 text-[10px] text-stone-600 font-bold uppercase tracking-widest">

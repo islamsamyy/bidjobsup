@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/auth-utils'
 import { redirect } from 'next/navigation'
 import { initializeConversation } from './actions'
 import Link from 'next/link'
@@ -11,22 +11,7 @@ export default async function MessagesPage({
   searchParams: Promise<{ recipient?: string }>
 }) {
   const { recipient } = await searchParams
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: internalUser } = await supabase
-    .from('users')
-    .select('id')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!internalUser) {
-    redirect('/join')
-  }
+  const { profile: internalUser, supabase } = await getAuthUser()
 
   // If we have a recipient, attempt to initialize/find a conversation
   if (recipient) {
@@ -37,7 +22,7 @@ export default async function MessagesPage({
   }
 
   // Fetch all conversations for this user
-  const { data: conversations } = await supabase
+  const { data: conversations } = await supabase!
     .from('conversations')
     .select(`
       id,
@@ -45,13 +30,13 @@ export default async function MessagesPage({
       participant_1:users!participant_1_id ( id, full_name, username, avatar_url ),
       participant_2:users!participant_2_id ( id, full_name, username, avatar_url )
     `)
-    .or(`participant_1_id.eq.${internalUser.id},participant_2_id.eq.${internalUser.id}`)
+    .or(`participant_1_id.eq.${internalUser?.id},participant_2_id.eq.${internalUser?.id}`)
     .order('last_message_at', { ascending: false })
 
   // For each conversation, get the last message preview
   const conversationsWithPreview = await Promise.all(
     (conversations || []).map(async (conv) => {
-      const { data: lastMsg } = await supabase
+      const { data: lastMsg } = await supabase!
         .from('messages')
         .select('content, created_at, sender_id')
         .eq('conversation_id', conv.id)
@@ -64,7 +49,7 @@ export default async function MessagesPage({
       const p1 = conv.participant_1 as any
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const p2 = conv.participant_2 as any
-      const other = p1?.id === internalUser.id ? p2 : p1
+      const other = p1?.id === internalUser?.id ? p2 : p1
 
       return {
         id: conv.id,
@@ -79,7 +64,7 @@ export default async function MessagesPage({
         },
         preview: lastMsg?.content || 'No messages yet',
         previewTime: lastMsg?.created_at || conv.last_message_at,
-        isOwnLastMessage: lastMsg?.sender_id === internalUser.id,
+        isOwnLastMessage: lastMsg?.sender_id === internalUser?.id,
       }
     })
   )
@@ -144,7 +129,7 @@ export default async function MessagesPage({
           </div>
           <h3 className="text-2xl font-headline font-bold text-on-surface italic mb-2">No Active Streams</h3>
           <p className="text-on-surface-variant max-w-sm text-center text-sm">
-            Your secure communications pipeline is currently empty. Start a conversation by messaging a talent or employer from their profile.
+            Your secure communications pipeline is currently empty. Start a conversation by messaging a talent or employer from their profile?.
           </p>
         </div>
       )}

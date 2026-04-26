@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLanguage } from '@/app/providers/LanguageProvider'
 
 interface SidebarLinkProps {
   href: string
   icon: string
-  label: string
+  label?: string
+  labelKey?: string
   accentColor?: 'primary' | 'secondary'
   exact?: boolean
 }
@@ -15,9 +17,12 @@ export function SidebarLink({
   href,
   icon,
   label,
+  labelKey,
   accentColor = 'primary',
   exact = false,
 }: SidebarLinkProps) {
+  const { t } = useLanguage()
+  const displayLabel = labelKey ? t(labelKey) : (label ?? '')
   const pathname = usePathname()
   const isActive = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/')
 
@@ -40,7 +45,7 @@ export function SidebarLink({
       >
         {icon}
       </span>
-      <span className="text-sm font-medium tracking-wide">{label}</span>
+      <span className="text-sm font-medium tracking-wide">{displayLabel}</span>
     </Link>
   )
 }

@@ -14,13 +14,11 @@ export async function sendBidStatusEmail({
   recipientName,
   jobTitle,
   status,
-  bidId,
 }: {
   to: string
   recipientName: string
   jobTitle: string
   status: 'accepted' | 'rejected' | 'interview' | 'pending'
-  bidId?: string
 }) {
   const statusConfig: Record<typeof status, { subject: string; headline: string; color: string; message: string }> = {
     accepted: {
@@ -127,7 +125,7 @@ export async function sendNewBidEmail({
       color: '#caa2f7',
       body: `<strong>${seekerName}</strong> has submitted a bid on your role <strong>${jobTitle}</strong>. Review their proposal and decide on next steps.`,
       ctaLabel: 'Review Bid',
-      ctaUrl: `${SITE_URL}/dashboard/employer/listings`,
+      ctaUrl: `${SITE_URL}/dashboard/employer/listings/${jobId}`,
     }),
   })
 }

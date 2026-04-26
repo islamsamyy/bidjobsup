@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { signupSchema, type SignupFormData } from '@/lib/validations/auth'
+import { signup } from '@/app/(auth)/actions'
 
 interface CreateProfileFormProps {
   initialMessage?: string
@@ -47,7 +48,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
 
 export default function CreateProfileForm({ initialMessage, defaultUserType = 'jobseeker' }: CreateProfileFormProps) {
   const [serverError, setServerError] = useState<string | null>(initialMessage || null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const {
     register,
@@ -65,7 +66,6 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
   const passwordValue = (watch('password') as string) ?? ''
 
   const onSubmit = async (data: SignupFormData) => {
-    setIsLoading(true)
     setServerError(null)
 
     const formData = new FormData()
@@ -75,16 +75,9 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
     formData.append('phone', data.phone || '')
     formData.append('userType', data.userType)
 
-    try {
-      const { signup } = await import('@/app/(auth)/actions')
-      await signup(formData)
-    } catch (err: any) {
-      if (err?.message && !err.message.includes('NEXT_REDIRECT')) {
-        setServerError(err.message || 'An unexpected error occurred. Please try again.')
-      }
-    } finally {
-      setIsLoading(false)
-    }
+    startTransition(async () => {
+      signup(formData)
+    })
   }
 
   return (
@@ -236,9 +229,9 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
           <button
             className="btn-gradient w-full flex justify-center items-center gap-2 text-xs tracking-widest uppercase py-4 disabled:opacity-60 disabled:cursor-not-allowed"
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading ? (
+            {isPending ? (
               <>
                 <span className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
                 Creating Account...

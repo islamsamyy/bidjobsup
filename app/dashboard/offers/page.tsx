@@ -1,30 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth-utils'
 import Link from 'next/link'
 import OffersClient from './client'
+import { PageHeader } from '../components/PageHeader'
+import { TranslatedText } from '../components/TranslatedText'
 
 export const dynamic = 'force-dynamic'
 
 export default async function OffersPage() {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: currentUser } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!currentUser) {
-    redirect('/join')
-  }
+  const { user: currentUser, supabase } = await getAuthUser()
 
   // Fetch invitations
-  const { data: invitationsData } = await supabase
+  const { data: invitationsData } = await supabase!
     .from('invitations')
     .select(`
       id,
@@ -42,7 +28,7 @@ export default async function OffersPage() {
       recipient:recipient_id(id, full_name, avatar_url, email),
       job:job_id(id, title, description)
     `)
-    .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+    .or(`sender_id.eq.${currentUser?.id},recipient_id.eq.${currentUser?.id}`)
     .order('created_at', { ascending: false })
 
   const invitations = invitationsData?.map(inv => ({
@@ -53,7 +39,7 @@ export default async function OffersPage() {
   }))
 
   // Fetch offers
-  const { data: offersData } = await supabase
+  const { data: offersData } = await supabase!
     .from('offers')
     .select(`
       id,
@@ -71,7 +57,7 @@ export default async function OffersPage() {
       to_user:to_user_id(id, full_name, avatar_url, email),
       job:job_id(id, title)
     `)
-    .or(`from_user_id.eq.${currentUser.id},to_user_id.eq.${currentUser.id}`)
+    .or(`from_user_id.eq.${currentUser?.id},to_user_id.eq.${currentUser?.id}`)
     .order('created_at', { ascending: false })
 
   const offers = offersData?.map(offer => ({
@@ -82,8 +68,8 @@ export default async function OffersPage() {
   }))
 
   // Count pending
-  const pendingInvitations = (invitations || []).filter(i => i.status === 'pending' && i.recipient_id === currentUser.id)
-  const pendingOffers = (offers || []).filter(o => o.status === 'open' && o.to_user_id === currentUser.id)
+  const pendingInvitations = (invitations || []).filter(i => i.status === 'pending' && i.recipient_id === currentUser?.id)
+  const pendingOffers = (offers || []).filter(o => o.status === 'open' && o.to_user_id === currentUser?.id)
 
   return (
     <main className="max-w-6xl mx-auto px-4 md:px-8 py-12">
@@ -96,13 +82,9 @@ export default async function OffersPage() {
           <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">
             arrow_back
           </span>
-          <span className="text-xs font-bold uppercase tracking-widest">Back to Dashboard</span>
+          <TranslatedText textKey="atsHistory.backToDashboard" className="text-xs font-bold uppercase tracking-widest" />
         </Link>
-
-        <h1 className="font-headline text-5xl font-bold text-on-surface mb-2">Job Invitations & Offers</h1>
-        <p className="text-on-surface-variant text-lg">
-          Manage job invitations and offers from employers and freelancers
-        </p>
+        <PageHeader titleKey="offersPage.title" subtitleKey="offersPage.subtitle" className="" />
       </div>
 
       {/* Summary Cards */}
@@ -158,7 +140,7 @@ export default async function OffersPage() {
         <OffersClient
           invitations={invitations || []}
           offers={offers || []}
-          currentUserId={currentUser.id}
+          currentUserId={Number(currentUser?.id)}
         />
       )}
     </main>

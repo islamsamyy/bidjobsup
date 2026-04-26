@@ -7,10 +7,29 @@
       "Bash(git commit -m 'fix: update JobFilterPanel to use URL routing instead of callback:*)",
       "Bash(bash /tmp/run_migrations.sh)",
       "Bash(find \"e:\\\\bidjob\\\\supabase\\\\migrations\" -name \"*.sql\" -exec basename {} \\\\;)",
-      "mcp__claude_ai_Supabase__apply_migration"
+      "mcp__claude_ai_Supabase__apply_migration",
+      "Bash(xargs -0 sed -i 's/\\\\.eq\\(\\\\x27employer_id\\\\x27, profile\\\\.id\\)/.eq\\(\\\\x27employer_id\\\\x27, profile?.id\\)/g; s/\\\\.eq\\(\\\\x27user_id\\\\x27, profile\\\\.id\\)/.eq\\(\\\\x27user_id\\\\x27, profile?.id\\)/g; s/\\\\.eq\\(\\\\x27freelancer_id\\\\x27, profile\\\\.id\\)/.eq\\(\\\\x27freelancer_id\\\\x27, profile?.id\\)/g')",
+      "Bash(xargs -0 sed -i 's/profile\\\\.id/profile?.id/g')",
+      "Bash(xargs -0 sed -i 's/profile\\\\.\\\\\\([a-z_]*\\\\\\)/profile?.\\\\1/g')",
+      "Bash(xargs -0 sed -i 's/user\\\\.\\\\\\([a-z_]*\\\\\\)/user?.\\\\1/g')",
+      "Bash(xargs -0 sed -i 's/internalUser\\\\.\\\\\\([a-z_]*\\\\\\)/internalUser?.\\\\1/g; s/currentUser\\\\.\\\\\\([a-z_]*\\\\\\)/currentUser?.\\\\1/g')",
+      "Bash(graphify install *)"
     ],
     "additionalDirectories": [
       "\\tmp"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Glob|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f graphify-out/graph.json ] && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"graphify: Knowledge graph exists. Read graphify-out/GRAPH_REPORT.md for god nodes and community structure before searching raw files.\"}}' || true"
+          }
+        ]
+      }
     ]
   }
 }

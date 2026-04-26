@@ -77,7 +77,7 @@ const CreatePost = ({ userId }: { userId: number }) => {
 
       <div>
         <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">
-          Post Type
+          {t('profileFeed.postType')}
         </label>
         <div className="flex gap-2">
           {(['text', 'project', 'achievement'] as const).map(type => (
@@ -91,7 +91,7 @@ const CreatePost = ({ userId }: { userId: number }) => {
                   : 'bg-surface-container hover:bg-surface-bright text-on-surface'
               }`}
             >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {t(`profileFeed.${type}Post`)}
             </button>
           ))}
         </div>
@@ -99,13 +99,13 @@ const CreatePost = ({ userId }: { userId: number }) => {
 
       <div>
         <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">
-          {postType === 'text' ? 'What do you want to share?' : 'Title'}
+          {postType === 'text' ? t('profileFeed.whatToShare') : t('profileFeed.postTitle')}
         </label>
         <input
           type="text"
           value={postType === 'text' ? content : title}
           onChange={e => postType === 'text' ? setContent(e.target.value) : setTitle(e.target.value)}
-          placeholder={postType === 'text' ? 'Share an update, achievement, or insight...' : 'Post title'}
+          placeholder={postType === 'text' ? t('profileFeed.whatToShare') : t('profileFeed.postTitlePlaceholder')}
           className="input-inset w-full"
           maxLength={postType === 'text' ? 5000 : 255}
         />
@@ -118,12 +118,12 @@ const CreatePost = ({ userId }: { userId: number }) => {
         <>
           <div>
             <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">
-              Description
+              {t('profileFeed.description')}
             </label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder="Add more details about your achievement or project..."
+              placeholder={t('profileFeed.descriptionPlaceholder')}
               className="input-inset w-full h-24"
               maxLength={1000}
             />
@@ -139,7 +139,7 @@ const CreatePost = ({ userId }: { userId: number }) => {
         disabled={loading || !content.trim()}
         className="w-full bg-primary text-on-primary px-6 py-3 rounded-lg font-semibold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? 'Publishing...' : 'Publish Post'}
+        {loading ? t('profileFeed.publishing') : t('profileFeed.publishPost')}
       </button>
     </form>
   )
@@ -218,8 +218,8 @@ const PostsList = ({
               <div className="flex items-start gap-4 flex-1">
                 {post.user?.avatar_url ? (
                   <img
-                    src={post.user.avatar_url}
-                    alt={post.user.full_name}
+                    src={post.user?.avatar_url}
+                    alt={post.user?.full_name}
                     className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
@@ -281,7 +281,7 @@ const PostsList = ({
                   className="inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors font-semibold uppercase tracking-widest text-sm"
                 >
                   <span className="material-symbols-outlined text-sm">open_in_new</span>
-                  View Project
+                  {t('discoveryFeed.viewProject')}
                 </a>
               )}
             </div>
@@ -289,12 +289,10 @@ const PostsList = ({
             {/* Post Stats */}
             <div className="flex gap-4 text-on-surface-variant text-sm mb-6 pb-6 border-b border-outline-variant/10">
               <span>
-                <span className="font-semibold text-on-surface">{post.likes_count}</span> Like
-                {post.likes_count !== 1 ? 's' : ''}
+                <span className="font-semibold text-on-surface">{post.likes_count}</span> {t('profileFeed.likes').replace('{{count}}', post.likes_count !== 1 ? 's' : '')}
               </span>
               <span>
-                <span className="font-semibold text-on-surface">{postCommentsList.length}</span> Comment
-                {postCommentsList.length !== 1 ? 's' : ''}
+                <span className="font-semibold text-on-surface">{postCommentsList.length}</span> {t('profileFeed.comments').replace('{{count}}', postCommentsList.length !== 1 ? 's' : '')}
               </span>
             </div>
 
@@ -310,7 +308,7 @@ const PostsList = ({
                 } disabled:opacity-50`}
               >
                 <span className="material-symbols-outlined text-sm">thumb_up</span>
-                Like
+                {t('common.like')}
               </button>
               <button
                 onClick={() => savePost(post.id)}
@@ -322,7 +320,7 @@ const PostsList = ({
                 } disabled:opacity-50`}
               >
                 <span className="material-symbols-outlined text-sm">bookmark</span>
-                Save
+                {t('common.save')}
               </button>
             </div>
 
@@ -330,14 +328,14 @@ const PostsList = ({
             {postCommentsList.length > 0 && (
               <div className="mb-6 space-y-4 pb-6 border-b border-outline-variant/10">
                 <h4 className="text-sm font-semibold text-on-surface-variant uppercase tracking-widest">
-                  Comments
+                  {t('profileFeed.comments')}
                 </h4>
                 {postCommentsList.map(comment => (
                   <div key={comment.id} className="flex gap-3">
                     {comment.user?.avatar_url ? (
                       <img
-                        src={comment.user.avatar_url}
-                        alt={comment.user.full_name}
+                        src={comment.user?.avatar_url}
+                        alt={comment.user?.full_name}
                         className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                       />
                     ) : (
@@ -369,7 +367,7 @@ const PostsList = ({
                 type="text"
                 value={postComments[post.id] || ''}
                 onChange={e => setPostComments(prev => ({ ...prev, [post.id]: e.target.value }))}
-                placeholder="Add a comment..."
+                placeholder={t('profileFeed.addComment')}
                 className="input-inset flex-1"
                 maxLength={1000}
               />

@@ -1,29 +1,15 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { tryGetAuth } from '@/lib/auth-utils'
 import { revalidatePath } from 'next/cache'
 
 export async function updateProfile(data: any) {
-  const supabase = await createClient()
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { profile, supabase } = auth
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be signed in to update your profile.' }
-  }
-
-  // 1. Get internal user ID
-  const { data: userRecord, error: userRecordError } = await supabase
-    .from('users')
-    .select('id')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (userRecordError || !userRecord) {
-    return { error: 'Failed to resolve identity protocol.' }
-  }
-
-  // 2. Update Comprehensive User Info
-  const { error: userError } = await supabase
+  // Update Comprehensive User Info
+  const { error: userError } = await supabase!
     .from('users')
     .update({
       full_name: data.full_name,
@@ -39,7 +25,7 @@ export async function updateProfile(data: any) {
       skills: data.skills,
       updated_at: new Date().toISOString()
     })
-    .eq('id', userRecord.id)
+    .eq('id', profile?.id)
 
   if (userError) {
     console.error('Update Users error:', userError)
@@ -53,3 +39,4 @@ export async function updateProfile(data: any) {
   
   return { success: true }
 }
+

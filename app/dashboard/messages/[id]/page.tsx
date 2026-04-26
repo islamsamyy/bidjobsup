@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/auth-utils'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import ChatStream from '../ChatStream'
@@ -11,25 +11,10 @@ export default async function MessageSessionPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const { id: conversationId } = await params
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: internalUser } = await supabase
-    .from('users')
-    .select('id')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!internalUser) {
-    redirect('/join')
-  }
+  const { profile: internalUser, supabase } = await getAuthUser()
 
   // 1. Fetch Conversation with Participants
-  const { data: conversation, error } = await supabase
+  const { data: conversation, error } = await supabase!
     .from('conversations')
     .select(`
       *,
@@ -44,18 +29,18 @@ export default async function MessageSessionPage({
   }
 
   // Verify access protocol
-  const isParticipant = conversation.participant_1_id === internalUser.id || conversation.participant_2_id === internalUser.id
+  const isParticipant = conversation.participant_1_id === internalUser?.id || conversation.participant_2_id === internalUser?.id
   if (!isParticipant) {
     redirect('/dashboard')
   }
 
   // Identify the other node
-  const otherNode = conversation.participant_1_id === internalUser.id 
+  const otherNode = conversation.participant_1_id === internalUser?.id 
     ? conversation.participant_2 
     : conversation.participant_1
 
   // 2. Fetch Initial Stream History
-  const { data: messages } = await supabase
+  const { data: messages } = await supabase!
     .from('messages')
     .select('*')
     .eq('conversation_id', conversationId)
@@ -89,11 +74,11 @@ export default async function MessageSessionPage({
         
         {/* Main Stream Area */}
         <div className="col-span-12 lg:col-span-8">
-          <ChatStream 
-            conversationId={conversationId} 
-            currentUserId={internalUser.id}
+          <ChatStream
+            conversationId={conversationId}
+            currentUserId={internalUser?.id || ''}
             initialMessages={messages || []}
-            recipientName={otherNode.full_name || otherNode.username || 'Tactical Node'}
+            recipientName={otherNode?.full_name || otherNode?.username || 'Tactical Node'}
           />
         </div>
 

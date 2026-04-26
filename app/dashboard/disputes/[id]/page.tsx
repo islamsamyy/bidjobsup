@@ -54,7 +54,7 @@ export default function DisputeDetailPage({ params }: { params: Promise<{ id: st
         const stored = localStorage.getItem('currentUser')
         if (stored) {
           const user = JSON.parse(stored)
-          setCurrentUserId(user.id)
+          setCurrentUserId(user?.id)
 
           const result = await getDisputeDetails(parseInt(id))
           if (!result.error && result.dispute) {
@@ -295,8 +295,8 @@ export default function DisputeDetailPage({ params }: { params: Promise<{ id: st
                     <div className="flex items-center gap-3 mb-2">
                       {msg.user?.avatar_url && (
                         <img
-                          src={msg.user.avatar_url}
-                          alt={msg.user.full_name}
+                          src={msg.user?.avatar_url}
+                          alt={msg.user?.full_name}
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       )}

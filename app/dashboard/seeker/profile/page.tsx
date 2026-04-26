@@ -1,42 +1,26 @@
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import { redirect } from 'next/navigation'
 import ProfileForm from './ProfileForm'
 
 export default async function SeekerProfilePage() {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch Profile Info with extended data
-  const { data: userData, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (error || !userData) {
-    redirect('/dashboard')
-  }
+  const { profile, supabase } = await getAuthUserAs('jobseeker')
 
   // 2. Get real stats
-  const { count: totalBids } = await supabase
+  const { count: totalBids } = await supabase!
     .from('bids')
     .select('*', { count: 'exact', head: true })
-    .eq('bidder_id', userData.id)
+    .eq('bidder_id', profile?.id)
 
-  const { count: acceptedBids } = await supabase
+  const { count: acceptedBids } = await supabase!
     .from('bids')
     .select('*', { count: 'exact', head: true })
-    .eq('bidder_id', userData.id)
+    .eq('bidder_id', profile?.id)
     .eq('status', 'accepted')
 
-  const { data: reviews } = await supabase
+  const { data: reviews } = await supabase!
     .from('reviews')
     .select('rating')
-    .eq('reviewed_user_id', userData.id)
+    .eq('reviewed_user_id', profile?.id)
 
   const avgRating = reviews && reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
@@ -47,7 +31,7 @@ export default async function SeekerProfilePage() {
     : '—'
 
   // Data is already flattened in the users table
-  const profile = userData
+  // const profile = profile // redundant now
 
   return (
     <main className="max-w-7xl mx-auto px-8 py-12">
@@ -56,8 +40,8 @@ export default async function SeekerProfilePage() {
       <header className="mb-20 flex flex-col md:flex-row items-center md:items-end gap-12 text-center md:text-left relative overflow-hidden group">
         <div className="relative group/avatar">
           <div className="w-48 h-48 rounded-[2.5rem] bg-surface-container-highest border-4 border-surface shadow-[0_30px_70px_rgba(0,0,0,0.4)] relative z-10 overflow-hidden group-hover/avatar:scale-[1.02] transition-transform duration-500">
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+            {profile?.avatar_url ? (
+              <img src={profile?.avatar_url as string} alt={profile?.full_name || ''} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-primary-container">
                 <span className="material-symbols-outlined text-[64px]">person</span>
@@ -70,20 +54,20 @@ export default async function SeekerProfilePage() {
 
         <div className="flex-grow space-y-4 pb-4">
           <h2 className="text-6xl font-headline font-black italic text-on-background leading-tight neon-glow group-hover:text-primary transition-colors">
-            {profile.full_name || 'Complete Your Name'}
+            {profile?.full_name || 'Complete Your Name'}
           </h2>
           <div className="flex flex-wrap justify-center md:justify-start items-center gap-6">
             <span className="text-primary text-sm font-black tracking-widest uppercase">
-              {profile.experience_level 
-                ? `${profile.experience_level.charAt(0).toUpperCase() + profile.experience_level.slice(1)} Level` 
+              {profile?.experience_level 
+                ? `${profile?.experience_level.charAt(0).toUpperCase() + profile?.experience_level.slice(1)} Level` 
                 : 'Set Experience Level'}
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-stone-700"></span>
             <span className="text-on-surface-variant font-bold text-sm tracking-tight flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">location_on</span>
-              {profile.location || 'Set Location'}
+              {profile?.location || 'Set Location'}
             </span>
-            {profile.verified && (
+            {profile?.verified && (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-stone-700"></span>
                 <span className="text-secondary font-black text-xs uppercase tracking-widest px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/20">
@@ -111,7 +95,7 @@ export default async function SeekerProfilePage() {
       <section className="bg-surface-container-low rounded-[3rem] p-12 md:p-20 border border-outline-variant/5 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 blur-[120px] rounded-full pointer-events-none origin-top-right group-hover:scale-110 transition-transform duration-1000"></div>
         <div className="relative z-10">
-          <ProfileForm initialData={profile} />
+          <ProfileForm initialData={profile as any} />
         </div>
       </section>
 

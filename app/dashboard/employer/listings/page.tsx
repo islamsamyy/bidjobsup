@@ -1,36 +1,19 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import Link from 'next/link'
 import { handleCloseJob, handleDeleteJob } from './actions'
 import React from 'react'
 
 export default async function EmployerListingsPage() {
-  const supabase = await createClient()
+  const { profile, supabase } = await getAuthUserAs('employer')
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch Employer Profile to check role (safety) and get internal ID
-  const { data: profile } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (profile?.user_type !== 'employer' && profile?.user_type !== 'both') {
-    redirect('/dashboard/seeker')
-  }
-
-  // 2. Fetch Jobs for this Employer using the internal profile.id
-  const { data: jobs, error } = await supabase
+  // 2. Fetch Jobs for this Employer using the internal profile?.id
+  const { data: jobs, error } = await supabase!
     .from('jobs')
     .select(`
       *,
       bids_count:bids(count)
     `)
-    .eq('employer_id', profile.id)
+    .eq('employer_id', profile?.id)
     .order('created_at', { ascending: false })
 
   return (

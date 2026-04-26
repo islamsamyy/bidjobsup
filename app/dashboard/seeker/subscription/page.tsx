@@ -5,16 +5,16 @@ import StripeCheckoutButton from '@/components/features/StripeCheckoutButton'
 export default async function SeekerSubscriptionPage() {
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase!.auth.getUser()
   if (authError || !user) {
     redirect('/sign-in')
   }
 
   // 1. Fetch Subscription Status
-  const { data: profile } = await supabase
+  const { data: profile } = await supabase!
     .from('users')
     .select('user_type, stripe_customer_id')
-    .eq('auth_id', user.id)
+    .eq('auth_id', user?.id)
     .single()
 
   if (profile?.user_type !== 'jobseeker' && profile?.user_type !== 'both') {
@@ -28,7 +28,7 @@ export default async function SeekerSubscriptionPage() {
       const Stripe = (await import('stripe')).default
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
       const subs = await stripe.subscriptions.list({
-        customer: profile.stripe_customer_id,
+        customer: profile?.stripe_customer_id,
         status: 'active',
         limit: 1,
         expand: ['data.items.data.price.product'],

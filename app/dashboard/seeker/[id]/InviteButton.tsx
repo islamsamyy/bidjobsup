@@ -16,17 +16,17 @@ export default function InviteButton({ seekerId, jobs }: InviteButtonProps) {
 
   const handleInvite = async () => {
     if (!selectedJobId) return
-    
+
     setStatus('loading')
     const result = await inviteToJob(selectedJobId, seekerId)
-    
-    if (result.success) {
+
+    if ('success' in result && result.success) {
       setStatus('success')
       setMessage('Invitation dispatched.')
       setTimeout(() => setIsOpen(false), 2000)
     } else {
       setStatus('error')
-      setMessage(result.error || 'Failed to transmit invite.')
+      setMessage(('error' in result && result.error) ? result.error : 'Failed to transmit invite.')
     }
   }
 

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { toActionError } from '@/lib/errors'
 
 interface AnalysisRecord {
   id?: string
@@ -71,9 +72,8 @@ export async function saveAnalysisToHistory(
     }
 
     return { success: true, id: data?.id }
-  } catch (err: any) {
-    console.error('Error in saveAnalysisToHistory:', err)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    return { success: false, error: (toActionError(err) as any).error }
   }
 }
 
@@ -131,9 +131,8 @@ export async function getUserAnalysisHistory(): Promise<{
     }))
 
     return { analyses }
-  } catch (err: any) {
-    console.error('Error in getUserAnalysisHistory:', err)
-    return { analyses: [], error: err.message }
+  } catch (err: unknown) {
+    return { analyses: [], error: (toActionError(err) as any).error }
   }
 }
 
@@ -177,14 +176,13 @@ export async function getAnalysisTrends(): Promise<{
       totalAnalyses: analyses.length,
       scoreImprovement
     }
-  } catch (err: any) {
-    console.error('Error in getAnalysisTrends:', err)
+  } catch (err: unknown) {
     return {
       averageScore: 0,
       bestScore: 0,
       totalAnalyses: 0,
       scoreImprovement: null,
-      error: err.message
+      error: (toActionError(err) as any).error
     }
   }
 }
@@ -215,9 +213,8 @@ export async function getCommonMissingKeywords(): Promise<{
       .slice(0, 20) // Top 20
 
     return { keywords }
-  } catch (err: any) {
-    console.error('Error in getCommonMissingKeywords:', err)
-    return { keywords: [], error: err.message }
+  } catch (err: unknown) {
+    return { keywords: [], error: (toActionError(err) as any).error }
   }
 }
 
@@ -257,8 +254,7 @@ export async function deleteAnalysisRecord(id: string): Promise<{
     }
 
     return { success: true }
-  } catch (err: any) {
-    console.error('Error in deleteAnalysisRecord:', err)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    return { success: false, error: (toActionError(err) as any).error }
   }
 }

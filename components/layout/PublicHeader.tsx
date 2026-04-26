@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LanguageSwitcher } from "@/components/features/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/features/ThemeSwitcher";
 import NotificationBell from "@/components/features/NotificationBell";
 import { useLanguage } from "@/app/providers/LanguageProvider";
 
@@ -83,7 +85,7 @@ export default function PublicHeader({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   /* auth ────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -134,12 +136,12 @@ export default function PublicHeader({
   /* ─────────────────────────────────────────────────────────── */
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-[#100d10]/80 backdrop-blur-2xl border-b border-[#292428]/40" dir={dir}>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-surface/80 backdrop-blur-2xl border-b border-outline-variant/30" dir={dir}>
         <div className="flex justify-between items-center w-full px-5 md:px-10 xl:px-14 py-3.5 max-w-screen-2xl mx-auto">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <img src="/logo.png" alt="BidJobs" className="h-9 w-auto group-hover:opacity-80 transition-opacity" />
+            <Image src="/logo.png" alt="BidJobs" width={140} height={36} className="h-9 w-auto group-hover:opacity-80 transition-opacity" />
           </Link>
 
           {/* ── Desktop nav ── */}
@@ -158,7 +160,7 @@ export default function PublicHeader({
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black tracking-[0.18em] uppercase transition-all duration-200
                       ${isActive
                         ? "text-primary bg-primary/10"
-                        : "text-[#b0a9ad] hover:text-[#faf1f5] hover:bg-white/5"
+                        : "text-on-surface-variant hover:text-on-surface hover:bg-on-surface/5"
                       }`}
                   >
                     <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>
@@ -174,7 +176,7 @@ export default function PublicHeader({
 
                   {/* Dropdown panel */}
                   {openMenu === group.label && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 bg-[#1c181c]/95 backdrop-blur-xl border border-[#292428]/60 rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 bg-surface-container/95 backdrop-blur-xl border border-outline-variant/40 rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                       <div className="p-2 space-y-0.5">
                         {group.items.map((item) => {
                           const active = pathname === item.href;
@@ -185,19 +187,19 @@ export default function PublicHeader({
                               className={`flex items-start gap-3 px-4 py-3 rounded-xl transition-all group/item
                                 ${active
                                   ? "bg-primary/10 text-primary"
-                                  : "hover:bg-white/5 text-[#b0a9ad] hover:text-[#faf1f5]"
+                                  : "hover:bg-on-surface/5 text-on-surface-variant hover:text-on-surface"
                                 }`}
                             >
                               <span
                                 className={`material-symbols-outlined text-[18px] mt-0.5 shrink-0 transition-colors
-                                  ${active ? "text-primary" : "text-[#4b474a] group-hover/item:text-primary"}`}
+                                  ${active ? "text-primary" : "text-outline-variant group-hover/item:text-primary"}`}
                                 style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}
                               >
                                 {item.icon}
                               </span>
                               <div className="min-w-0">
                                 <p className="text-[10px] font-black uppercase tracking-[0.15em] leading-none">{item.label}</p>
-                                <p className="text-[10px] text-[#585457] mt-1 leading-snug font-medium">{item.desc}</p>
+                                <p className="text-[10px] text-outline mt-1 leading-snug font-medium">{item.desc}</p>
                               </div>
                               {active && (
                                 <span className="material-symbols-outlined text-[14px] text-primary ml-auto mt-0.5">check_circle</span>
@@ -218,7 +220,7 @@ export default function PublicHeader({
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black tracking-[0.18em] uppercase transition-all duration-200
                 ${pathname === "/pricing"
                   ? "text-primary bg-primary/10"
-                  : "text-[#b0a9ad] hover:text-[#faf1f5] hover:bg-white/5"
+                  : "text-on-surface-variant hover:text-on-surface hover:bg-on-surface/5"
                 }`}
             >
               <span className="material-symbols-outlined text-[15px]" style={{ fontVariationSettings: pathname === "/pricing" ? "'FILL' 1" : "'FILL' 0" }}>
@@ -230,6 +232,7 @@ export default function PublicHeader({
 
           {/* ── Auth + mobile toggle ── */}
           <div className="flex items-center gap-3">
+            <ThemeSwitcher />
             <LanguageSwitcher />
             {loading ? (
               <div className="w-28 h-9 bg-surface-container-highest animate-pulse rounded-full" />
@@ -247,10 +250,10 @@ export default function PublicHeader({
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="w-9 h-9 rounded-full border border-[#292428] overflow-hidden bg-surface-container flex items-center justify-center hover:border-primary/50 transition-colors shrink-0"
+                  className="w-9 h-9 rounded-full border border-outline-variant overflow-hidden bg-surface-container flex items-center justify-center hover:border-primary/50 transition-colors shrink-0"
                 >
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                    <Image src={profile.avatar_url} alt="Avatar" width={36} height={36} className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-secondary font-black text-base uppercase">
                       {profile?.full_name?.charAt(0) || user.email?.charAt(0) || "?"}
@@ -262,7 +265,7 @@ export default function PublicHeader({
               <div className="hidden xl:flex items-center gap-3">
                 <Link
                   href="/sign-in"
-                  className="text-[10px] font-black tracking-[0.18em] uppercase text-[#b0a9ad] hover:text-[#faf1f5] transition-colors px-3 py-2"
+                  className="text-[10px] font-black tracking-[0.18em] uppercase text-on-surface-variant hover:text-on-surface transition-colors px-3 py-2"
                 >
                   {t("buttons.signIn")}
                 </Link>
@@ -299,12 +302,12 @@ export default function PublicHeader({
           />
 
           {/* Drawer panel */}
-          <div className="absolute top-0 right-0 h-full w-80 max-w-[90vw] bg-[#1c181c] border-l border-[#292428]/60 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300" dir={dir}>
+          <div className="absolute top-0 right-0 h-full w-80 max-w-[90vw] bg-surface-container border-l border-outline-variant/40 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300" dir={dir}>
 
             {/* Drawer header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-[#292428]/40">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-outline-variant/30">
               <Link href="/" onClick={() => setMobileOpen(false)}>
-                <img src="/logo.png" alt="BidJobs" className="h-8 w-auto" />
+                <Image src="/logo.png" alt="BidJobs" width={120} height={32} className="h-8 w-auto" />
               </Link>
               <button
                 onClick={() => setMobileOpen(false)}
@@ -326,10 +329,10 @@ export default function PublicHeader({
                     <button
                       onClick={() => setMobileExpanded(isExpanded ? null : group.label)}
                       className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors rounded-2xl
-                        ${isActive ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-[#b0a9ad]"}`}
+                        ${isActive ? "bg-primary/10 text-primary" : "hover:bg-on-surface/5 text-on-surface-variant"}`}
                     >
                       <span
-                        className={`material-symbols-outlined text-[18px] ${isActive ? "text-primary" : "text-[#4b474a]"}`}
+                        className={`material-symbols-outlined text-[18px] ${isActive ? "text-primary" : "text-outline-variant"}`}
                         style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
                       >
                         {group.icon}
@@ -350,17 +353,17 @@ export default function PublicHeader({
                               key={item.href}
                               href={item.href}
                               className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors
-                                ${active ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-[#b0a9ad] hover:text-[#faf1f5]"}`}
+                                ${active ? "bg-primary/10 text-primary" : "hover:bg-on-surface/5 text-on-surface-variant hover:text-on-surface"}`}
                             >
                               <span
-                                className={`material-symbols-outlined text-[16px] shrink-0 ${active ? "text-primary" : "text-[#4b474a]"}`}
+                                className={`material-symbols-outlined text-[16px] shrink-0 ${active ? "text-primary" : "text-outline-variant"}`}
                                 style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}
                               >
                                 {item.icon}
                               </span>
                               <div className="min-w-0">
                                 <p className="text-[10px] font-black uppercase tracking-[0.15em]">{item.label}</p>
-                                <p className="text-[10px] text-[#585457] font-medium mt-0.5 leading-snug">{item.desc}</p>
+                                <p className="text-[10px] text-outline font-medium mt-0.5 leading-snug">{item.desc}</p>
                               </div>
                             </Link>
                           );
@@ -375,10 +378,10 @@ export default function PublicHeader({
               <Link
                 href="/pricing"
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-colors
-                  ${pathname === "/pricing" ? "bg-primary/10 text-primary" : "hover:bg-white/5 text-[#b0a9ad]"}`}
+                  ${pathname === "/pricing" ? "bg-primary/10 text-primary" : "hover:bg-on-surface/5 text-on-surface-variant"}`}
               >
                 <span
-                  className={`material-symbols-outlined text-[18px] ${pathname === "/pricing" ? "text-primary" : "text-[#4b474a]"}`}
+                  className={`material-symbols-outlined text-[18px] ${pathname === "/pricing" ? "text-primary" : "text-outline-variant"}`}
                   style={{ fontVariationSettings: pathname === "/pricing" ? "'FILL' 1" : "'FILL' 0" }}
                 >
                   payments
@@ -388,7 +391,7 @@ export default function PublicHeader({
             </div>
 
             {/* Drawer auth footer */}
-            <div className="px-4 py-6 border-t border-[#292428]/40 space-y-3">
+            <div className="px-4 py-6 border-t border-outline-variant/30 space-y-3">
               {loading ? (
                 <div className="w-full h-12 bg-surface-container-highest animate-pulse rounded-xl" />
               ) : user ? (
@@ -401,9 +404,9 @@ export default function PublicHeader({
                     {t("buttons.goToDashboard")}
                   </Link>
                   <div className="flex items-center gap-3 px-1">
-                    <div className="w-9 h-9 rounded-full border border-[#292428] overflow-hidden bg-surface-container flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-full border border-outline-variant overflow-hidden bg-surface-container flex items-center justify-center shrink-0">
                       {profile?.avatar_url ? (
-                        <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                        <Image src={profile.avatar_url} alt="Avatar" width={36} height={36} className="w-full h-full object-cover" />
                       ) : (
                         <span className="text-secondary font-black text-sm uppercase">
                           {profile?.full_name?.charAt(0) || user.email?.charAt(0) || "?"}
@@ -412,7 +415,7 @@ export default function PublicHeader({
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-on-surface truncate">{profile?.full_name || "My Account"}</p>
-                      <p className="text-[10px] text-[#585457] truncate">{user.email}</p>
+                      <p className="text-[10px] text-outline truncate">{user.email}</p>
                     </div>
                   </div>
                 </>
@@ -427,7 +430,7 @@ export default function PublicHeader({
                   </Link>
                   <Link
                     href="/sign-in"
-                    className="flex items-center justify-center w-full border border-[#292428]/60 text-[#b0a9ad] hover:text-[#faf1f5] font-black py-3.5 px-5 rounded-xl text-[10px] tracking-[0.18em] uppercase transition-colors"
+                    className="flex items-center justify-center w-full border border-outline-variant/40 text-on-surface-variant hover:text-on-surface font-black py-3.5 px-5 rounded-xl text-[10px] tracking-[0.18em] uppercase transition-colors"
                   >
                     {t("buttons.signIn")}
                   </Link>

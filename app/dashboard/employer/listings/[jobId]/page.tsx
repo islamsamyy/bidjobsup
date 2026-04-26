@@ -1,35 +1,19 @@
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import { redirect } from 'next/navigation'
 import ApplicantReviewClient from '@/components/features/employer/ApplicantReviewClient'
 
 export default async function JobApplicantsPage({ params }: { params: Promise<{ jobId: string }> }) {
-  const supabase = await createClient()
+  const { profile, supabase } = await getAuthUserAs('employer')
 
   // In Next.js 15+, params is a Promise
   const { jobId } = await params;
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch User Record
-  const { data: userRecord } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!userRecord || (userRecord.user_type !== 'employer' && userRecord.user_type !== 'both')) {
-    redirect('/dashboard/seeker')
-  }
-
   // 2. Fetch Job details and ensure ownership
-  const { data: job, error: jobError } = await supabase
+  const { data: job, error: jobError } = await supabase!
     .from('jobs')
     .select('*')
     .eq('id', jobId)
-    .eq('employer_id', userRecord.id)
+    .eq('employer_id', profile?.id)
     .single()
 
   if (jobError || !job) {
@@ -37,7 +21,7 @@ export default async function JobApplicantsPage({ params }: { params: Promise<{ 
   }
 
   // 3. Fetch Bids for this job with seeker profile details
-  const { data: bids, error: bidsError } = await supabase
+  const { data: bids, error: bidsError } = await supabase!
     .from('bids')
     .select(`
       *,

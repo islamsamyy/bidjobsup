@@ -1,29 +1,17 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { tryGetAuth } from '@/lib/auth-utils'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function createJob(formData: FormData) {
-  const supabase = await createClient()
-
-  // 1. Check Auth & Profile
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    throw new Error('Unauthorized')
+  const auth = await tryGetAuth()
+  if (!auth.ok) {
+    throw new Error(auth.error || 'Unauthorized')
   }
+  const { user, profile, supabase } = auth
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!profile || (profile.user_type !== 'employer' && profile.user_type !== 'both')) {
-    throw new Error('Only employers can post jobs')
-  }
-
-  // 2. Parse Form Data
+  // Parse Form Data
   const title = formData.get('title') as string
   const category = formData.get('category') as string
   const description = formData.get('description') as string
@@ -34,10 +22,10 @@ export async function createJob(formData: FormData) {
   const experienceLevel = (formData.get('experience_level') as 'entry' | 'intermediate' | 'expert') || 'expert'
   const duration = (formData.get('duration') as any) || '1_week_to_1_month'
 
-  // 3. Insert Job into Database
+  // Insert Job into Database
   const jobData: any = {
-    employer_id: profile.id,
-    employer_auth_id: user.id,
+    employer_id: profile?.id,
+    employer_auth_id: user?.id,
     title,
     description: description || 'No description provided.',
     category: category || 'General',
@@ -50,7 +38,7 @@ export async function createJob(formData: FormData) {
     status: 'open',
   }
 
-  const { data: insertedJob, error } = await supabase
+  const { data: insertedJob, error } = await supabase!
     .from('jobs')
     .insert([jobData])
     .select()
@@ -65,9 +53,10 @@ export async function createJob(formData: FormData) {
     throw new Error('Job created but no data returned')
   }
 
-  // 4. Redirect on success
+  // Redirect on success
   revalidatePath('/dashboard/employer')
   revalidatePath('/dashboard/employer/listings')
   revalidatePath('/jobs/browse')
   redirect(`/dashboard/employer/listings`)
 }
+

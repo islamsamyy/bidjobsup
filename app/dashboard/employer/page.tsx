@@ -1,60 +1,44 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import AnalyticsCharts from '@/components/features/analytics/AnalyticsCharts'
 import { getEmployerAnalytics } from '@/lib/actions/analytics'
 
 export const dynamic = 'force-dynamic'
 
 export default async function EmployerDashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch employer profile from 'users' + extended data
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!profile) {
-    redirect('/sign-in')
-  }
+  const { profile, supabase } = await getAuthUserAs('employer')
 
   // 2. Get active jobs count
-  const { count: activeJobsCount } = await supabase
+  const { count: activeJobsCount } = await supabase!
     .from('jobs')
     .select('*', { count: 'exact', head: true })
-    .eq('employer_id', profile.id)
+    .eq('employer_id', profile?.id)
     .eq('status', 'open')
 
   // 3. Get total applicants across all employer's jobs
-  const { count: applicantsCount } = await supabase
+  const { count: applicantsCount } = await supabase!
     .from('bids')
     .select('*, jobs!inner()', { count: 'exact', head: true })
-    .eq('jobs.employer_id', profile.id)
+    .eq('jobs.employer_id', profile?.id)
 
   // 4. Get hired count from contracts table
-  const { count: hiredCount } = await supabase
+  const { count: hiredCount } = await supabase!
     .from('contracts')
     .select('*', { count: 'exact', head: true })
-    .eq('employer_id', profile.id)
+    .eq('employer_id', profile?.id)
 
   // 5. Get total jobs posted (all statuses) for listing views proxy
-  const { count: totalJobsPosted } = await supabase
+  const { count: totalJobsPosted } = await supabase!
     .from('jobs')
     .select('*', { count: 'exact', head: true })
-    .eq('employer_id', profile.id)
+    .eq('employer_id', profile?.id)
 
   // 6. Get latest notifications for activity feed
-  const { data: notifications } = await supabase
+  const { data: notifications } = await supabase!
     .from('notifications')
     .select('*')
-    .eq('user_id', profile.id)
+    .eq('user_id', profile?.id)
     .order('created_at', { ascending: false })
     .limit(5)
 
@@ -62,9 +46,9 @@ export default async function EmployerDashboardPage() {
   const analyticsResult = await getEmployerAnalytics()
 
   // 8. Calculate profile completeness
-  const isProfileComplete = !!(profile.full_name && profile.bio && profile.company_name)
+  const isProfileComplete = !!(profile?.full_name && profile?.bio && profile?.company_name)
 
-  const firstName = profile.full_name?.split(' ')[0] || profile.username || 'Partner'
+  const firstName = profile?.full_name?.split(' ')[0] || profile?.username || 'Partner'
 
   // Determine time-based greeting
   const hour = new Date().getHours()

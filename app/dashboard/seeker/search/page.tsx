@@ -1,5 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth-utils'
 import JobSearchClient from '@/components/features/seeker/JobSearchClient'
 
 export const metadata = {
@@ -8,17 +7,11 @@ export const metadata = {
 }
 
 export default async function SeekerSearchPage() {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
+  const { supabase } = await getAuthUser()
 
   // Fetch Jobs
   // We want to fetch public, open jobs that are not expired
-  const { data: jobs, error } = await supabase
+  const { data: jobs, error } = await supabase!
     .from('jobs')
     .select('*')
     .eq('status', 'open')

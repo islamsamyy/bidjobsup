@@ -1,0 +1,10 @@
+{
+  "attachmentFolderPath": "attachments",
+  "boldMathEnabled": true,
+  "promptDelete": true,
+  "showLineNumber": true,
+  "strictLineBreaks": false,
+  "trailingAsterisk": false,
+  "useMarkdownLinks": true,
+  "wikiLinkNesting": false
+}

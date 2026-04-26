@@ -7,16 +7,16 @@ export const dynamic = 'force-dynamic'
 
 export default async function SkillsPage() {
   const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase!.auth.getUser()
 
   if (authError || !user) {
     redirect('/sign-in')
   }
 
-  const { data: currentUser } = await supabase
+  const { data: currentUser } = await supabase!
     .from('users')
     .select('id, user_type')
-    .eq('auth_id', user.id)
+    .eq('auth_id', user?.id)
     .single()
 
   if (!currentUser) {
@@ -24,7 +24,7 @@ export default async function SkillsPage() {
   }
 
   // Fetch user skills
-  const { data: skills } = await supabase
+  const { data: skills } = await supabase!
     .from('skills')
     .select(`
       id,
@@ -36,12 +36,12 @@ export default async function SkillsPage() {
       verified,
       verified_by_user_id
     `)
-    .eq('user_id', currentUser.id)
+    .eq('user_id', currentUser?.id)
     .order('is_featured', { ascending: false })
     .order('endorsement_count', { ascending: false })
 
   // Fetch skill endorsements
-  const { data: endorsementsData } = await supabase
+  const { data: endorsementsData } = await supabase!
     .from('skill_endorsements')
     .select(`
       id,
@@ -57,7 +57,7 @@ export default async function SkillsPage() {
   }))
 
   // Fetch skill categories for the form
-  const { data: categories } = await supabase
+  const { data: categories } = await supabase!
     .from('skill_categories')
     .select('id, name, description')
     .is('parent_category_id', null)
@@ -200,7 +200,7 @@ export default async function SkillsPage() {
             skills={skills}
             endorsements={endorsements || []}
             categories={categories || []}
-            currentUserId={currentUser.id}
+            currentUserId={currentUser?.id}
           />
         )}
       </div>

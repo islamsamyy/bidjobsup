@@ -2,59 +2,50 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getAuthUser } from '@/lib/supabase/get-user'
+import { toActionError } from '@/lib/errors'
 
-// Internal helpers
-async function getUserInternalId(supabase: Awaited<ReturnType<typeof createClient>>, authId: string) {
-  const { data } = await supabase
-    .from('users')
-    .select('id')
-    .eq('auth_id', authId)
-    .single()
-  return data?.id ?? null
-}
+// ─── Form actions (used directly in <form action={...}>) ──────────────────────
 
-// Form action — used in <form action={markNotificationAsRead}>
 export async function markNotificationAsRead(formData: FormData): Promise<void> {
-  const supabase = await createClient()
+  try {
+    const auth = await getAuthUser()
+    if (!auth.ok) return
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+    const notificationId = formData.get('notificationId')
+    if (!notificationId) return
 
-  const notificationId = formData.get('notificationId')
-  if (!notificationId) return
+    await auth.supabase
+      .from('notifications')
+      .update({ read_at: new Date().toISOString() })
+      .eq('id', Number(notificationId))
+      .eq('user_id', auth.user?.id)
 
-  const userId = await getUserInternalId(supabase, user.id)
-  if (!userId) return
-
-  await supabase
-    .from('notifications')
-    .update({ read_at: new Date().toISOString() })
-    .eq('id', Number(notificationId))
-    .eq('user_id', userId)
-
-  revalidatePath('/dashboard', 'layout')
+    revalidatePath('/dashboard', 'layout')
+  } catch (err) {
+    console.error('[markNotificationAsRead]', err)
+  }
 }
 
-// Form action — used in <form action={markAllNotificationsAsRead}>
 export async function markAllNotificationsAsRead(): Promise<void> {
-  const supabase = await createClient()
+  try {
+    const auth = await getAuthUser()
+    if (!auth.ok) return
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+    await auth.supabase
+      .from('notifications')
+      .update({ read_at: new Date().toISOString() })
+      .eq('user_id', auth.user?.id)
+      .is('read_at', null)
 
-  const userId = await getUserInternalId(supabase, user.id)
-  if (!userId) return
-
-  await supabase
-    .from('notifications')
-    .update({ read_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .is('read_at', null)
-
-  revalidatePath('/dashboard', 'layout')
+    revalidatePath('/dashboard', 'layout')
+  } catch (err) {
+    console.error('[markAllNotificationsAsRead]', err)
+  }
 }
 
-// Programmatic helper (for use in server components / other actions)
+// ─── Programmatic helper (called from other actions) ─────────────────────────
+
 export async function createNotification({
   userId,
   userAuthId,
@@ -70,11 +61,10 @@ export async function createNotification({
   content: string
   link?: string
 }) {
-  const supabase = await createClient()
+  try {
+    const supabase = await createClient()
 
-  const { error } = await supabase
-    .from('notifications')
-    .insert({
+    const { error } = await supabase!.from('notifications').insert({
       user_id: userId,
       user_auth_id: userAuthId,
       type,
@@ -83,10 +73,9 @@ export async function createNotification({
       link: link ?? null,
     })
 
-  if (error) {
-    console.error('Error creating notification:', error)
-    return { error: error.message }
+    if (error) return { error: error.message }
+    return { success: true }
+  } catch (err) {
+    return toActionError(err) as any
   }
-
-  return { success: true }
 }

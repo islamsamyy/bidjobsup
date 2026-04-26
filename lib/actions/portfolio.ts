@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { toActionError } from '@/lib/errors'
 
 export interface PortfolioItem {
   id: number
@@ -39,9 +40,8 @@ export async function getUserPortfolio(userId: number): Promise<{
     }
 
     return { portfolio: data || [] }
-  } catch (err: any) {
-    console.error('Error in getUserPortfolio:', err)
-    return { portfolio: [], error: err.message }
+  } catch (err: unknown) {
+    return { portfolio: [], error: (toActionError(err) as any).error }
   }
 }
 
@@ -69,9 +69,8 @@ export async function getFeaturedPortfolio(userId: number, limit = 3): Promise<{
     }
 
     return { portfolio: data || [] }
-  } catch (err: any) {
-    console.error('Error in getFeaturedPortfolio:', err)
-    return { portfolio: [], error: err.message }
+  } catch (err: unknown) {
+    return { portfolio: [], error: (toActionError(err) as any).error }
   }
 }
 
@@ -125,9 +124,8 @@ export async function createPortfolioItem(
     }
 
     return { success: true, id: data.id }
-  } catch (err: any) {
-    console.error('Error in createPortfolioItem:', err)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    return { success: false, error: (toActionError(err) as any).error }
   }
 }
 
@@ -181,9 +179,8 @@ export async function updatePortfolioItem(
     }
 
     return { success: true }
-  } catch (err: any) {
-    console.error('Error in updatePortfolioItem:', err)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    return { success: false, error: (toActionError(err) as any).error }
   }
 }
 
@@ -224,9 +221,8 @@ export async function deletePortfolioItem(id: number): Promise<{
     }
 
     return { success: true }
-  } catch (err: any) {
-    console.error('Error in deletePortfolioItem:', err)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    return { success: false, error: (toActionError(err) as any).error }
   }
 }
 
@@ -267,8 +263,7 @@ export async function toggleFeaturedPortfolio(id: number, featured: boolean): Pr
     }
 
     return { success: true }
-  } catch (err: any) {
-    console.error('Error in toggleFeaturedPortfolio:', err)
-    return { success: false, error: err.message }
+  } catch (err: unknown) {
+    return { success: false, error: (toActionError(err) as any).error }
   }
 }

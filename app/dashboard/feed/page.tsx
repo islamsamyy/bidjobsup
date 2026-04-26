@@ -1,29 +1,23 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth-utils'
 import DiscoveryFeedClient from './client'
+import en from '@/locales/en.json'
 
 export const dynamic = 'force-dynamic'
 
 export default async function DiscoveryFeedPage() {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { profile: currentUser, supabase } = await getAuthUser()
 
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: currentUser } = await supabase
-    .from('users')
-    .select('id, full_name, avatar_url')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!currentUser) {
-    redirect('/join')
+  const t = (key: string): string => {
+    const keys = key.split('.')
+    let value: any = en
+    for (const k of keys) {
+      value = value?.[k]
+    }
+    return typeof value === 'string' ? value : key
   }
 
   // Fetch all public posts with pagination
-  const { data: postsData } = await supabase
+  const { data: postsData } = await supabase!
     .from('profile_posts')
     .select(`
       id,
@@ -55,7 +49,7 @@ export default async function DiscoveryFeedPage() {
   }))
 
   // Fetch comments for all posts
-  const { data: commentsData } = await supabase
+  const { data: commentsData } = await supabase!
     .from('post_comments')
     .select(`
       id,
@@ -80,10 +74,10 @@ export default async function DiscoveryFeedPage() {
       {/* Header */}
       <div className="mb-12">
         <h1 className="font-headline text-5xl font-bold text-on-surface mb-2">
-          Professional Feed
+          {t('discoveryFeed.title')}
         </h1>
         <p className="text-on-surface-variant text-lg">
-          Discover achievements and insights from the professional community
+          {t('discoveryFeed.subtitle')}
         </p>
       </div>
 
@@ -94,17 +88,17 @@ export default async function DiscoveryFeedPage() {
             trending_up
           </span>
           <p className="text-on-surface-variant text-lg">
-            No posts yet
+            {t('discoveryFeed.noPosts')}
           </p>
           <p className="text-on-surface-variant text-sm mt-2">
-            Be the first to share your professional achievements!
+            {t('discoveryFeed.noPostsSubtitle')}
           </p>
         </div>
       ) : (
         <DiscoveryFeedClient
           posts={posts || []}
           comments={comments || []}
-          currentUserId={currentUser.id}
+          currentUserId={Number(currentUser?.id)}
         />
       )}
     </main>

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import { markAllNotificationsAsRead } from '@/lib/actions/notifications'
 import AnalyticsCharts from '@/components/features/analytics/AnalyticsCharts'
 import { getSeekerAnalytics } from '@/lib/actions/analytics'
@@ -8,73 +8,57 @@ import { getSeekerAnalytics } from '@/lib/actions/analytics'
 export const dynamic = 'force-dynamic'
 
 export default async function SeekerDashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    redirect('/sign-in')
-  }
-
-  // 1. Fetch user profile from 'users' + extended profile data
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('auth_id', user.id)
-    .single()
-    
-  if (!profile) {
-    redirect('/sign-in')
-  }
+  const { profile, supabase } = await getAuthUserAs('jobseeker')
 
   // 2. Get active applications count
-  const { count: activeAppsCount } = await supabase
+  const { count: activeAppsCount } = await supabase!
     .from('bids')
     .select('*', { count: 'exact', head: true })
-    .eq('bidder_id', profile.id)
+    .eq('bidder_id', profile?.id)
     .neq('status', 'rejected')
     
   // 3. Get saved jobs count from saved_items table
-  const { count: savedJobsCount } = await supabase
+  const { count: savedJobsCount } = await supabase!
     .from('saved_items')
     .select('*', { count: 'exact', head: true })
-    .eq('user_id', profile.id)
+    .eq('user_id', profile?.id)
 
   // 4. Get average review rating for this user
-  const { data: reviews } = await supabase
+  const { data: reviews } = await supabase!
     .from('reviews')
     .select('rating')
-    .eq('reviewee_id', profile.id)
+    .eq('reviewee_id', profile?.id)
 
   const avgRating = reviews && reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
     : null
 
   // 5. Get latest notifications for activity feed
-  const { data: notifications } = await supabase
+  const { data: notifications } = await supabase!
     .from('notifications')
     .select('*')
-    .eq('user_id', profile.id)
+    .eq('user_id', profile?.id)
     .order('created_at', { ascending: false })
     .limit(5)
 
   // 6. Calculate real profile completeness
   const profileFields = [
-    profile.full_name,
-    profile.bio,
-    profile.avatar_url,
-    profile.location,
-    profile.portfolio_url,
-    profile.skills && profile.skills.length > 0,
-    profile.hourly_rate,
+    profile?.full_name,
+    profile?.bio,
+    profile?.avatar_url,
+    profile?.location,
+    profile?.portfolio_url,
+    profile?.skills && profile?.skills.length > 0,
+    profile?.hourly_rate,
   ]
   const filledFields = profileFields.filter(Boolean).length
   const profileCompleteness = Math.round((filledFields / profileFields.length) * 100)
 
   // 7. Get accepted bids count (success metric)
-  const { count: acceptedBidsCount } = await supabase
+  const { count: acceptedBidsCount } = await supabase!
     .from('bids')
     .select('*', { count: 'exact', head: true })
-    .eq('bidder_id', profile.id)
+    .eq('bidder_id', profile?.id)
     .eq('status', 'accepted')
 
   // 8. Fetch analytics data
@@ -85,7 +69,7 @@ export default async function SeekerDashboardPage() {
     ? Math.round(((acceptedBidsCount || 0) / totalBids) * 100) + '%'
     : '—'
 
-  const firstName = profile.full_name?.split(' ')[0] || profile.username || 'Talent'
+  const firstName = profile?.full_name?.split(' ')[0] || profile?.username || 'Talent'
 
   // Determine time-based greeting
   const hour = new Date().getHours()
@@ -104,7 +88,7 @@ export default async function SeekerDashboardPage() {
             <p className="text-on-surface-variant font-body text-lg max-w-xl">
               {totalBids > 0 
                 ? `You have ${totalBids} active application${totalBids !== 1 ? 's' : ''} in progress. Keep pushing forward.`
-                : 'Start by searching for elite opportunities or completing your profile.'
+                : 'Start by searching for elite opportunities or completing your profile?.'
               }
             </p>
           </div>
@@ -221,7 +205,7 @@ export default async function SeekerDashboardPage() {
                 </div>
                 <h4 className="font-bold text-sm mb-1">Welcome to BidJobs!</h4>
                 <p className="text-xs text-on-surface-variant mb-3 italic">
-                  Start by searching for elite opportunities or completing your profile.
+                  Start by searching for elite opportunities or completing your profile?.
                 </p>
               </div>
             )}

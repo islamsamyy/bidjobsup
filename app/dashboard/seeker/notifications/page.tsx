@@ -1,5 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUserAs } from '@/lib/auth-utils'
 import { markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/actions/notifications'
 
 export const metadata = {
@@ -8,27 +7,12 @@ export const metadata = {
 }
 
 export default async function NotificationsPage() {
-  const supabase = await createClient()
+  const { profile, supabase } = await getAuthUserAs('jobseeker')
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/sign-in')
-  }
-
-  const { data: profile } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-    
-  if (!profile || (profile.user_type !== 'jobseeker' && profile.user_type !== 'both')) {
-    redirect('/dashboard')
-  }
-
-  const { data: notifications } = await supabase
+  const { data: notifications } = await supabase!
     .from('notifications')
     .select('*')
-    .eq('user_id', profile.id)
+    .eq('user_id', profile?.id)
     .order('created_at', { ascending: false })
 
   const unreadCount = notifications?.filter(n => !n.read_at).length || 0
@@ -44,7 +28,7 @@ export default async function NotificationsPage() {
         </div>
         {unreadCount > 0 && (
           <form action={markAllNotificationsAsRead}>
-            <input type="hidden" name="userId" value={profile.id} />
+            <input type="hidden" name="userId" value={profile?.id} />
             <button
               type="submit"
               className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary/70 transition-colors flex items-center gap-2"

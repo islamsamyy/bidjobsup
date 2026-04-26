@@ -2,45 +2,44 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getAuthUser } from '@/lib/supabase/get-user'
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+async function adminAuth() {
+  const auth = await getAuthUser()
+  if (!auth.ok) return auth
+  if (auth.user?.role !== 'admin') return { ok: false, error: 'Unauthorized' } as const
+  return auth
+}
+
+// ─── Actions ─────────────────────────────────────────────────────────────────
 
 /**
  * Get admin dashboard metrics
  */
-export async function getAdminMetrics(): Promise<{
-  totalUsers: number
-  totalJobs: number
-  totalDisputes: number
-  totalReports: number
-  flaggedJobs: number
-  pendingReports: number
-  error?: string
-}> {
+export async function getAdminMetrics() {
+  const auth = await adminAuth()
+  if (!auth.ok) return { totalUsers: 0, totalJobs: 0, totalDisputes: 0, totalReports: 0, flaggedJobs: 0, pendingReports: 0, error: auth.error }
+
+  const { supabase } = auth
+
   try {
-    const supabase = await createClient()
-
-    // Verify user is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return { totalUsers: 0, totalJobs: 0, totalDisputes: 0, totalReports: 0, flaggedJobs: 0, pendingReports: 0, error: 'Not authenticated' }
-    }
-
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
-      return { totalUsers: 0, totalJobs: 0, totalDisputes: 0, totalReports: 0, flaggedJobs: 0, pendingReports: 0, error: 'Unauthorized' }
-    }
-
-    // Get metrics
-    const { count: totalUsers } = await supabase.from('users').select('*', { count: 'exact', head: true })
-    const { count: totalJobs } = await supabase.from('jobs').select('*', { count: 'exact', head: true })
-    const { count: totalDisputes } = await supabase.from('disputes').select('*', { count: 'exact', head: true })
-    const { count: totalReports } = await supabase.from('reports').select('*', { count: 'exact', head: true })
-    const { count: flaggedJobs } = await supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('flagged', true)
-    const { count: pendingReports } = await supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'open')
+    const [
+      { count: totalUsers },
+      { count: totalJobs },
+      { count: totalDisputes },
+      { count: totalReports },
+      { count: flaggedJobs },
+      { count: pendingReports },
+    ] = await Promise.all([
+      supabase.from('users').select('*', { count: 'exact', head: true }),
+      supabase.from('jobs').select('*', { count: 'exact', head: true }),
+      supabase.from('disputes').select('*', { count: 'exact', head: true }),
+      supabase.from('reports').select('*', { count: 'exact', head: true }),
+      supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('flagged', true),
+      supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+    ])
 
     return {
       totalUsers: totalUsers || 0,
@@ -51,7 +50,6 @@ export async function getAdminMetrics(): Promise<{
       pendingReports: pendingReports || 0,
     }
   } catch (err: any) {
-    console.error('Error in getAdminMetrics:', err)
     return { totalUsers: 0, totalJobs: 0, totalDisputes: 0, totalReports: 0, flaggedJobs: 0, pendingReports: 0, error: err.message }
   }
 }
@@ -59,209 +57,147 @@ export async function getAdminMetrics(): Promise<{
 /**
  * Get all reports
  */
-export async function getAllReports(status?: string): Promise<{
-  reports: any[]
-  error?: string
-}> {
-  try {
-    const supabase = await createClient()
+export async function getAllReports(status?: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { reports: [], error: auth.error }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return { reports: [], error: 'Not authenticated' }
-    }
+  let query = auth.supabase
+    .from('reports')
+    .select('*, reported_by_user:reported_by(full_name, avatar_url)')
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single()
+  if (status) query = query.eq('status', status)
 
-    if (!profile || profile.role !== 'admin') {
-      return { reports: [], error: 'Unauthorized' }
-    }
-
-    let query = supabase.from('reports').select('*, reported_by_user:reported_by(full_name, avatar_url)')
-
-    if (status) {
-      query = query.eq('status', status)
-    }
-
-    const { data, error } = await query.order('created_at', { ascending: false }).limit(100)
-
-    if (error) {
-      console.error('Error fetching reports:', error)
-      return { reports: [], error: error.message }
-    }
-
-    return { reports: data || [] }
-  } catch (err: any) {
-    console.error('Error in getAllReports:', err)
-    return { reports: [], error: err.message }
-  }
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(100)
+  return { reports: data || [], error: error?.message }
 }
 
 /**
  * Update report status
  */
-export async function updateReportStatus(reportId: number, status: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient()
+export async function updateReportStatus(reportId: number, status: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { success: false, error: auth.error }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return { success: false, error: 'Not authenticated' }
-    }
+  const { error } = await auth.supabase
+    .from('reports')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', reportId)
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
-      return { success: false, error: 'Unauthorized' }
-    }
-
-    const { error } = await supabase
-      .from('reports')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', reportId)
-
-    if (error) {
-      console.error('Error updating report:', error)
-      return { success: false, error: error.message }
-    }
-
-    revalidatePath('/admin/reports')
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error in updateReportStatus:', err)
-    return { success: false, error: err.message }
-  }
+  if (!error) revalidatePath('/admin/reports')
+  return { success: !error, error: error?.message }
 }
 
 /**
  * Flag or unflag a job
  */
-export async function flagJob(jobId: number, flagged: boolean): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient()
+export async function flagJob(jobId: number, flagged: boolean) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { success: false, error: auth.error }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return { success: false, error: 'Not authenticated' }
-    }
+  const { error } = await auth.supabase
+    .from('jobs')
+    .update({ flagged, updated_at: new Date().toISOString() })
+    .eq('id', jobId)
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
-      return { success: false, error: 'Unauthorized' }
-    }
-
-    const { error } = await supabase
-      .from('jobs')
-      .update({ flagged, updated_at: new Date().toISOString() })
-      .eq('id', jobId)
-
-    if (error) {
-      console.error('Error flagging job:', error)
-      return { success: false, error: error.message }
-    }
-
-    revalidatePath('/admin/jobs')
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error in flagJob:', err)
-    return { success: false, error: err.message }
-  }
+  if (!error) revalidatePath('/admin/jobs')
+  return { success: !error, error: error?.message }
 }
 
 /**
  * Update job moderation status
  */
-export async function updateJobModeration(jobId: number, status: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient()
+export async function updateJobModeration(jobId: number, status: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { success: false, error: auth.error }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return { success: false, error: 'Not authenticated' }
-    }
+  const { error } = await auth.supabase
+    .from('jobs')
+    .update({ moderation_status: status, updated_at: new Date().toISOString() })
+    .eq('id', jobId)
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
-      return { success: false, error: 'Unauthorized' }
-    }
-
-    const { error } = await supabase
-      .from('jobs')
-      .update({ moderation_status: status, updated_at: new Date().toISOString() })
-      .eq('id', jobId)
-
-    if (error) {
-      console.error('Error updating job moderation:', error)
-      return { success: false, error: error.message }
-    }
-
-    revalidatePath('/admin/jobs')
-    return { success: true }
-  } catch (err: any) {
-    console.error('Error in updateJobModeration:', err)
-    return { success: false, error: err.message }
-  }
+  if (!error) revalidatePath('/admin/jobs')
+  return { success: !error, error: error?.message }
 }
 
 /**
  * Get all jobs for moderation
  */
-export async function getAllJobsForModeration(status?: string): Promise<{
-  jobs: any[]
-  error?: string
-}> {
-  try {
-    const supabase = await createClient()
+export async function getAllJobsForModeration(status?: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { jobs: [], error: auth.error }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return { jobs: [], error: 'Not authenticated' }
-    }
+  let query = auth.supabase
+    .from('jobs')
+    .select('*, employer:employer_id(full_name, avatar_url)')
 
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('auth_id', user.id)
-      .single()
+  if (status) query = query.eq('moderation_status', status)
 
-    if (!profile || profile.role !== 'admin') {
-      return { jobs: [], error: 'Unauthorized' }
-    }
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(100)
+  return { jobs: data || [], error: error?.message }
+}
 
-    let query = supabase.from('jobs').select('*, employer:employer_id(full_name, avatar_url)')
+/**
+ * Get all users for management
+ */
+export async function getAllUsers(role?: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { users: [], error: auth.error }
 
-    if (status) {
-      query = query.eq('moderation_status', status)
-    }
+  let query = auth.supabase
+    .from('users')
+    .select('id, full_name, email, role, avatar_url, is_verified, created_at, updated_at')
 
-    const { data, error } = await query.order('created_at', { ascending: false }).limit(100)
+  if (role) query = query.eq('role', role)
 
-    if (error) {
-      console.error('Error fetching jobs:', error)
-      return { jobs: [], error: error.message }
-    }
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(100)
+  return { users: data || [], error: error?.message }
+}
 
-    return { jobs: data || [] }
-  } catch (err: any) {
-    console.error('Error in getAllJobsForModeration:', err)
-    return { jobs: [], error: err.message }
-  }
+/**
+ * Update user role
+ */
+export async function updateUserRole(userId: number, newRole: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { success: false, error: auth.error }
+
+  const { error } = await auth.supabase
+    .from('users')
+    .update({ role: newRole, updated_at: new Date().toISOString() })
+    .eq('id', userId)
+
+  if (!error) revalidatePath('/admin/users')
+  return { success: !error, error: error?.message }
+}
+
+/**
+ * Get all disputes for management
+ */
+export async function getAllDisputes(status?: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { disputes: [], error: auth.error }
+
+  let query = auth.supabase
+    .from('disputes')
+    .select('*, contract:contract_id(id, title), initiator:initiator_id(full_name, avatar_url)')
+
+  if (status) query = query.eq('status', status)
+
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(100)
+  return { disputes: data || [], error: error?.message }
+}
+
+/**
+ * Update dispute status
+ */
+export async function updateDisputeStatus(disputeId: number, status: string) {
+  const auth = await adminAuth()
+  if (!auth.ok) return { success: false, error: auth.error }
+
+  const { error } = await auth.supabase
+    .from('disputes')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', disputeId)
+
+  if (!error) revalidatePath('/admin/disputes')
+  return { success: !error, error: error?.message }
 }

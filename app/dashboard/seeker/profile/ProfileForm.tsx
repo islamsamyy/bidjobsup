@@ -13,17 +13,32 @@ interface ProfileFormProps {
     location: string
     skills: string[]
     hourly_rate: number | null
+    experience_level?: string
+    company_name?: string
+    industry?: string
     [key: string]: any
   }
 }
 
 export default function ProfileForm({ initialData }: ProfileFormProps) {
-  const [formData, setFormData] = useState(initialData)
+  const [formData, setFormData] = useState({
+    full_name: initialData.full_name || '',
+    username: initialData.username || '',
+    bio: initialData.bio || '',
+    portfolio_url: initialData.portfolio_url || '',
+    avatar_url: initialData.avatar_url || '',
+    location: initialData.location || '',
+    skills: initialData.skills || [],
+    hourly_rate: initialData.hourly_rate || null,
+    experience_level: initialData.experience_level || '',
+    company_name: initialData.company_name || '',
+    industry: initialData.industry || '',
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 

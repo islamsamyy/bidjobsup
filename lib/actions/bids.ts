@@ -1,84 +1,61 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { tryGetAuth } from '@/lib/auth-utils'
 import { createNotification } from '@/lib/actions/notifications'
 import { sendBidStatusEmail, sendNewBidEmail } from '@/lib/email'
 
-export async function submitBid(jobId: number | string, amount: number, proposal: string, deliveryDays: number) {
-  const supabase = await createClient()
+export async function submitBid(
+  jobId: number | string,
+  amount: number,
+  proposal: string,
+  deliveryDays: number
+) {
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { profile, supabase } = auth
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  
-  if (authError || !user) {
-    return { error: 'Unauthorized' }
-  }
-
-  // Find the internal user record matching the Auth identity
-  const { data: userRecord, error: userError } = await supabase
-    .from('users')
-    .select('id, user_type, full_name')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (userError || !userRecord) {
-    return { error: 'User protocol entry not found. Please complete your registration.' }
-  }
-
-  // Ensure only jobseekers can bid
-  if (userRecord.user_type !== 'jobseeker' && userRecord.user_type !== 'both') {
-    return { error: 'Insufficient clearance. Only Seekers can submit proposals.' }
-  }
-
-  // Fetch job title and employer info
-  const { data: jobData } = await supabase
+  const { data: jobData } = await supabase!
     .from('jobs')
     .select('title, employer_id, employer:users!employer_id(id, auth_id)')
     .eq('id', Number(jobId))
     .single()
 
-  // Insert the bid / application using the internal user ID
-  const { data, error } = await supabase
+  const { data, error } = await supabase!
     .from('bids')
-    .insert([
-      {
-        job_id: Number(jobId),
-        bidder_id: userRecord.id,
-        amount: amount,
-        proposal: proposal,
-        delivery_days: deliveryDays,
-        status: 'pending'
-      }
-    ])
+    .insert([{
+      job_id: Number(jobId),
+      bidder_id: profile?.id,
+      amount,
+      proposal,
+      delivery_days: deliveryDays,
+      status: 'pending',
+    }])
     .select()
     .single()
 
-  if (error) {
-    console.error('Bid Error:', error)
-    return { error: error.message }
-  }
+  if (error) return { error: error.message }
 
-  // 4. Notify employer (in-app + email)
   if (jobData?.employer) {
+    const employer = jobData.employer as any
     await createNotification({
-      userId: (jobData.employer as any).id,
-      userAuthId: (jobData.employer as any).auth_id,
+      userId: employer.id,
+      userAuthId: employer.auth_id,
       type: 'new_bid',
-      title: 'New Bid Protocol Initialized',
-      content: `${userRecord.full_name || 'An agent'} submitted a bid for "${jobData.title}"`,
-      link: `/dashboard/employer/listings`
+      title: 'New Bid Received',
+      content: `${profile?.full_name || 'Someone'} submitted a bid for "${jobData.title}"`,
+      link: `/dashboard/employer/listings`,
     })
 
-    // Fetch employer email for notification
-    const { data: employerAuth } = await supabase.auth.admin.getUserById((jobData.employer as any).auth_id)
+    const { data: employerAuth } = await supabase!.auth.admin.getUserById(employer.auth_id)
     if (employerAuth?.user?.email) {
       await sendNewBidEmail({
-        to: employerAuth.user.email,
-        recipientName: (jobData.employer as any).full_name || 'Employer',
-        seekerName: userRecord.full_name || 'A talent',
+        to: employerAuth.user?.email,
+        recipientName: employer.full_name || 'Employer',
+        seekerName: profile?.full_name || 'A talent',
         jobTitle: jobData.title,
         jobId: String(jobId),
-      }).catch(() => {}) // non-blocking — don't fail the bid if email fails
+      }).catch(() => {})
     }
   }
 
@@ -89,117 +66,86 @@ export async function submitBid(jobId: number | string, amount: number, proposal
   return { success: true, bid: data }
 }
 
-export async function updateBidStatus(bidId: string | number, status: 'accepted' | 'rejected' | 'pending' | 'interview') {
-  const supabase = await createClient()
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  
-  if (authError || !user) {
-    return { error: 'Unauthorized' }
+export async function updateBidStatus(
+  bidId: string | number,
+  status: 'accepted' | 'rejected' | 'pending' | 'interview'
+) {
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { user, profile, supabase } = auth
+
+  if (profile?.user_type !== 'employer' && profile?.user_type !== 'both') {
+    return { error: 'Unauthorized: Only employers can update bid status.' }
   }
 
-  // 1. Get internal user ID
-  const { data: userRecord } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!userRecord || (userRecord.user_type !== 'employer' && userRecord.user_type !== 'both')) {
-    return { error: 'Insufficient permissions' }
-  }
-
-  // 2. Verify that this employer owns the job the bid is for
-  const { data: bidData, error: bidFetchError } = await supabase
+  const { data: bidData, error: bidFetchError } = await supabase!
     .from('bids')
-    .select('*, job:jobs!job_id(employer_id, title), bidder:users!bidder_id(id, auth_id)')
+    .select('*, job:jobs!job_id(employer_id, title), bidder:users!bidder_id(id, auth_id, full_name)')
     .eq('id', Number(bidId))
     .single()
 
-  if (bidFetchError || !bidData) {
-    return { error: 'Bid not found' }
+  if (bidFetchError || !bidData) return { error: 'Bid not found' }
+
+  if ((bidData as any).job.employer_id !== profile?.id) {
+    return { error: 'Unauthorized: You do not own this job.' }
   }
 
-  // Use (bidData as any).job.employer_id to avoid TS errors
-  if ((bidData as any).job.employer_id !== userRecord.id) {
-    return { error: 'Unauthorized: You are not the protocol owner of this mission.' }
-  }
-
-  // 3. Update status
-  const { data, error } = await supabase
+  const { data, error } = await supabase!
     .from('bids')
     .update({ status })
     .eq('id', Number(bidId))
     .select()
     .single()
-    
-  if (error) {
-    return { error: error.message }
-  }
 
-  // 4. Notify Seeker (in-app + email)
+  if (error) return { error: error.message }
+
   if (bidData.bidder) {
-    const statusText = status.toUpperCase()
-    let content = `Your proposal for "${(bidData as any).job.title}" has been ${status}.`
-    if (status === 'interview') {
-      content = `The employer of "${(bidData as any).job.title}" has initiated an INTERVIEW protocol. Check your messages.`
-    }
+    const bidder = bidData.bidder as any
+    const jobTitle = (bidData as any).job.title
+    const content =
+      status === 'interview'
+        ? `The employer of "${jobTitle}" has started an interview. Check your messages.`
+        : `Your proposal for "${jobTitle}" has been ${status}.`
 
     await createNotification({
-      userId: (bidData.bidder as any).id,
-      userAuthId: (bidData.bidder as any).auth_id,
+      userId: bidder.id,
+      userAuthId: bidder.auth_id,
       type: 'bid_update',
-      title: `Mission Status Modified: ${statusText}`,
+      title: `Bid Status: ${status.toUpperCase()}`,
       content,
-      link: `/dashboard/seeker/applications`
+      link: `/dashboard/seeker/applications`,
     })
 
-    const { data: seekerAuth } = await supabase.auth.admin.getUserById((bidData.bidder as any).auth_id)
+    const { data: seekerAuth } = await supabase!.auth.admin.getUserById(bidder.auth_id)
     if (seekerAuth?.user?.email) {
       await sendBidStatusEmail({
-        to: seekerAuth.user.email,
-        recipientName: (bidData.bidder as any).full_name || 'Agent',
-        jobTitle: (bidData as any).job.title,
+        to: seekerAuth.user?.email,
+        recipientName: bidder.full_name || 'Applicant',
+        jobTitle,
         status,
       }).catch(() => {})
     }
   }
 
-  revalidatePath(`/dashboard/employer/listings`)
-  revalidatePath(`/dashboard/seeker/applications`)
-  
+  revalidatePath('/dashboard/employer/listings')
+  revalidatePath('/dashboard/seeker/applications')
+
   return { success: true, bid: data }
 }
 
 export async function withdrawBid(bidId: string | number) {
-  const supabase = await createClient()
+  const auth = await tryGetAuth()
+  if (!auth.ok) return { error: auth.error }
+  const { profile, supabase } = auth
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return { error: 'Unauthorized' }
-
-  // 1. Get internal user ID
-  const { data: userRecord } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!userRecord || (userRecord.user_type !== 'jobseeker' && userRecord.user_type !== 'both')) {
-    return { error: 'Insufficient permissions' }
-  }
-
-  // 2. Delete bid
-  const { error } = await supabase
+  const { error } = await supabase!
     .from('bids')
     .delete()
     .eq('id', Number(bidId))
-    .eq('bidder_id', userRecord.id)
+    .eq('bidder_id', profile?.id)
 
-  if (error) {
-    return { error: error.message }
-  }
+  if (error) return { error: error.message }
 
   revalidatePath('/dashboard/seeker')
-  
   return { success: true }
 }

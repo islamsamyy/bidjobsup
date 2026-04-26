@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { toActionError } from '@/lib/errors'
 
 export interface AnalyticsData {
   activeJobs: number
@@ -140,9 +141,9 @@ export async function getEmployerAnalytics(): Promise<{
         applicationStatus,
       },
     }
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error in getEmployerAnalytics:', err)
-    return { data: null, error: err.message }
+    return toActionError(err) as any
   }
 }
 

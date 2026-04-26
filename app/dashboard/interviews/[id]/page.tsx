@@ -76,7 +76,7 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
         const stored = localStorage.getItem('currentUser')
         if (stored) {
           const user = JSON.parse(stored)
-          setCurrentUserId(user.id)
+          setCurrentUserId(user?.id)
 
           const result = await getInterviewDetails(parseInt(id))
           if (!result.error) {

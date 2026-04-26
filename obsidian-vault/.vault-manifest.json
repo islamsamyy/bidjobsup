@@ -1,0 +1,186 @@
+{
+  "name": "BidJob Codebase Knowledge Graph",
+  "version": "1.0.0",
+  "created": "2026-04-26T00:00:00Z",
+  "source": "graphify-out/GRAPH_REPORT.md",
+  "description": "Interactive Obsidian vault for navigating and understanding the BidJob platform codebase",
+
+  "statistics": {
+    "total_nodes": 524,
+    "total_edges": 596,
+    "communities_detected": 126,
+    "extraction_rate": "67%",
+    "inference_rate": "33%"
+  },
+
+  "documents": {
+    "core": [
+      "README.md",
+      "VAULT-GUIDE.md",
+      "SETUP-COMPLETE.md",
+      "God-Nodes.md",
+      "Communities-Index.md"
+    ],
+    "analysis": [
+      "Analysis/System-Architecture.md"
+    ],
+    "communities": [
+      "Community-0-Jobs-Contacts.md",
+      "Community-1-Auth-System.md",
+      "Community-3-Contracts-Escrow.md",
+      "Community-5-Admin-Dashboard.md"
+    ],
+    "templates": [
+      "Templates/Community-Template.md",
+      "Templates/Function-Template.md"
+    ]
+  },
+
+  "god_nodes": [
+    {
+      "name": "getAuthUser()",
+      "edges": 55,
+      "betweenness": 0.190,
+      "role": "Authentication gateway",
+      "location": "lib/supabase/get-user.ts"
+    },
+    {
+      "name": "Error()",
+      "edges": 34,
+      "betweenness": 0.080,
+      "role": "Error boundary",
+      "location": "app/dashboard/employer/post-job/error.tsx"
+    },
+    {
+      "name": "createClient()",
+      "edges": 23,
+      "betweenness": 0.099,
+      "role": "Database gateway",
+      "location": "lib/supabase/client.ts"
+    },
+    {
+      "name": "tryGetAuth()",
+      "edges": 15,
+      "role": "Fallback auth check",
+      "location": "lib/supabase/try-get-auth.ts"
+    },
+    {
+      "name": "adminAuth()",
+      "edges": 12,
+      "role": "Admin access control",
+      "location": "admin community"
+    },
+    {
+      "name": "useLanguage()",
+      "edges": 9,
+      "role": "i18n provider",
+      "location": "Community 6"
+    }
+  ],
+
+  "key_communities": [
+    {
+      "id": 0,
+      "name": "Jobs & Contacts",
+      "cohesion": 0.05,
+      "nodes": 20,
+      "role": "Job management system"
+    },
+    {
+      "id": 1,
+      "name": "Authentication System",
+      "cohesion": 0.06,
+      "nodes": 20,
+      "role": "User login and auth"
+    },
+    {
+      "id": 3,
+      "name": "Contracts & Escrow",
+      "cohesion": 0.09,
+      "nodes": 25,
+      "role": "Payments and contracts"
+    },
+    {
+      "id": 5,
+      "name": "Admin Dashboard",
+      "cohesion": 0.15,
+      "nodes": 17,
+      "role": "Moderation and admin tools"
+    },
+    {
+      "id": 6,
+      "name": "Internationalization",
+      "cohesion": 0.15,
+      "nodes": 10,
+      "role": "Multi-language support"
+    },
+    {
+      "id": 7,
+      "name": "ATS Optimizer",
+      "cohesion": 0.14,
+      "nodes": 9,
+      "role": "CV analysis and optimization"
+    },
+    {
+      "id": 8,
+      "name": "Interview Management",
+      "cohesion": 0.18,
+      "nodes": 13,
+      "role": "Interview scheduling and notes"
+    },
+    {
+      "id": 9,
+      "name": "Dispute Resolution",
+      "cohesion": 0.22,
+      "nodes": 10,
+      "role": "Conflict resolution system"
+    },
+    {
+      "id": 10,
+      "name": "AI Features",
+      "cohesion": 0.18,
+      "nodes": 8,
+      "role": "Claude API integration"
+    },
+    {
+      "id": 15,
+      "name": "Analytics",
+      "cohesion": 0.73,
+      "nodes": 5,
+      "role": "Data visualization and metrics"
+    }
+  ],
+
+  "quick_start": {
+    "step_1": "Open vault in Obsidian: File → Open vault folder → e:\\bidjob\\obsidian-vault",
+    "step_2": "Read README.md for quick navigation",
+    "step_3": "Read VAULT-GUIDE.md for detailed how-to",
+    "step_4": "Enable Graph View: Ctrl+G to visualize connections",
+    "step_5": "Use Quick Switcher: Ctrl+O to jump between documents"
+  },
+
+  "useful_queries": {
+    "authentication": "[[Community-1-Auth-System]]",
+    "payments": "[[Community-3-Contracts-Escrow]]",
+    "admin": "[[Community-5-Admin-Dashboard]]",
+    "critical_functions": "[[God-Nodes]]",
+    "all_communities": "[[Communities-Index]]",
+    "architecture": "[[Analysis/System-Architecture]]",
+    "user_guide": "[[VAULT-GUIDE]]"
+  },
+
+  "maintenance": {
+    "refresh_graph": "Run 'graphify update .' in project root",
+    "update_vault": "Manually update documents with new findings",
+    "check_updates": "After major code changes",
+    "add_tags": "Use tags like #critical, #refactor-needed for filtering"
+  },
+
+  "vault_insights": {
+    "god_nodes_critical": "Changes to these 6 functions affect the entire system",
+    "code_organization": "111 thin communities - consolidation opportunity",
+    "low_cohesion": "Core communities (0.05-0.15) - could be better organized",
+    "inferred_edges": "199 edges need verification during refactoring",
+    "highest_cohesion": "Community 15 (Analytics) - 0.73 - Well organized"
+  }
+}

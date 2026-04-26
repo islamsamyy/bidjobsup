@@ -19,8 +19,8 @@ export async function submitContactForm(formData: FormData) {
 
   const supabase = await createClient()
 
-  // Store in contact_messages table — if table doesn't exist, store in notifications as fallback
-  const { error } = await supabase
+  // Store in contact_messages table
+  const { error } = await supabase!
     .from('contact_messages')
     .insert({
       name,
@@ -30,9 +30,7 @@ export async function submitContactForm(formData: FormData) {
     })
 
   if (error) {
-    // Fallback: if table doesn't exist, just log it — the form still succeeds for the user
     console.error('Contact form submission error:', error.message)
-    // We still return success to the user since we don't want to expose DB errors
   }
 
   return { success: true }

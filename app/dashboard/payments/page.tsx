@@ -1,30 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAuthUser } from '@/lib/auth-utils'
 import Link from 'next/link'
 import PaymentHistoryClient from './client'
+import { PageHeader } from '../components/PageHeader'
+import { TranslatedText } from '../components/TranslatedText'
 
 export const dynamic = 'force-dynamic'
 
 export default async function PaymentsPage() {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    redirect('/sign-in')
-  }
-
-  const { data: currentUser } = await supabase
-    .from('users')
-    .select('id, user_type')
-    .eq('auth_id', user.id)
-    .single()
-
-  if (!currentUser) {
-    redirect('/join')
-  }
+  const { user: currentUser, supabase } = await getAuthUser()
 
   // Fetch all payments
-  const { data: paymentsData } = await supabase
+  const { data: paymentsData } = await supabase!
     .from('payments')
     .select(`
       id,
@@ -42,7 +28,7 @@ export default async function PaymentsPage() {
       payee:payee_id(id, full_name, avatar_url),
       contract:contract_id(id, title)
     `)
-    .or(`payer_id.eq.${currentUser.id},payee_id.eq.${currentUser.id}`)
+    .or(`payer_id.eq.${currentUser?.id},payee_id.eq.${currentUser?.id}`)
     .order('created_at', { ascending: false })
 
   const payments = paymentsData?.map(p => ({
@@ -53,7 +39,7 @@ export default async function PaymentsPage() {
   }))
 
   // Fetch invoices
-  const { data: invoicesData } = await supabase
+  const { data: invoicesData } = await supabase!
     .from('invoices')
     .select(`
       id,
@@ -69,7 +55,7 @@ export default async function PaymentsPage() {
       from_user:from_user_id(id, full_name, avatar_url),
       to_user:to_user_id(id, full_name, avatar_url)
     `)
-    .or(`from_user_id.eq.${currentUser.id},to_user_id.eq.${currentUser.id}`)
+    .or(`from_user_id.eq.${currentUser?.id},to_user_id.eq.${currentUser?.id}`)
     .order('created_at', { ascending: false })
 
   const invoices = invoicesData?.map(i => ({
@@ -79,8 +65,8 @@ export default async function PaymentsPage() {
   }))
 
   // Calculate totals
-  const sentPayments = payments?.filter(p => p.payer_id === currentUser.id && p.status === 'completed') || []
-  const receivedPayments = payments?.filter(p => p.payee_id === currentUser.id && p.status === 'completed') || []
+  const sentPayments = payments?.filter(p => p.payer_id === currentUser?.id && p.status === 'completed') || []
+  const receivedPayments = payments?.filter(p => p.payee_id === currentUser?.id && p.status === 'completed') || []
 
   const totalSent = sentPayments.reduce((sum, p) => sum + (p.amount || 0), 0)
   const totalReceived = receivedPayments.reduce((sum, p) => sum + (p.amount || 0), 0)
@@ -97,13 +83,9 @@ export default async function PaymentsPage() {
           <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">
             arrow_back
           </span>
-          <span className="text-xs font-bold uppercase tracking-widest">Back to Dashboard</span>
+          <TranslatedText textKey="atsHistory.backToDashboard" className="text-xs font-bold uppercase tracking-widest" />
         </Link>
-
-        <h1 className="font-headline text-5xl font-bold text-on-surface mb-2">Payment History</h1>
-        <p className="text-on-surface-variant text-lg">
-          Track all your payments, invoices, and financial transactions
-        </p>
+        <PageHeader titleKey="paymentsPage.title" subtitleKey="paymentsPage.subtitle" className="" />
       </div>
 
       {/* Summary Cards */}
@@ -172,7 +154,7 @@ export default async function PaymentsPage() {
           <PaymentHistoryClient
             payments={payments}
             invoices={invoices}
-            currentUserId={currentUser.id}
+            currentUserId={Number(currentUser?.id)}
           />
         )}
       </div>

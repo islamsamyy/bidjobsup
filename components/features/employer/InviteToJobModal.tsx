@@ -39,13 +39,13 @@ export default function InviteToJobModal({
     try {
       const result = await inviteToJob(selectedJobId, talentId)
 
-      if (result.success) {
+      if ('success' in result && result.success) {
         setSelectedJobId(null)
         setMessage('')
         setIsOpen(false)
         // Success - invite sent
       } else {
-        setError(result.error || 'Failed to send invite')
+        setError(('error' in result && result.error) ? result.error : 'Failed to send invite')
       }
     } catch (err: any) {
       setError(err.message || 'Failed to send invite')

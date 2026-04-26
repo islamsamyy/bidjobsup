@@ -93,19 +93,19 @@ export default function SettingsClient({ profile, email }: { profile: Profile; e
 
   // ── Notifications ─────────────────────────────────
   const [notifPrefs, setNotifPrefs] = useState({
-    email_new_bid: profile.notification_prefs?.email_new_bid ?? true,
-    email_bid_status: profile.notification_prefs?.email_bid_status ?? true,
-    email_new_message: profile.notification_prefs?.email_new_message ?? true,
-    email_weekly_digest: profile.notification_prefs?.email_weekly_digest ?? false,
+    email_new_bid: profile?.notification_prefs?.email_new_bid ?? true,
+    email_bid_status: profile?.notification_prefs?.email_bid_status ?? true,
+    email_new_message: profile?.notification_prefs?.email_new_message ?? true,
+    email_weekly_digest: profile?.notification_prefs?.email_weekly_digest ?? false,
   })
   const [notifMsg, setNotifMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [notifLoading, setNotifLoading] = useState(false)
 
   // ── Privacy ───────────────────────────────────────
   const [privacy, setPrivacy] = useState({
-    profile_visible: profile.privacy_settings?.profile_visible ?? true,
-    show_hourly_rate: profile.privacy_settings?.show_hourly_rate ?? true,
-    show_location: profile.privacy_settings?.show_location ?? true,
+    profile_visible: profile?.privacy_settings?.profile_visible ?? true,
+    show_hourly_rate: profile?.privacy_settings?.show_hourly_rate ?? true,
+    show_location: profile?.privacy_settings?.show_location ?? true,
   })
   const [privacyMsg, setPrivacyMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [privacyLoading, setPrivacyLoading] = useState(false)

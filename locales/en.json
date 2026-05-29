@@ -1351,10 +1351,12 @@
       "browseJobs": "Browse Jobs"
     },
     "messages": {
-      "title": "Messages",
+      "title": "Communication",
       "subtitle": "Direct messaging with employers and clients",
-      "noMessages": "No messages yet",
+      "noMessages": "No Active Streams",
       "startConversation": "Start a new conversation",
+      "activeConversations": "active conversation",
+      "browseJobs": "Browse Jobs",
       "typeMessage": "Type your message...",
       "send": "Send",
       "newMessage": "New Message"

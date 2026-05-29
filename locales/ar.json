@@ -1351,10 +1351,12 @@
       "browseJobs": "تصفح الوظائف"
     },
     "messages": {
-      "title": "الرسائل",
+      "title": "التواصل",
       "subtitle": "الرسائل المباشرة مع أصحاب العمل والعملاء",
-      "noMessages": "لا توجد رسائل حتى الآن",
+      "noMessages": "لا توجد تدفقات نشطة",
       "startConversation": "ابدأ محادثة جديدة",
+      "activeConversations": "محادثة نشطة",
+      "browseJobs": "تصفح الوظائف",
       "typeMessage": "اكتب رسالتك...",
       "send": "إرسال",
       "newMessage": "رسالة جديدة"

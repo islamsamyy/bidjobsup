@@ -1336,12 +1336,19 @@
       "active": "Active",
       "completed": "Completed",
       "disputed": "Disputed",
-      "noContracts": "No active contracts",
+      "noContracts": "No Active Contracts",
+      "noContractsEmployerDesc": "Once you hire a freelancer, their contract will appear here. You can manage milestones and payments.",
+      "noContractsSeekerDesc": "Once you accept a job offer, the contract will appear here. Track your milestones and deliverables.",
       "startBidding": "Start bidding on jobs to create contracts",
       "viewDetails": "View Details",
-      "startDate": "Start Date",
-      "dueDate": "Due Date",
-      "amount": "Amount"
+      "startDate": "Started",
+      "dueDate": "Due",
+      "amount": "Amount",
+      "with": "With",
+      "freelancer": "Freelancer",
+      "employer": "Employer",
+      "viewOpenJobs": "View Open Jobs",
+      "browseJobs": "Browse Jobs"
     },
     "messages": {
       "title": "Messages",

@@ -1337,11 +1337,18 @@
       "completed": "مكتمل",
       "disputed": "متنازع عليه",
       "noContracts": "لا توجد عقود نشطة",
+      "noContractsEmployerDesc": "بمجرد توظيف مستقل، سيظهر عقده هنا. يمكنك إدارة المراحل والمدفوعات.",
+      "noContractsSeekerDesc": "بمجرد قبول عرض عمل، سيظهر العقد هنا. تتبع مراحلك والقابليات.",
       "startBidding": "ابدأ في تقديم عطاءات على الوظائف لإنشاء عقود",
       "viewDetails": "عرض التفاصيل",
       "startDate": "تاريخ البدء",
       "dueDate": "تاريخ الاستحقاق",
-      "amount": "المبلغ"
+      "amount": "المبلغ",
+      "with": "مع",
+      "freelancer": "مستقل",
+      "employer": "صاحب العمل",
+      "viewOpenJobs": "عرض الوظائف المفتوحة",
+      "browseJobs": "تصفح الوظائف"
     },
     "messages": {
       "title": "الرسائل",

@@ -50,8 +50,8 @@ export async function signup(formData: FormData) {
   const phone = formData.get('phone') as string
   const userType = (formData.get('userType') as string) || 'jobseeker'
   // Normalize tos to boolean — HTML checkbox sends 'on', we also accept 'true'
-  const tosRaw = formData.get('tos')
-  const tosAccepted = tosRaw === true || tosRaw === 'true' || tosRaw === 'on'
+  const tosRaw = formData.get('tos') as string | null
+  const tosAccepted = tosRaw === 'true' || tosRaw === 'on'
 
   if (!tosAccepted) {
     redirect(`/sign-up?message=${encodeURIComponent('You must accept the Terms of Service')}`)

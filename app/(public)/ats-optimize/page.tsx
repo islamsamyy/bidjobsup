@@ -8,7 +8,7 @@ import { useLanguage } from "@/app/providers/LanguageProvider";
 
 export default function ATSOptimizePage() {
   const router = useRouter();
-  const { t, isRtl } = useLanguage();
+  const { t, dir } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cvText, setCvText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -157,7 +157,7 @@ export default function ATSOptimizePage() {
   };
 
   return (
-    <main className={`min-h-screen pt-28 pb-20 px-5 md:px-10 lg:px-14 ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <main className={`min-h-screen pt-28 pb-20 px-5 md:px-10 lg:px-14 ${dir === 'rtl' ? 'rtl' : 'ltr'}`} dir={dir === 'rtl' ? 'rtl' : 'ltr'}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-12">

@@ -146,7 +146,7 @@ export default function SignInForm({ initialMessage }: SignInFormProps) {
       <div className="flex items-center gap-4 my-10">
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-outline-variant/20 to-outline-variant/40" />
         <span className="font-body text-[10px] uppercase tracking-widest text-on-surface-variant/40">
-          {dir === 'rtl' ? 'أو استمر باستخدام' : 'Or continue with'}
+          {t('auth.orContinueWith')}
         </span>
         <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent via-outline-variant/20 to-outline-variant/40" />
       </div>

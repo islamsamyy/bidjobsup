@@ -6,13 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { signupSchema, type SignupFormData } from '@/lib/validations/auth'
 import { signup } from '@/app/(auth)/actions'
+import { useLanguage } from '@/app/providers/LanguageProvider'
 
 interface CreateProfileFormProps {
   initialMessage?: string
   defaultUserType?: 'jobseeker' | 'employer'
 }
 
-function PasswordStrengthBar({ password }: { password: string }) {
+function PasswordStrengthBar({ password, t }: { password: string; t: (key: string) => string }) {
   const checks = [
     password.length >= 8,
     /[A-Z]/.test(password),
@@ -20,7 +21,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
     /[^A-Za-z0-9]/.test(password),
   ]
   const strength = checks.filter(Boolean).length
-  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong']
+  const labels = ['', t('auth.passwordStrength.weak'), t('auth.passwordStrength.fair'), t('auth.passwordStrength.good'), t('auth.passwordStrength.strong')]
   const colours = ['', 'bg-error', 'bg-amber-500', 'bg-yellow-400', 'bg-green-500']
 
   if (!password) return null
@@ -47,6 +48,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
 }
 
 export default function CreateProfileForm({ initialMessage, defaultUserType = 'jobseeker' }: CreateProfileFormProps) {
+  const { t, dir } = useLanguage()
   const [serverError, setServerError] = useState<string | null>(initialMessage || null)
   const [isPending, startTransition] = useTransition()
 
@@ -83,14 +85,14 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
   }
 
   return (
-    <div className="bg-surface-container-low p-8 md:p-10 rounded-xl shadow-2xl relative overflow-hidden">
+    <div className="bg-surface-container-low p-8 md:p-10 rounded-xl shadow-2xl relative overflow-hidden" dir={dir}>
       {/* Subtle background glow */}
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 space-y-8">
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-headline font-bold text-on-surface">Create Your Account</h2>
-          <p className="text-on-surface-variant text-sm">Join the network as a specialist talent.</p>
+          <h2 className="text-2xl font-headline font-bold text-on-surface">{t('auth.createAccount')}</h2>
+          <p className="text-on-surface-variant text-sm">{t('auth.joinNetworkAsSpecialist')}</p>
         </div>
 
         {serverError && (
@@ -107,7 +109,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
           {/* Full Name */}
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold px-1">
-              Full Name
+              {t('forms.labels.fullName')}
             </label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pr-4 border-r border-outline-variant/30">
@@ -115,7 +117,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
               </span>
               <input
                 className={`input-inset w-full pl-[3.5rem] ${errors.fullName ? 'border-error/50' : ''}`}
-                placeholder="Enter your full name"
+                placeholder={t('forms.placeholders.fullName')}
                 type="text"
                 autoComplete="name"
                 {...register('fullName')}
@@ -131,7 +133,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
           {/* Email */}
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold px-1">
-              Email Address
+              {t('forms.labels.emailAddress')}
             </label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pr-4 border-r border-outline-variant/30">
@@ -139,7 +141,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
               </span>
               <input
                 className={`input-inset w-full pl-[3.5rem] ${errors.email ? 'border-error/50' : ''}`}
-                placeholder="name@company.com"
+                placeholder={t('forms.placeholders.email')}
                 type="email"
                 autoComplete="email"
                 {...register('email')}
@@ -155,7 +157,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
           {/* Password */}
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold px-1">
-              Password
+              {t('forms.labels.password')}
             </label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pr-4 border-r border-outline-variant/30">
@@ -169,7 +171,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
                 {...register('password')}
               />
             </div>
-            <PasswordStrengthBar password={passwordValue || ''} />
+            <PasswordStrengthBar password={passwordValue || ''} t={t} />
             {errors.password && (
               <p className="text-error text-[10px] uppercase tracking-widest px-1 animate-in fade-in duration-200">
                 {errors.password.message}
@@ -180,7 +182,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
           {/* Phone */}
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold px-1">
-              Phone Number <span className="text-on-surface-variant/40 normal-case">(optional)</span>
+              {t('forms.labels.phoneNumber')} <span className="text-on-surface-variant/40 normal-case">({t('common.optional')})</span>
             </label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pr-4 border-r border-outline-variant/30">
@@ -188,7 +190,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
               </span>
               <input
                 className={`input-inset w-full pl-[3.5rem] ${errors.phone ? 'border-error/50' : ''}`}
-                placeholder="+1 (555) 000-0000"
+                placeholder={t('forms.placeholders.phoneNumber')}
                 type="tel"
                 autoComplete="tel"
                 {...register('phone')}
@@ -210,13 +212,13 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
               {...register('tos')}
             />
             <label className="text-sm text-on-surface-variant leading-relaxed" htmlFor="tos">
-              I agree to the{' '}
+              {t('auth.agreeToThe')}{' '}
               <Link className="text-secondary hover:underline" href="/terms">
-                Terms of Service
+                {t('auth.termsOfService')}
               </Link>{' '}
-              and{' '}
+              {t('auth.and')}{' '}
               <Link className="text-secondary hover:underline" href="/terms">
-                Privacy Policy
+                {t('auth.privacyPolicy')}
               </Link>
               .
             </label>
@@ -236,11 +238,11 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
             {isPending ? (
               <>
                 <span className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
-                Creating Account...
+                {t('auth.creatingAccount')}
               </>
             ) : (
               <>
-                Create Account
+                {t('auth.createAccount')}
                 <span className="material-symbols-outlined text-xl">arrow_forward</span>
               </>
             )}
@@ -250,7 +252,7 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
         {/* Divider */}
         <div className="flex items-center gap-4">
           <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-outline-variant/30 to-transparent" />
-          <span className="text-[10px] uppercase tracking-widest text-on-surface-variant/50">or register as</span>
+          <span className="text-[10px] uppercase tracking-widest text-on-surface-variant/50">{t('auth.orRegisterAs')}</span>
           <div className="h-[1px] flex-grow bg-gradient-to-l from-transparent via-outline-variant/30 to-transparent" />
         </div>
 
@@ -262,13 +264,13 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
           <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">
             business
           </span>
-          Looking to Hire? Switch to Employer
+          {t('auth.switchToEmployer')}
         </Link>
 
         <p className="text-center text-sm text-on-surface-variant">
-          Already have an account?{' '}
+          {t('auth.alreadyHaveAccount')}{' '}
           <Link className="text-primary hover:underline font-bold" href="/sign-in">
-            Sign In
+            {t('buttons.signIn')}
           </Link>
         </p>
       </div>

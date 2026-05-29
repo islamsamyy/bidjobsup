@@ -269,8 +269,11 @@
     "labels": {
       "firstName": "الاسم الأول",
       "lastName": "اسم العائلة",
+      "fullName": "الاسم الكامل",
       "email": "عنوان البريد الإلكتروني",
+      "emailAddress": "عنوان البريد الإلكتروني",
       "phone": "رقم الهاتف",
+      "phoneNumber": "رقم الهاتف",
       "password": "كلمة المرور",
       "confirmPassword": "تأكيد كلمة المرور",
       "jobTitle": "المسمى الوظيفي",
@@ -290,8 +293,10 @@
     "placeholders": {
       "firstName": "أدخل اسمك الأول",
       "lastName": "أدخل اسم العائلة",
+      "fullName": "أدخل اسمك الكامل",
       "email": "you@example.com",
       "phone": "+966 XX XXX XXXX",
+      "phoneNumber": "+966 XX XXX XXXX",
       "password": "على الأقل 8 أحرف",
       "jobTitle": "مثال: مطور Full Stack",
       "jobDescription": "صف الوظيفة بالتفصيل...",
@@ -370,7 +375,25 @@
     "signInPrompt": "سجل الدخول إلى حسابك",
     "signUpPrompt": "أنشئ حسابك",
     "fullName": "الاسم الكامل",
-    "agreeToTerms": "أوافق على الشروط وسياسة الخصوصية"
+    "agreeToTerms": "أوافق على الشروط وسياسة الخصوصية",
+    "createAccount": "إنشاء حساب",
+    "creatingAccount": "جاري إنشاء الحساب...",
+    "haveAccount": "الوصول إلى نظام المواهب الحصري في رؤية 2030. تنتظرك أرقى فرصك المعمارية.",
+    "noAccount": "ليس لديك حساب؟",
+    "orContinueWith": "أو استمر باستخدام",
+    "orRegisterAs": "أو سجل باستخدام",
+    "switchToEmployer": "تبحث عن توظيف؟ انتقل إلى حساب صاحب العمل",
+    "joinNetworkAsSpecialist": "انضم إلى الشبكة كمتخصص موهوب.",
+    "agreeToThe": "أوافق على",
+    "termsOfService": "شروط الخدمة",
+    "and": "و",
+    "privacyPolicy": "سياسة الخصوصية",
+    "passwordStrength": {
+      "weak": "ضعيفة",
+      "fair": "متوسطة",
+      "good": "جيدة",
+      "strong": "قوية"
+    }
   },
   "contracts": {
     "title": "العقود",

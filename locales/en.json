@@ -271,8 +271,11 @@
     "labels": {
       "firstName": "First Name",
       "lastName": "Last Name",
+      "fullName": "Full Name",
       "email": "Email Address",
+      "emailAddress": "Email Address",
       "phone": "Phone Number",
+      "phoneNumber": "Phone Number",
       "password": "Password",
       "confirmPassword": "Confirm Password",
       "jobTitle": "Job Title",
@@ -292,7 +295,9 @@
     "placeholders": {
       "firstName": "Enter your first name",
       "lastName": "Enter your last name",
+      "fullName": "Enter your full name",
       "email": "you@example.com",
+      "phoneNumber": "+966 XX XXX XXXX",
       "phone": "+966 XX XXX XXXX",
       "password": "At least 8 characters",
       "jobTitle": "e.g., Full Stack Developer",
@@ -372,7 +377,25 @@
     "signInPrompt": "Sign in to your account",
     "signUpPrompt": "Create your account",
     "fullName": "Full Name",
-    "agreeToTerms": "I agree to the Terms and Privacy Policy"
+    "agreeToTerms": "I agree to the Terms and Privacy Policy",
+    "createAccount": "Create Account",
+    "creatingAccount": "Creating Account...",
+    "haveAccount": "Access the exclusive Vision 2030 talent ecosystem. Your next architectural milestone awaits.",
+    "noAccount": "Don't have an account?",
+    "orContinueWith": "Or continue with",
+    "orRegisterAs": "Or register as",
+    "switchToEmployer": "Looking to Hire? Switch to Employer",
+    "joinNetworkAsSpecialist": "Join the network as a specialist talent.",
+    "agreeToThe": "I agree to the",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "passwordStrength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
+    }
   },
   "contracts": {
     "title": "Contracts",

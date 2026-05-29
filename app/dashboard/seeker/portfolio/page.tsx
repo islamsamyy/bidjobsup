@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { getUserPortfolio, createPortfolioItem } from '@/lib/actions/portfolio'
+import { useLanguage } from '@/app/providers/LanguageProvider'
 import PortfolioCard from '@/components/features/PortfolioCard'
 
 interface PortfolioItem {
@@ -17,6 +18,7 @@ interface PortfolioItem {
 }
 
 export default function PortfolioPage() {
+  const { t, dir } = useLanguage()
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([])
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<number | null>(null)
@@ -132,9 +134,9 @@ export default function PortfolioPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-on-surface mb-2">Portfolio</h1>
+          <h1 className="text-3xl font-bold text-on-surface mb-2">{t('dashboardPages.portfolioPage.title')}</h1>
           <p className="text-on-surface-variant">
-            Showcase your best work and attract top opportunities
+            {t('dashboardPages.portfolioPage.subtitle')}
           </p>
         </div>
         {!showForm && (
@@ -143,7 +145,7 @@ export default function PortfolioPage() {
             className="bg-primary text-on-primary-container font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-all flex items-center gap-2"
           >
             <span className="material-symbols-outlined">add</span>
-            Add Project
+            {t('dashboardPages.portfolioPage.addPortfolioItem')}
           </button>
         )}
       </div>
@@ -151,7 +153,7 @@ export default function PortfolioPage() {
       {/* Add Project Form */}
       {showForm && (
         <div className="bg-surface-container/60 backdrop-blur-xl rounded-2xl border border-white/5 p-8">
-          <h2 className="text-xl font-bold text-on-surface mb-6">Add Portfolio Item</h2>
+          <h2 className="text-xl font-bold text-on-surface mb-6">{t('dashboardPages.portfolioPage.addPortfolioItem')}</h2>
 
           {error && (
             <div className="mb-6 bg-error/20 border border-error text-error px-4 py-3 rounded-lg text-sm flex items-start gap-2">
@@ -164,7 +166,7 @@ export default function PortfolioPage() {
             {/* Title */}
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
-                Project Title *
+                {t('dashboardPages.portfolioPage.projectTitle')} *
               </label>
               <input
                 type="text"
@@ -181,7 +183,7 @@ export default function PortfolioPage() {
             {/* Description */}
             <div>
               <label className="block text-sm font-bold text-on-surface mb-2">
-                Description
+                {t('dashboardPages.portfolioPage.description')}
               </label>
               <textarea
                 value={formData.description}

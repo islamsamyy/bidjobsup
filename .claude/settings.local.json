@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npx tsc:*)",
       "Bash(curl -s -o /dev/null -w \"Pricing Page: %{http_code}\\\\n\" http://localhost:3000/pricing)",
-      "Bash(grep -E \"\\\\.tsx?$\")"
+      "Bash(grep -E \"\\\\.tsx?$\")",
+      "Bash(Get-ChildItem -Path \"e:\\\\bidjob\" -Recurse -Filter \"*nav*\" -Include \"*.tsx\", \"*.ts\")",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }

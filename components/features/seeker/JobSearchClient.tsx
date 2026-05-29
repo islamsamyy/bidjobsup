@@ -38,12 +38,20 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
 
         if (data.success && Array.isArray(data.data)) {
           setFilteredJobs(data.data)
+        } else if (!searchTerm && !experienceLevel && sortOrder === 'recent') {
+          // Fall back to initial jobs if no filters applied and API fails
+          setFilteredJobs(initialJobs)
         } else {
           setFilteredJobs([])
         }
       } catch (err) {
         console.error('Failed to fetch filtered jobs:', err)
-        setFilteredJobs([])
+        // Fall back to client-side filtering if API is unavailable
+        if (!searchTerm && !experienceLevel && sortOrder === 'recent') {
+          setFilteredJobs(initialJobs)
+        } else {
+          setFilteredJobs([])
+        }
       } finally {
         setIsLoadingFilters(false)
       }
@@ -52,23 +60,30 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
     // Debounce search (only call after 500ms of inactivity)
     const timeout = setTimeout(fetchFilteredJobs, 500)
     return () => clearTimeout(timeout)
-  }, [searchTerm, experienceLevel, sortOrder])
+  }, [searchTerm, experienceLevel, sortOrder, initialJobs])
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedJob) return
     setIsSubmitting(true)
     setMessage(null)
-    
-    const res = await submitBid(selectedJob.id, amount, proposal, deliveryDays)
-    setIsSubmitting(false)
-    if (res.success) {
-      setMessage({ type: 'success', text: "Mission Proposition Dispatched. Await Handshake Protocol." })
-      setAppliedJobs(prev => new Set([...prev, selectedJob.id]))
-      // Clear proposal but keep context for a bit
-      setTimeout(() => setSelectedJob(null), 3000)
-    } else {
-      setMessage({ type: 'error', text: "Protocol Handshake Failure: " + res.error })
+
+    try {
+      const res = await submitBid(selectedJob.id, amount, proposal, deliveryDays)
+      setIsSubmitting(false)
+
+      if ('error' in res && res.error) {
+        setMessage({ type: 'error', text: "Protocol Handshake Failure: " + res.error })
+      } else if ('success' in res && res.success) {
+        setMessage({ type: 'success', text: "Mission Proposition Dispatched. Await Handshake Protocol." })
+        setAppliedJobs(prev => new Set([...prev, selectedJob.id]))
+        setTimeout(() => setSelectedJob(null), 3000)
+      } else {
+        setMessage({ type: 'error', text: "Protocol Handshake Failure: Unexpected response from server" })
+      }
+    } catch (err) {
+      setIsSubmitting(false)
+      setMessage({ type: 'error', text: "Protocol Handshake Failure: " + (err instanceof Error ? err.message : 'Unknown error') })
     }
   }
 

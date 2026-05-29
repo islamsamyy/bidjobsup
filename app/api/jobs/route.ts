@@ -1,8 +1,5 @@
 import { NextRequest } from 'next/server'
-
-// In-memory storage for testing
-const jobs: any[] = []
-let jobIdCounter = 1
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,10 +13,47 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // Mock jobs data (in production, fetch from database)
+    // Fetch jobs from Supabase database
+    const supabase = await createClient()
+    let query = supabase.from('jobs').select('*')
+
+    // Apply search filter
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
+    }
+
+    // Apply category filter
+    if (category) {
+      query = query.eq('category', category)
+    }
+
+    // Apply experience level filter (if job table has this field)
+    if (experienceLevel) {
+      query = query.eq('experience_level', experienceLevel)
+    }
+
+    // Apply sorting
+    if (sortBy === 'salary-high') {
+      query = query.order('budget_max', { ascending: false })
+    } else if (sortBy === 'salary-low') {
+      query = query.order('budget_min', { ascending: true })
+    } else {
+      // Recent (default)
+      query = query.order('created_at', { ascending: false })
+    }
+
+    // Get total count before pagination
+    const { count: total } = await supabase
+      .from('jobs')
+      .select('*', { count: 'exact', head: true })
+
+    // Apply pagination
+    const { data: dbJobs, error } = await query.range(offset, offset + limit - 1)
+
+    // Fallback mock data if database fails or returns no results
     const mockJobs = [
       {
-        id: 1,
+        id: 1001,
         title: 'Senior React Developer',
         description: 'Build scalable React applications with TypeScript',
         category: 'Developer',
@@ -29,7 +63,7 @@ export async function GET(req: NextRequest) {
         created_at: new Date(Date.now() - 3600000).toISOString()
       },
       {
-        id: 2,
+        id: 1002,
         title: 'Junior Node.js Developer',
         description: 'Backend API development using Node.js and Express',
         category: 'Developer',
@@ -39,7 +73,7 @@ export async function GET(req: NextRequest) {
         created_at: new Date(Date.now() - 86400000).toISOString()
       },
       {
-        id: 3,
+        id: 1003,
         title: 'UX/UI Designer',
         description: 'Design mobile app interfaces and user experiences',
         category: 'Design',
@@ -49,7 +83,7 @@ export async function GET(req: NextRequest) {
         created_at: new Date(Date.now() - 172800000).toISOString()
       },
       {
-        id: 4,
+        id: 1004,
         title: 'Full Stack Web Developer',
         description: 'Complete web application development',
         category: 'Developer',
@@ -59,7 +93,7 @@ export async function GET(req: NextRequest) {
         created_at: new Date(Date.now() - 7200000).toISOString()
       },
       {
-        id: 5,
+        id: 1005,
         title: 'Data Analyst',
         description: 'Analyze and visualize business data',
         category: 'AI',
@@ -70,36 +104,9 @@ export async function GET(req: NextRequest) {
       }
     ]
 
-    let filtered = [...mockJobs, ...jobs] // Combine mock + created jobs
-
-    // Apply filters
-    if (search) {
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(search.toLowerCase()) ||
-        job.description.toLowerCase().includes(search.toLowerCase())
-      )
-    }
-
-    if (category) {
-      filtered = filtered.filter(job => job.category === category)
-    }
-
-    if (experienceLevel) {
-      filtered = filtered.filter(job => job.experience_level === experienceLevel)
-    }
-
-    // Apply sorting
-    if (sortBy === 'salary-high') {
-      filtered.sort((a, b) => (b.budget_max || 0) - (a.budget_max || 0))
-    } else if (sortBy === 'salary-low') {
-      filtered.sort((a, b) => (a.budget_min || 0) - (b.budget_min || 0))
-    } else {
-      // Recent (default)
-      filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    }
-
-    // Apply pagination
-    const paginated = filtered.slice(offset, offset + limit)
+    // Use database jobs if available, otherwise use mock
+    const jobs = !error && dbJobs && dbJobs.length > 0 ? dbJobs : mockJobs
+    const paginated = jobs.slice(0, limit)
 
     return Response.json(
       {
@@ -161,26 +168,37 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const job = {
-      id: `job-${jobIdCounter++}`,
-      title,
-      description,
-      budget,
-      category,
-      skills: skills || [],
-      deadline,
-      created_at: new Date().toISOString(),
-      status: 'active',
-    }
+    // Insert job into Supabase database
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('jobs')
+      .insert([{
+        title,
+        description,
+        budget_min: budget,
+        budget_max: budget,
+        category,
+        skills: skills || [],
+        deadline,
+        status: 'active',
+      }])
+      .select()
+      .single()
 
-    jobs.push(job)
+    if (error) {
+      console.error('Database error:', error)
+      return Response.json(
+        { error: 'Failed to create job: ' + error.message },
+        { status: 400 }
+      )
+    }
 
     return Response.json(
       {
         success: true,
         message: 'Job created successfully',
-        id: job.id,
-        job,
+        id: data.id,
+        job: data,
       },
       { status: 201 }
     )

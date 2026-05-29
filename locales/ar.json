@@ -475,6 +475,26 @@
     "public": "عام",
     "private": "خاص"
   },
+  "admin": {
+    "dashboard": "لوحة تحكم المسؤول",
+    "platformManagement": "أدوات إدارة المنصة والإشراف",
+    "totalUsers": "إجمالي المستخدمين",
+    "totalJobs": "إجمالي الوظائف",
+    "flaggedJobs": "الوظائف المضبوط عليها",
+    "openReports": "التقارير المفتوحة",
+    "activeDisputes": "النزاعات النشطة",
+    "totalReports": "إجمالي التقارير",
+    "manageReports": "إدارة التقارير",
+    "reviewReports": "مراجعة تقارير المستخدمين والحوادث",
+    "manageJobs": "إدارة الوظائف",
+    "reviewModerate": "مراجعة وإشراف على قوائم الوظائف",
+    "manageUsers": "إدارة المستخدمين",
+    "userActivity": "مراقبة نشاط المستخدم والحسابات",
+    "viewDisputes": "عرض النزاعات",
+    "resolveConflicts": "حل النزاعات والصراعات",
+    "viewReports": "عرض التحليلات",
+    "platformMetrics": "مقاييس المنصة والرؤى"
+  },
   "footer": {
     "copyright": "© 2026 BidJobs. جميع الحقوق محفوظة.",
     "terms": "الشروط والخصوصية",

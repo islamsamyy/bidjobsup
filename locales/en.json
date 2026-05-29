@@ -477,6 +477,26 @@
     "public": "Public",
     "private": "Private"
   },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "platformManagement": "Platform management and moderation tools",
+    "totalUsers": "Total Users",
+    "totalJobs": "Total Jobs",
+    "flaggedJobs": "Flagged Jobs",
+    "openReports": "Open Reports",
+    "activeDisputes": "Active Disputes",
+    "totalReports": "Total Reports",
+    "manageReports": "Manage Reports",
+    "reviewReports": "Review user reports and incidents",
+    "manageJobs": "Manage Jobs",
+    "reviewModerate": "Review and moderate job listings",
+    "manageUsers": "Manage Users",
+    "userActivity": "Monitor user activity and accounts",
+    "viewDisputes": "View Disputes",
+    "resolveConflicts": "Resolve disputes and conflicts",
+    "viewReports": "View Analytics",
+    "platformMetrics": "Platform metrics and insights"
+  },
   "footer": {
     "copyright": "© 2026 BidJobs. All rights reserved.",
     "terms": "Terms & Privacy",

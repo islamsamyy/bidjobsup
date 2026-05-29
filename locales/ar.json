@@ -1266,6 +1266,164 @@
       "subtitle": "التواصل مع أصحاب العمل والعملاء",
       "noMessages": "لا توجد رسائل",
       "startConversation": "ابدأ محادثة جديدة"
+    },
+    "seekerProfile": {
+      "title": "ملفي الشخصي",
+      "editProfile": "تحرير الملف الشخصي",
+      "successRate": "معدل النجاح",
+      "totalBids": "إجمالي العطاءات",
+      "acceptedBids": "العطاءات المقبولة",
+      "rating": "التقييم",
+      "bio": "السيرة الذاتية",
+      "skills": "المهارات",
+      "experience": "الخبرة",
+      "portfolio": "المحفظة",
+      "completeYourName": "أكمل اسمك",
+      "profileCompletion": "اكتمال الملف الشخصي"
+    },
+    "savedJobs": {
+      "title": "الوظائف المحفوظة",
+      "subtitle": "مجموعتك من الفرص المثيرة للاهتمام",
+      "noSavedJobs": "لم تحفظ أي وظائف بعد",
+      "startBrowsing": "ابدأ في تصفح الوظائف لحفظ المفضلة لديك",
+      "browseJobs": "تصفح الوظائف"
+    },
+    "portfolio": {
+      "title": "محفظتي",
+      "subtitle": "اعرض أفضل أعمالك والمشاريع",
+      "addPortfolioItem": "إضافة عنصر محفظة",
+      "noPortfolioItems": "لم تضف أي عناصر محفظة بعد",
+      "startShowcasing": "ابدأ في عرض عملك لجذب العملاء",
+      "project": "المشروع",
+      "skills": "المهارات المستخدمة",
+      "link": "رابط المشروع",
+      "date": "تاريخ الإنجاز"
+    },
+    "skills": {
+      "title": "المهارات والتوصيات",
+      "subtitle": "أدر مهاراتك المهنية واحصل على التوصيات",
+      "addSkill": "إضافة مهارة",
+      "endorsements": "التوصيات",
+      "noSkills": "لم تضف أي مهارات بعد",
+      "addYourSkills": "أضف مهاراتك للاكتشاف من قبل أصحاب العمل",
+      "endorsed": "موصى",
+      "times": "مرات"
+    },
+    "notifications": {
+      "title": "إشعاراتي",
+      "subtitle": "ابق محدثًا مع جميع إشعاراتك",
+      "noNotifications": "أنت مواكب للأحداث!",
+      "markAsRead": "وضع علامة كمقروء",
+      "markAllAsRead": "وضع علامة على الكل كمقروء",
+      "messageNotification": "رسالة جديدة",
+      "bidNotification": "عطاء جديد مستلم",
+      "reviewNotification": "مراجعة جديدة"
+    },
+    "subscription": {
+      "title": "اشتراكي",
+      "subtitle": "إدارة خطتك الاشتراكية والفواتير",
+      "currentPlan": "الخطة الحالية",
+      "upgradeAvailable": "ترقية متاحة",
+      "downgradeOption": "خيار الخفض",
+      "cancelSubscription": "إلغاء الاشتراك",
+      "billingHistory": "سجل الفواتير",
+      "nextBillingDate": "تاريخ الفواتير التالي",
+      "features": "الميزات المضمنة"
+    },
+    "contracts": {
+      "title": "العقود",
+      "subtitle": "إدارة عقودك النشطة والاتفاقيات",
+      "active": "نشط",
+      "completed": "مكتمل",
+      "disputed": "متنازع عليه",
+      "noContracts": "لا توجد عقود نشطة",
+      "startBidding": "ابدأ في تقديم عطاءات على الوظائف لإنشاء عقود",
+      "viewDetails": "عرض التفاصيل",
+      "startDate": "تاريخ البدء",
+      "dueDate": "تاريخ الاستحقاق",
+      "amount": "المبلغ"
+    },
+    "messages": {
+      "title": "الرسائل",
+      "subtitle": "الرسائل المباشرة مع أصحاب العمل والعملاء",
+      "noMessages": "لا توجد رسائل حتى الآن",
+      "startConversation": "ابدأ محادثة جديدة",
+      "typeMessage": "اكتب رسالتك...",
+      "send": "إرسال",
+      "newMessage": "رسالة جديدة"
+    },
+    "seekerDashboard": {
+      "title": "لوحة التحكم",
+      "subtitle": "مركزك المهني",
+      "welcomeBack": "مرحبا بك",
+      "statsOverview": "إحصائياتك",
+      "recentActivity": "النشاط الأخير",
+      "upcomingDeadlines": "المواعيد النهائية القادمة",
+      "recommendations": "الموصى به لك"
+    },
+    "employerListings": {
+      "title": "قائمة الوظائف",
+      "subtitle": "إدارة إعلانات وظائفك النشطة",
+      "postNew": "نشر وظيفة جديدة",
+      "active": "نشط",
+      "closed": "مغلق",
+      "draft": "مسودة",
+      "noListings": "لم تنشر أي وظائف بعد",
+      "startPosting": "انشر وظيفتك الأولى للعثور على المواهب",
+      "views": "المشاهدات",
+      "applications": "الطلبات",
+      "status": "الحالة"
+    },
+    "employerPostJob": {
+      "title": "نشر وظيفة جديدة",
+      "subtitle": "أنشئ قائمة وظائف للعثور على أفضل المواهب",
+      "jobTitle": "عنوان الوظيفة",
+      "description": "الوصف",
+      "budget": "الميزانية",
+      "duration": "المدة",
+      "skills": "المهارات المطلوبة",
+      "category": "الفئة",
+      "publish": "نشر الوظيفة",
+      "saveDraft": "حفظ كمسودة"
+    },
+    "employerProfile": {
+      "title": "ملف الشركة",
+      "subtitle": "إدارة معلومات شركتك",
+      "companyName": "اسم الشركة",
+      "industry": "الصناعة",
+      "website": "الموقع الإلكتروني",
+      "description": "وصف الشركة",
+      "logo": "شعار الشركة",
+      "location": "الموقع",
+      "teamSize": "حجم الفريق"
+    },
+    "employerTalent": {
+      "title": "دليل المواهب",
+      "subtitle": "تصفح والبحث عن المستقلين",
+      "search": "ابحث حسب المهارة أو الاسم أو الفئة",
+      "filter": "تصفية النتائج",
+      "noResults": "لا توجد مستقلون يطابقون معاييرك",
+      "viewProfile": "عرض الملف الشخصي",
+      "hiring": "متاح للتوظيف",
+      "rate": "معدل الساعة"
+    },
+    "employerBilling": {
+      "title": "الفواتير والمدفوعات",
+      "subtitle": "إدارة المدفوعات والفواتير الخاصة بك",
+      "paymentMethod": "طريقة الدفع",
+      "invoices": "الفواتير",
+      "transactions": "المعاملات الأخيرة",
+      "noTransactions": "لا توجد معاملات حتى الآن",
+      "amount": "المبلغ",
+      "date": "التاريخ",
+      "status": "الحالة"
+    },
+    "employerNotifications": {
+      "title": "الإشعارات",
+      "subtitle": "ابق محدثًا حول نشاط الوظيفة",
+      "newApplication": "طلب جديد",
+      "bidSubmitted": "تم تقديم عطاء",
+      "contractUpdate": "تحديث العقد"
     }
   }
 }

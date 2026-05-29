@@ -1266,6 +1266,164 @@
       "subtitle": "Communicate with employers and clients",
       "noMessages": "No messages",
       "startConversation": "Start a new conversation"
+    },
+    "seekerProfile": {
+      "title": "My Profile",
+      "editProfile": "Edit Profile",
+      "successRate": "Success Rate",
+      "totalBids": "Total Bids",
+      "acceptedBids": "Accepted Bids",
+      "rating": "Rating",
+      "bio": "Bio",
+      "skills": "Skills",
+      "experience": "Experience",
+      "portfolio": "Portfolio",
+      "completeYourName": "Complete Your Name",
+      "profileCompletion": "Profile Completion"
+    },
+    "savedJobs": {
+      "title": "Saved Jobs",
+      "subtitle": "Your collection of interesting opportunities",
+      "noSavedJobs": "You haven't saved any jobs yet",
+      "startBrowsing": "Start browsing jobs to save your favorites",
+      "browseJobs": "Browse Jobs"
+    },
+    "portfolio": {
+      "title": "My Portfolio",
+      "subtitle": "Showcase your best work and projects",
+      "addPortfolioItem": "Add Portfolio Item",
+      "noPortfolioItems": "You haven't added any portfolio items yet",
+      "startShowcasing": "Start showcasing your work to attract clients",
+      "project": "Project",
+      "skills": "Skills Used",
+      "link": "Project Link",
+      "date": "Completion Date"
+    },
+    "skills": {
+      "title": "Skills & Endorsements",
+      "subtitle": "Manage your professional skills and get endorsements",
+      "addSkill": "Add Skill",
+      "endorsements": "Endorsements",
+      "noSkills": "You haven't added any skills yet",
+      "addYourSkills": "Add your skills to get discovered by employers",
+      "endorsed": "Endorsed",
+      "times": "times"
+    },
+    "notifications": {
+      "title": "My Notifications",
+      "subtitle": "Stay updated with all your notifications",
+      "noNotifications": "You're all caught up!",
+      "markAsRead": "Mark as Read",
+      "markAllAsRead": "Mark All as Read",
+      "messageNotification": "New message",
+      "bidNotification": "New bid received",
+      "reviewNotification": "New review"
+    },
+    "subscription": {
+      "title": "My Subscription",
+      "subtitle": "Manage your subscription plan and billing",
+      "currentPlan": "Current Plan",
+      "upgradeAvailable": "Upgrade Available",
+      "downgradeOption": "Downgrade Option",
+      "cancelSubscription": "Cancel Subscription",
+      "billingHistory": "Billing History",
+      "nextBillingDate": "Next Billing Date",
+      "features": "Features Included"
+    },
+    "contracts": {
+      "title": "Contracts",
+      "subtitle": "Manage your active contracts and agreements",
+      "active": "Active",
+      "completed": "Completed",
+      "disputed": "Disputed",
+      "noContracts": "No active contracts",
+      "startBidding": "Start bidding on jobs to create contracts",
+      "viewDetails": "View Details",
+      "startDate": "Start Date",
+      "dueDate": "Due Date",
+      "amount": "Amount"
+    },
+    "messages": {
+      "title": "Messages",
+      "subtitle": "Direct messaging with employers and clients",
+      "noMessages": "No messages yet",
+      "startConversation": "Start a new conversation",
+      "typeMessage": "Type your message...",
+      "send": "Send",
+      "newMessage": "New Message"
+    },
+    "seekerDashboard": {
+      "title": "Dashboard",
+      "subtitle": "Your professional hub",
+      "welcomeBack": "Welcome back",
+      "statsOverview": "Your Stats",
+      "recentActivity": "Recent Activity",
+      "upcomingDeadlines": "Upcoming Deadlines",
+      "recommendations": "Recommended for You"
+    },
+    "employerListings": {
+      "title": "Job Listings",
+      "subtitle": "Manage your active job postings",
+      "postNew": "Post New Job",
+      "active": "Active",
+      "closed": "Closed",
+      "draft": "Draft",
+      "noListings": "You haven't posted any jobs yet",
+      "startPosting": "Post your first job to find talent",
+      "views": "Views",
+      "applications": "Applications",
+      "status": "Status"
+    },
+    "employerPostJob": {
+      "title": "Post a New Job",
+      "subtitle": "Create a job listing to find top talent",
+      "jobTitle": "Job Title",
+      "description": "Description",
+      "budget": "Budget",
+      "duration": "Duration",
+      "skills": "Required Skills",
+      "category": "Category",
+      "publish": "Publish Job",
+      "saveDraft": "Save as Draft"
+    },
+    "employerProfile": {
+      "title": "Company Profile",
+      "subtitle": "Manage your company information",
+      "companyName": "Company Name",
+      "industry": "Industry",
+      "website": "Website",
+      "description": "Company Description",
+      "logo": "Company Logo",
+      "location": "Location",
+      "teamSize": "Team Size"
+    },
+    "employerTalent": {
+      "title": "Talent Directory",
+      "subtitle": "Browse and search for freelancers",
+      "search": "Search by skill, name, or category",
+      "filter": "Filter Results",
+      "noResults": "No freelancers match your criteria",
+      "viewProfile": "View Profile",
+      "hiring": "Available for Hire",
+      "rate": "Hourly Rate"
+    },
+    "employerBilling": {
+      "title": "Billing & Payments",
+      "subtitle": "Manage your payments and invoices",
+      "paymentMethod": "Payment Method",
+      "invoices": "Invoices",
+      "transactions": "Recent Transactions",
+      "noTransactions": "No transactions yet",
+      "amount": "Amount",
+      "date": "Date",
+      "status": "Status"
+    },
+    "employerNotifications": {
+      "title": "Notifications",
+      "subtitle": "Stay updated on job activity",
+      "newApplication": "New Application",
+      "bidSubmitted": "Bid Submitted",
+      "contractUpdate": "Contract Update"
     }
   }
 }

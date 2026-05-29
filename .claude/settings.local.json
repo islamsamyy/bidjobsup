@@ -6,7 +6,8 @@
       "Bash(grep -E \"\\\\.tsx?$\")",
       "Bash(Get-ChildItem -Path \"e:\\\\bidjob\" -Recurse -Filter \"*nav*\" -Include \"*.tsx\", \"*.ts\")",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(node testsprite_tests/runner.js)"
+      "Bash(node testsprite_tests/runner.js)",
+      "Bash(node testsprite_tests/frontend_ui_tests.js)"
     ]
   }
 }

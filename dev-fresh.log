@@ -13,3 +13,204 @@
  POST /api/auth/login 200 in 319ms (next.js: 225ms, proxy.ts: 52ms, application-code: 41ms)
  POST /api/auth/logout 200 in 648ms (next.js: 479ms, proxy.ts: 157ms, application-code: 12ms)
  POST /api/auth/login 400 in 119ms (next.js: 57ms, proxy.ts: 54ms, application-code: 8ms)
+ GET / 200 in 3.6s (next.js: 278ms, proxy.ts: 1410ms, application-code: 1958ms)
+[browser] Image with src "/logo.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/logo.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET / 200 in 7.4s (next.js: 291ms, proxy.ts: 827ms, application-code: 6.3s)
+ GET /dashboard 200 in 7.8s (next.js: 162ms, proxy.ts: 4.3s, application-code: 3.3s)
+ GET /dashboard 200 in 2.8s (next.js: 504ms, proxy.ts: 487ms, application-code: 1844ms)
+[browser] Image with src "/logo.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+ GET / 200 in 7.7s (next.js: 255ms, proxy.ts: 1714ms, application-code: 5.7s)
+ GET /dashboard 200 in 2.0s (next.js: 160ms, proxy.ts: 464ms, application-code: 1395ms)
+ GET /dashboard 200 in 2.4s (next.js: 46ms, proxy.ts: 349ms, application-code: 2.0s)
+ GET /dashboard 200 in 2.8s (next.js: 288ms, proxy.ts: 412ms, application-code: 2.1s)
+ GET /dashboard 200 in 2.3s (next.js: 273ms, proxy.ts: 693ms, application-code: 1322ms)
+ GET /dashboard 200 in 2.9s (next.js: 300ms, proxy.ts: 727ms, application-code: 1917ms)
+ GET /dashboard 200 in 2.5s (next.js: 183ms, proxy.ts: 594ms, application-code: 1722ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+ GET /dashboard 200 in 2.3s (next.js: 409ms, proxy.ts: 755ms, application-code: 1122ms)
+ GET /dashboard 200 in 3.6s (next.js: 188ms, proxy.ts: 446ms, application-code: 3.0s)
+ GET /dashboard/seeker 200 in 8.3s (next.js: 165ms, proxy.ts: 243ms, application-code: 7.9s)
+ GET /dashboard/seeker 200 in 7.5s (next.js: 387ms, proxy.ts: 730ms, application-code: 6.4s)
+ GET /dashboard/seeker 200 in 9.7s (next.js: 314ms, proxy.ts: 731ms, application-code: 8.7s)
+⨯ ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  [90m38 |[0m     />
+  [90m39 |[0m
+[31m[1m>[0m [90m40 |[0m       {[90m/* Footer Branding Context */[0m}
+  [90m   |[0m       [31m[1m^[0m
+  [90m41 |[0m       <footer className=[32m"mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...[0m
+  [90m42 |[0m         <div className=[32m"flex items-center gap-4"[0m>
+  [90m43 |[0m           <div className=[32m"w-10 h-10 rounded-xl bg-surface-container-highest border border-...[0m
+
+Parsing ecmascript source code failed
+
+
+ GET /dashboard/seeker/profile 500 in 2.5s (next.js: 393ms, proxy.ts: 875ms, application-code: 1256ms)
+⨯ ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  [90m38 |[0m     />
+  [90m39 |[0m
+[31m[1m>[0m [90m40 |[0m       {[90m/* Footer Branding Context */[0m}
+  [90m   |[0m       [31m[1m^[0m
+  [90m41 |[0m       <footer className=[32m"mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...[0m
+  [90m42 |[0m         <div className=[32m"flex items-center gap-4"[0m>
+  [90m43 |[0m           <div className=[32m"w-10 h-10 rounded-xl bg-surface-container-highest border border-...[0m
+
+Parsing ecmascript source code failed
+
+
+ GET /dashboard/seeker/profile 500 in 545ms (next.js: 59ms, proxy.ts: 414ms, application-code: 72ms)
+[browser] Uncaught Error: ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed
+
+
+    at <unknown> (Error: ./app/dashboard/seeker/profile/page.tsx:40:7)
+    at <unknown> (Error: (./app/dashboard/seeker/profile/page.tsx:40:7)
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 
+ GET / 500 in 19.6s (next.js: 15.9s, proxy.ts: 3.7s, application-code: 24ms)
+ GET / 500 in 2.3s (next.js: 403ms, proxy.ts: 1780ms, application-code: 77ms)
+[browser] Uncaught Error: ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed
+
+
+    at <unknown> (Error: ./app/dashboard/seeker/profile/page.tsx:40:7)
+    at <unknown> (Error: (./app/dashboard/seeker/profile/page.tsx:40:7)
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 
+ GET / 500 in 790ms (next.js: 287ms, proxy.ts: 353ms, application-code: 149ms)
+[browser] Uncaught Error: ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed
+
+
+    at <unknown> (Error: ./app/dashboard/seeker/profile/page.tsx:40:7)
+    at <unknown> (Error: (./app/dashboard/seeker/profile/page.tsx:40:7)
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 
+ GET / 500 in 737ms (next.js: 99ms, proxy.ts: 513ms, application-code: 125ms)
+[browser] Uncaught Error: ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed
+
+
+    at <unknown> (Error: ./app/dashboard/seeker/profile/page.tsx:40:7)
+    at <unknown> (Error: (./app/dashboard/seeker/profile/page.tsx:40:7)
+[browser] ./app/dashboard/seeker/profile/page.tsx:40:7
+Expected ',', got '{'
+  38 |     />
+  39 |
+> 40 |       {/* Footer Branding Context */}
+     |       ^
+  41 |       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:f...
+  42 |         <div className="flex items-center gap-4">
+  43 |           <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-...
+
+Parsing ecmascript source code failed 

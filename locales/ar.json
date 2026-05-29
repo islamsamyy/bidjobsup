@@ -1419,9 +1419,9 @@
       "applicationStatus": "حالة الطلب"
     },
     "employerListings": {
-      "title": "قائمة الوظائف",
-      "subtitle": "إدارة إعلانات وظائفك النشطة",
-      "postNew": "نشر وظيفة جديدة",
+      "title": "نظام المواهب",
+      "subtitle": "نسق خط الإنتاج الإبداعي الخاص بك. راقب تدفقات العطاءات النشطة وصنف مجموعات المواهب وحسّن وصول الاستوديو الخاص بك.",
+      "postNew": "انشر دورًا جديدًا",
       "active": "نشط",
       "closed": "مغلق",
       "draft": "مسودة",
@@ -1429,7 +1429,20 @@
       "startPosting": "انشر وظيفتك الأولى للعثور على المواهب",
       "views": "المشاهدات",
       "applications": "الطلبات",
-      "status": "الحالة"
+      "status": "الحالة",
+      "noActive": "لا توجد مهام نشطة",
+      "pipelineDormant": "خط المواهب الخاص بك نائم حاليًا. ابدأ دورًا جديدًا للبدء.",
+      "beginRecruit": "بدء بروتوكول التجنيد",
+      "creativeSector": "قطاع إبداعي",
+      "propositions": "المقترحات",
+      "inspect": "فحص",
+      "closeJob": "إغلاق الوظيفة",
+      "deleteJob": "حذف الوظيفة",
+      "activeRoles": "الأدوار النشطة",
+      "engagementFactor": "عامل المشاركة",
+      "activeBids": "العطاءات النشطة",
+      "totalBudget": "إجمالي الميزانية المنشورة",
+      "allocated": "مخصص"
     },
     "employerPostJob": {
       "title": "نشر وظيفة جديدة",
@@ -1481,6 +1494,28 @@
       "newApplication": "طلب جديد",
       "bidSubmitted": "تم تقديم عطاء",
       "contractUpdate": "تحديث العقد"
+    },
+    "employerDashboard": {
+      "youHave": "لديك",
+      "candidateAwait": "مرشحين في انتظار المراجعة عبر مناصبك المفتوحة.",
+      "postFirstRole": "انشر وظيفتك الأولى لبدء جذب المواهب من الدرجة الأولى.",
+      "enterpriseProfile": "الملف الشركي",
+      "addCompany": "أضف",
+      "profileDetails": "تفاصيل ملف الشركة",
+      "toAttractTop": "لجذب أفضل 1% من المواهب.",
+      "profileFullyVerified": "ملفك الشركي موثق بالكامل ومحسّن.",
+      "activeListings": "الوظائف المفتوحة",
+      "totalApplicants": "إجمالي المرشحين",
+      "talentHired": "المواهب المعينة",
+      "totalRoles": "إجمالي الوظائف المنشورة",
+      "priorityAlerts": "التنبيهات ذات الأولوية",
+      "accelerateHiring": "تسريع التوظيف",
+      "postFirstRole": "انشر وظيفتك الأولى",
+      "deployMatching": "نشر المطابقة الدقيقة",
+      "createDetailedRole": "أنشئ وصف وظيفة مفصلاً وستساعدك منصتنا على العثور على المطابقة المثالية من قاعدة المواهب العالمية.",
+      "createSophisticated": "أنشئ متطلبات وظيفية متطورة للغاية، وسيقوم ذكاؤنا الاصطناعي بمصادرة أفضل 1% من المواهب المطابقة لاحتياجاتك المحددة.",
+      "postNewRole": "انشر وظيفة جديدة",
+      "browseTalent": "تصفح قائمة المواهب"
     },
     "skillsPage": {
       "title": "المهارات والتوصيات",

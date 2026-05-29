@@ -1421,9 +1421,9 @@
       "applicationStatus": "Application Status"
     },
     "employerListings": {
-      "title": "Job Listings",
-      "subtitle": "Manage your active job postings",
-      "postNew": "Post New Job",
+      "title": "Talent Ecosystem",
+      "subtitle": "Orchestrate your creative pipeline. Monitor active bid flows, curate talent clusters, and refine your studio's reach.",
+      "postNew": "Post New Role",
       "active": "Active",
       "closed": "Closed",
       "draft": "Draft",
@@ -1431,7 +1431,20 @@
       "startPosting": "Post your first job to find talent",
       "views": "Views",
       "applications": "Applications",
-      "status": "Status"
+      "status": "Status",
+      "noActive": "No active missions",
+      "pipelineDormant": "Your talent pipeline is currently dormant. Initiate a new role to begin engagement.",
+      "beginRecruit": "Begin Recruitment Protocol",
+      "creativeSector": "Creative Sector",
+      "propositions": "Propositions",
+      "inspect": "Inspect",
+      "closeJob": "Close Job",
+      "deleteJob": "Delete Job",
+      "activeRoles": "Active Roles",
+      "engagementFactor": "Engagement Factor",
+      "activeBids": "Active Bids",
+      "totalBudget": "Total Budget Deployed",
+      "allocated": "Allocated"
     },
     "employerPostJob": {
       "title": "Post a New Job",
@@ -1483,6 +1496,28 @@
       "newApplication": "New Application",
       "bidSubmitted": "Bid Submitted",
       "contractUpdate": "Contract Update"
+    },
+    "employerDashboard": {
+      "youHave": "You have",
+      "candidateAwait": "candidates awaiting review across your open positions.",
+      "postFirstRole": "Post your first role to start attracting world-class talent.",
+      "enterpriseProfile": "Enterprise Profile",
+      "addCompany": "Add your",
+      "profileDetails": "Company Profile details",
+      "toAttractTop": "to attract top 1% talent.",
+      "profileFullyVerified": "Your enterprise profile is fully verified and optimized.",
+      "activeListings": "Active Listings",
+      "totalApplicants": "Total Applicants",
+      "talentHired": "Talent Hired",
+      "totalRoles": "Total Roles Posted",
+      "priorityAlerts": "Priority Alerts",
+      "accelerateHiring": "Accelerate Hiring",
+      "postFirstRole": "Post Your First Role",
+      "deployMatching": "Deploy Precision Matching",
+      "createDetailedRole": "Create a detailed role description and our platform will help you find the perfect match from our global talent pool.",
+      "createSophisticated": "Create highly sophisticated role requirements, and our AI will passively source the top 1% of talent matching your specific needs.",
+      "postNewRole": "Post New Role",
+      "browseTalent": "Browse Talent Pool"
     },
     "skillsPage": {
       "title": "Skills & Endorsements",

@@ -80,6 +80,7 @@ export default function PublicHeader({
   // Which desktop dropdown is open
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   // Mobile drawer
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -133,6 +134,31 @@ export default function PublicHeader({
     closeTimer.current = setTimeout(() => setOpenMenu(null), 120);
   };
 
+  // Close dropdown on click outside or Escape key
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenMenu(null)
+      }
+    }
+
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpenMenu(null)
+      }
+    }
+
+    if (openMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleEscapeKey)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [openMenu])
+
   /* ─────────────────────────────────────────────────────────── */
   return (
     <>
@@ -145,7 +171,7 @@ export default function PublicHeader({
           </Link>
 
           {/* ── Desktop nav ── */}
-          <div className="hidden xl:flex items-center gap-1">
+          <div className="hidden xl:flex items-center gap-1" ref={dropdownRef}>
             {NAV.map((group) => {
               const isActive = group.items.some((i) => pathname === i.href || pathname.startsWith(i.href + "/"));
               return (

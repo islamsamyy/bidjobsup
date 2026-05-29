@@ -29,13 +29,14 @@ export default async function SeekerProfilePage() {
     : '—'
 
   return (
-    <ProfileClient
-      profile={profile}
-      avgRating={avgRating}
-      successRate={successRate}
-      totalBids={totalBids || 0}
-      acceptedBids={acceptedBids || 0}
-    />
+    <>
+      <ProfileClient
+        profile={profile}
+        avgRating={avgRating}
+        successRate={successRate}
+        totalBids={totalBids || 0}
+        acceptedBids={acceptedBids || 0}
+      />
 
       {/* Footer Branding Context */}
       <footer className="mt-20 pt-10 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-8 px-4 opacity-50 hover:opacity-100 transition-opacity duration-500">
@@ -52,6 +53,6 @@ export default async function SeekerProfilePage() {
           Your identity and profile data are encrypted and securely managed.
         </p>
       </footer>
-    </main>
+    </>
   )
 }

@@ -1505,7 +1505,15 @@
       "description": "Company Description",
       "logo": "Company Logo",
       "location": "Location",
-      "teamSize": "Team Size"
+      "teamSize": "Team Size",
+      "studioNarrative": "Studio Narrative",
+      "premiumTier": "Premium Tier Studio",
+      "globalOps": "Global Operations",
+      "studioRank": "Studio Rank",
+      "brandEquity": "Brand Equity",
+      "employerProtocol": "Employer Protocol",
+      "secureNode": "Secure Enterprise Node 4X.21",
+      "studioIdentity": "Your studio identity is public to prospective talent. Ensure your mission narrative aligns with global brand standards."
     },
     "employerTalent": {
       "title": "Talent Directory",
@@ -1515,7 +1523,11 @@
       "noResults": "No freelancers match your criteria",
       "viewProfile": "View Profile",
       "hiring": "Available for Hire",
-      "rate": "Hourly Rate"
+      "rate": "Hourly Rate",
+      "globalTalent": "Global Talent Registry",
+      "precisionMatch": "Precision-matched freelancers ready to power your next elite initiative.",
+      "availableForHire": "Available for Hire",
+      "hourlyRate": "Hourly Rate"
     },
     "employerBilling": {
       "title": "Billing & Payments",
@@ -1526,7 +1538,17 @@
       "noTransactions": "No transactions yet",
       "amount": "Amount",
       "date": "Date",
-      "status": "Status"
+      "status": "Status",
+      "billingCapital": "Billing & Capital",
+      "manageElite": "Manage your elite access to global talent pools. Monitor active subscription cycles and review historical investments in your team architecture.",
+      "activeSubscription": "Active Subscription",
+      "noActivePlan": "No Active Plan",
+      "protocolVerified": "Protocol Verified",
+      "noSubscription": "No Subscription",
+      "nextRenewal": "Next Renewal Cycle",
+      "cycleInvestment": "Cycle Investment",
+      "modifyProtocol": "Modify Protocol",
+      "pauseRenewal": "Pause Renewal"
     },
     "employerNotifications": {
       "title": "Notifications",

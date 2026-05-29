@@ -90,11 +90,11 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
       </motion.div>
 
       {/* Search Bar */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className="flex gap-4 relative z-10"
+        className="flex gap-4 relative z-10 flex-col lg:flex-row"
       >
         <div className="relative flex-1 group">
           <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-stone-500 group-focus-within:text-primary transition-colors">
@@ -111,6 +111,55 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
         <button className="bg-surface-container-high border border-outline-variant/30 text-on-surface px-8 rounded-2xl flex items-center gap-2 hover:bg-surface-container-highest transition-colors uppercase font-black text-xs tracking-widest shadow-lg">
           <Filter className="w-4 h-4" /> {t('dashboardPages.search.filters')}
         </button>
+      </motion.div>
+
+      {/* Filter Controls */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.4 }}
+        className="flex gap-4 flex-wrap z-10 items-center"
+      >
+        <select
+          value={experienceLevel}
+          onChange={(e) => setExperienceLevel(e.target.value)}
+          className="bg-surface-container-high/50 border border-outline-variant/20 text-on-surface rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-body text-sm"
+        >
+          <option value="">All Experience Levels</option>
+          <option value="junior">Junior</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="senior">Senior</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="bg-surface-container-high/50 border border-outline-variant/20 text-on-surface rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-body text-sm"
+        >
+          <option value="recent">Most Recent</option>
+          <option value="salary-high">Highest Salary</option>
+          <option value="salary-low">Lowest Salary</option>
+        </select>
+
+        {isLoadingFilters && (
+          <div className="flex items-center gap-2 text-on-surface-variant text-sm">
+            <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+            Loading...
+          </div>
+        )}
+
+        {(searchTerm || experienceLevel || sortOrder !== 'recent') && (
+          <button
+            onClick={() => {
+              setSearchTerm('')
+              setExperienceLevel('')
+              setSortOrder('recent')
+            }}
+            className="text-xs text-primary hover:text-primary/80 transition-colors font-bold uppercase tracking-widest"
+          >
+            Reset Filters
+          </button>
+        )}
       </motion.div>
 
       {/* Grid of Results */}

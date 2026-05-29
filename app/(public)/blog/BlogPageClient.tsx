@@ -18,10 +18,10 @@ function PlaceholderImage({
 }
 
 export default function BlogPageClient() {
-  const { t, isRtl } = useLanguage();
+  const { t, dir } = useLanguage();
 
   return (
-    <div className={`pb-20 ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className={`pb-20 ${dir === 'rtl' ? 'rtl' : 'ltr'}`} dir={dir}>
       {/* Featured Article Hero */}
       <section className="max-w-screen-2xl mx-auto px-8 mb-24 relative group cursor-pointer">
         <div className="relative h-[716px] w-full overflow-hidden rounded-xl shadow-2xl">
@@ -30,7 +30,7 @@ export default function BlogPageClient() {
             gradient="from-primary/40 via-secondary/20 to-tertiary/30"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-surface/90 to-transparent" />
-          <div className={`absolute bottom-0 ${isRtl ? 'right-0' : 'left-0'} p-12 w-full md:w-2/3`}>
+          <div className={`absolute bottom-0 ${dir === 'rtl' ? 'right-0' : 'left-0'} p-12 w-full md:w-2/3`}>
             <div className="flex gap-3 mb-6">
               <span className="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                 {t('blogPage.visionUpdates')}
@@ -64,7 +64,7 @@ export default function BlogPageClient() {
               <span className="text-primary hover:text-primary-dim transition-colors cursor-pointer font-bold flex items-center gap-2">
                 {t('blogPage.readFullEditorial')}
                 <svg
-                  className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 ${dir === 'rtl' ? 'rotate-180' : ''}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -114,7 +114,7 @@ export default function BlogPageClient() {
         <aside className="lg:w-1/3 flex flex-col gap-12">
           {/* Newsletter Signup */}
           <div className="bg-surface-container p-10 rounded-xl relative overflow-hidden border border-outline-variant/15">
-            <div className={`absolute top-0 ${isRtl ? 'left-0' : 'right-0'} p-4 opacity-10`}>
+            <div className={`absolute top-0 ${dir === 'rtl' ? 'left-0' : 'right-0'} p-4 opacity-10`}>
               <svg
                 className="w-20 h-20 text-primary"
                 fill="none"
@@ -179,7 +179,7 @@ export default function BlogPageClient() {
           </div>
 
           {/* Special Report */}
-          <div className={`bg-stone-950 p-8 rounded-xl border-y-4 ${isRtl ? 'border-r-4' : 'border-l-4'} border-transparent border-t-transparent border-b-transparent ${isRtl ? 'border-r-primary' : 'border-l-primary'}`}>
+          <div className={`bg-stone-950 p-8 rounded-xl border-y-4 ${dir === 'rtl' ? 'border-r-4' : 'border-l-4'} border-transparent border-t-transparent border-b-transparent ${dir === 'rtl' ? 'border-r-primary' : 'border-l-primary'}`}>
             <span className="text-[10px] text-primary font-bold uppercase tracking-widest mb-2 block">
               {t('blogPage.specialReport')}
             </span>
@@ -210,7 +210,7 @@ export default function BlogPageClient() {
       <section className="max-w-screen-2xl mx-auto px-8 mt-20 flex justify-center">
         <div className="flex items-center gap-2">
           <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors">
-            <svg className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className={`w-4 h-4 ${dir === 'rtl' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
@@ -230,7 +230,7 @@ export default function BlogPageClient() {
             12
           </button>
           <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-stone-800 text-stone-500 hover:border-primary hover:text-primary transition-colors">
-            <svg className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className={`w-4 h-4 ${dir === 'rtl' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>

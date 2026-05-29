@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useLanguage } from '@/app/providers/LanguageProvider';
 
 export default function JoinPageClient() {
-  const { t, isRtl } = useLanguage();
+  const { t, dir } = useLanguage();
 
   return (
-    <div className={`px-6 pt-12 pb-20 overflow-hidden ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className={`px-6 pt-12 pb-20 overflow-hidden ${dir === 'rtl' ? 'rtl' : 'ltr'}`} dir={dir}>
       <div className="fixed top-[20%] right-[-10%] w-[500px] h-[500px] bg-[#caa2f7]/5 rounded-full blur-[120px] pointer-events-none -z-10" />
       <div className="fixed bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-[#613471]/5 rounded-full blur-[100px] pointer-events-none -z-10" />
 
@@ -41,8 +41,8 @@ export default function JoinPageClient() {
             <p className="text-[#b0a9ad] leading-relaxed font-light mb-auto">
               {t('joinPage.freelancerDesc')}
             </p>
-            <div className={`mt-10 flex items-center gap-3 text-[#caa2f7] font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform ${isRtl ? 'translate-x-[10px]' : 'translate-x-[-10px]'} group-hover:translate-x-0`}>
-              {t('joinPage.secureOpp')} <span className="material-symbols-outlined text-sm">{isRtl ? 'arrow_back' : 'arrow_forward'}</span>
+            <div className={`mt-10 flex items-center gap-3 text-[#caa2f7] font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform ${dir === 'rtl' ? 'translate-x-[10px]' : 'translate-x-[-10px]'} group-hover:translate-x-0`}>
+              {t('joinPage.secureOpp')} <span className="material-symbols-outlined text-sm">{dir === 'rtl' ? 'arrow_back' : 'arrow_forward'}</span>
             </div>
           </Link>
 
@@ -59,8 +59,8 @@ export default function JoinPageClient() {
             <p className="text-[#b0a9ad] leading-relaxed font-light mb-auto">
               {t('joinPage.companyDesc')}
             </p>
-            <div className={`mt-10 flex items-center gap-3 text-[#caa2f7] font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform ${isRtl ? 'translate-x-[10px]' : 'translate-x-[-10px]'} group-hover:translate-x-0`}>
-              {t('joinPage.recruitExc')} <span className="material-symbols-outlined text-sm">{isRtl ? 'arrow_back' : 'arrow_forward'}</span>
+            <div className={`mt-10 flex items-center gap-3 text-[#caa2f7] font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform ${dir === 'rtl' ? 'translate-x-[10px]' : 'translate-x-[-10px]'} group-hover:translate-x-0`}>
+              {t('joinPage.recruitExc')} <span className="material-symbols-outlined text-sm">{dir === 'rtl' ? 'arrow_back' : 'arrow_forward'}</span>
             </div>
           </Link>
         </div>
@@ -68,7 +68,7 @@ export default function JoinPageClient() {
         <div className="flex flex-col items-center gap-8">
           <p className="text-[#b0a9ad] text-sm font-light tracking-wide">
             {t('joinPage.alreadyPart')}{' '}
-            <Link className={`text-[#caa2f7] font-black hover:text-white transition-colors ${isRtl ? 'mr-2' : 'ml-2'} underline underline-offset-8 decoration-[#caa2f7]/30 uppercase tracking-widest`} href="/sign-in">
+            <Link className={`text-[#caa2f7] font-black hover:text-white transition-colors ${dir === 'rtl' ? 'mr-2' : 'ml-2'} underline underline-offset-8 decoration-[#caa2f7]/30 uppercase tracking-widest`} href="/sign-in">
               {t('joinPage.signInHere')}
             </Link>
           </p>

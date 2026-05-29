@@ -29,10 +29,10 @@ export default function JobsBrowseClient({
   industries: any[]
   jobs: any[] | null
 }) {
-  const { t, isRtl } = useLanguage();
+  const { t, dir } = useLanguage();
 
   return (
-    <main className={`max-w-screen-2xl mx-auto px-8 pt-12 pb-32 ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <main className={`max-w-screen-2xl mx-auto px-8 pt-12 pb-32 ${dir === 'rtl' ? 'rtl' : 'ltr'}`} dir={dir}>
       {/* Hero & Search Section */}
       <section className="mb-24 relative overflow-hidden py-16">
         <div className="absolute -top-40 -left-20 w-96 h-96 bg-[#caa2f7]/5 rounded-full blur-[120px] pointer-events-none"></div>
@@ -118,7 +118,7 @@ export default function JobsBrowseClient({
           </div>
           <Link href="/jobs" className="text-[#caa2f7] hover:text-[#faf1f5] transition-colors flex items-center gap-3 text-xs font-black uppercase tracking-widest group">
             {t('jobsBrowsePage.allSectors')} 
-            <span className={`material-symbols-outlined text-sm transition-transform ${isRtl ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>{isRtl ? 'arrow_back' : 'arrow_forward'}</span>
+            <span className={`material-symbols-outlined text-sm transition-transform ${dir === 'rtl' ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>{dir === 'rtl' ? 'arrow_back' : 'arrow_forward'}</span>
           </Link>
         </div>
         
@@ -142,7 +142,7 @@ export default function JobsBrowseClient({
                 <h3 className="font-headline text-3xl font-bold mb-3 tracking-tight">{ind.name}</h3>
                 <div className="flex items-center justify-between mt-auto">
                   <span className="text-[10px] font-black uppercase tracking-widest text-[#4b474a]">{ind.count} {t('jobsBrowsePage.activeRoles')}</span>
-                  <span className={`material-symbols-outlined text-[#caa2f7] opacity-0 group-hover:opacity-100 transition-all ${isRtl ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>north_east</span>
+                  <span className={`material-symbols-outlined text-[#caa2f7] opacity-0 group-hover:opacity-100 transition-all ${dir === 'rtl' ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>north_east</span>
                 </div>
               </div>
             </Link>
@@ -200,7 +200,7 @@ export default function JobsBrowseClient({
 
       {/* Global Context */}
       <section className="bg-gradient-to-br from-[#1c181c] to-[#100d10] rounded-[3rem] p-20 relative overflow-hidden border border-[#292428] shadow-2xl">
-        <div className={`absolute ${isRtl ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 w-1/2 h-full opacity-[0.03] pointer-events-none transform ${isRtl ? '-translate-x-32' : 'translate-x-32'} group`}>
+        <div className={`absolute ${dir === 'rtl' ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 w-1/2 h-full opacity-[0.03] pointer-events-none transform ${dir === 'rtl' ? '-translate-x-32' : 'translate-x-32'} group`}>
           <span className="material-symbols-outlined text-[35rem] text-[#caa2f7]">apartment</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-20 relative z-10 text-center md:text-left">

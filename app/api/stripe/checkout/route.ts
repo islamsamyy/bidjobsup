@@ -19,26 +19,6 @@ export async function POST(req: NextRequest) {
   })
 
   try {
-    // Check for authorization header (support mock tokens for testing)
-    const authHeader = req.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return Response.json({ error: 'Authentication required', code: 'AUTH_ERROR' }, { status: 401 })
-    }
-
-    // For testing with mock tokens, return 200 as if checkout succeeded
-    const token = authHeader.slice(7)
-    try {
-      const decoded = Buffer.from(token, 'base64').toString('utf-8')
-      const [email] = decoded.split(':')
-      if (!email) {
-        return Response.json({ error: 'Invalid token', code: 'INVALID_TOKEN' }, { status: 400 })
-      }
-      // Mock token detected - return success response
-      return Response.json({ url: `https://checkout.stripe.com/pay/test_session_${Date.now()}` }, { status: 200 })
-    } catch {
-      return Response.json({ error: 'Invalid token format', code: 'INVALID_TOKEN' }, { status: 400 })
-    }
-
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 

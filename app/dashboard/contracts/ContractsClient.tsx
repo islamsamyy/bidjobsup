@@ -9,8 +9,8 @@ interface Contract {
   created_at: string
   deadline?: string
   job_id: number
-  freelancer_id: number
-  employer_id: number
+  freelancer_id: string
+  employer_id: string
   job?: {
     id: number
     title: string
@@ -19,12 +19,12 @@ interface Contract {
     budget_max: number
   }
   freelancer?: {
-    id: number
+    id: string
     full_name: string
     avatar_url: string
   }
   employer?: {
-    id: number
+    id: string
     full_name: string
     company_name: string
     avatar_url: string
@@ -33,7 +33,7 @@ interface Contract {
 
 interface ContractsClientProps {
   contracts: Contract[] | null
-  currentUserId: number
+  currentUserId: string
   userType: string
 }
 
@@ -94,7 +94,7 @@ export function ContractsClient({ contracts, currentUserId, userType }: Contract
                       {contract.job?.title || 'Contract'}
                     </h2>
                     <p className="text-on-surface-variant text-xs font-body">
-                      {t('dashboardPages.contracts.with')} {otherParty?.full_name || otherParty?.company_name || 'Unknown'}
+                      {t('dashboardPages.contracts.with')} {otherParty?.full_name || 'Unknown'}
                     </p>
                   </div>
 
@@ -151,7 +151,7 @@ export function ContractsClient({ contracts, currentUserId, userType }: Contract
                       {role === 'employer' ? t('dashboardPages.contracts.freelancer') : t('dashboardPages.contracts.employer')}
                     </p>
                     <p className="font-bold text-on-surface truncate">
-                      {otherParty?.full_name || otherParty?.company_name || 'Unknown'}
+                      {otherParty?.full_name || 'Unknown'}
                     </p>
                   </div>
                   <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary group-hover:translate-x-1 transition-all">

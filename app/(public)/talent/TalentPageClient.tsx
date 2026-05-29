@@ -17,10 +17,10 @@ export default function TalentPageClient({
   error: any
   INDUSTRIES: string[]
 }) {
-  const { t, isRtl } = useLanguage();
+  const { t, dir } = useLanguage();
 
   return (
-    <div className={`bg-[#100d10] text-[#faf1f5] font-body min-h-screen flex flex-col selection:bg-[#caa2f7] selection:text-[#431f6b] ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className={`bg-[#100d10] text-[#faf1f5] font-body min-h-screen flex flex-col selection:bg-[#caa2f7] selection:text-[#431f6b] ${dir === 'rtl' ? 'rtl' : 'ltr'}`} dir={dir}>
       {/* Search Header */}
       <section className="pt-40 pb-20 px-8 relative overflow-hidden border-b border-[#292428]/30">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-[#caa2f7]/5 rounded-full blur-[120px] pointer-events-none" />
@@ -39,13 +39,13 @@ export default function TalentPageClient({
           {/* Search Bar */}
           <form action="/talent" method="GET" className="max-w-3xl mx-auto bg-[#1c181c] p-2 rounded-2xl border border-[#292428] shadow-2xl flex flex-col md:flex-row gap-2">
             <div className="flex-grow relative">
-              <span className={`material-symbols-outlined absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#4b474a]`}>search</span>
+              <span className={`material-symbols-outlined absolute ${dir === 'rtl' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[#4b474a]`}>search</span>
               <input
                 type="text"
                 name="query"
                 placeholder={t('talentPage.searchPlaceholder')}
                 defaultValue={query}
-                className={`w-full bg-transparent border-none focus:ring-0 text-sm font-light ${isRtl ? 'pr-12' : 'pl-12'} h-14 placeholder:text-[#4b474a]`}
+                className={`w-full bg-transparent border-none focus:ring-0 text-sm font-light ${dir === 'rtl' ? 'pr-12' : 'pl-12'} h-14 placeholder:text-[#4b474a]`}
               />
             </div>
             <div className="h-14 w-px bg-[#292428] hidden md:block" />

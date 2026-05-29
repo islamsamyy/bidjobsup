@@ -20,7 +20,7 @@ export default async function ContractsPage() {
   return (
     <ContractsClient
       contracts={contracts}
-      currentUserId={currentUser?.id || 0}
+      currentUserId={currentUser?.id || ''}
       userType={currentUser?.user_type || 'jobseeker'}
     />
   )

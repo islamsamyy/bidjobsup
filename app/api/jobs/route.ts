@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
       {
         success: true,
         data: paginated,
-        total: filtered.length,
+        total: jobs.length,
         count: paginated.length,
         limit,
         offset,

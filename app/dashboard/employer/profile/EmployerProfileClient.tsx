@@ -4,10 +4,10 @@ import { useLanguage } from '@/app/providers/LanguageProvider'
 import ProfileForm from '../../seeker/profile/ProfileForm'
 
 interface Profile {
-  id: number
+  id: string
   full_name: string | null
   avatar_url: string | null
-  location: string | null
+  location?: string | null
 }
 
 interface EmployerProfileClientProps {

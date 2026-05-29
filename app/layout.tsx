@@ -31,6 +31,10 @@ export const metadata: Metadata = {
   description:
     "A premium job marketplace connecting employers with world-class freelancers. Post jobs, submit bids, and build your professional reputation.",
   keywords: ["jobs", "freelance", "bidding", "marketplace", "talent", "hiring"],
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

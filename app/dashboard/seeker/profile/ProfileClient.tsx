@@ -4,12 +4,12 @@ import { useLanguage } from '@/app/providers/LanguageProvider'
 import ProfileForm from './ProfileForm'
 
 interface Profile {
-  id: number
+  id: string
   full_name: string | null
   avatar_url: string | null
-  experience_level: string | null
-  location: string | null
-  verified: boolean
+  experience_level?: string | null
+  location?: string | null
+  verified?: boolean
 }
 
 interface ProfileClientProps {

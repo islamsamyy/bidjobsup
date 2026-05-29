@@ -15,5 +15,5 @@ export default async function NotificationsPage() {
     .eq('user_id', profile?.id)
     .order('created_at', { ascending: false })
 
-  return <NotificationsClient notifications={notifications} profileId={profile?.id || 0} />
+  return <NotificationsClient notifications={notifications} profileId={profile?.id || ''} />
 }

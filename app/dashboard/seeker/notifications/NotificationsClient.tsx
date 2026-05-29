@@ -14,7 +14,7 @@ interface Notification {
 
 interface NotificationsClientProps {
   notifications: Notification[] | null
-  profileId: number
+  profileId: string
 }
 
 export function NotificationsClient({ notifications, profileId }: NotificationsClientProps) {
@@ -64,13 +64,14 @@ export function NotificationsClient({ notifications, profileId }: NotificationsC
           {notifications.map((notif) => (
             <form
               key={notif.id}
-              action={markNotificationAsRead.bind(null, notif.id)}
+              action={markNotificationAsRead}
               className={`p-6 rounded-2xl border transition-all cursor-pointer ${
                 notif.read_at
                   ? 'bg-surface-container border-outline-variant/10'
                   : 'bg-primary/5 border-primary/30 hover:border-primary/50'
               }`}
             >
+              <input type="hidden" name="notificationId" value={notif.id} />
               <div className="flex gap-4 items-start">
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${

@@ -28,6 +28,10 @@ export default async function SeekerProfilePage() {
     ? Math.round(((acceptedBids || 0) / (totalBids || 1)) * 100) + '%'
     : '—'
 
+  if (!profile) {
+    return <div>Loading...</div>
+  }
+
   return (
     <>
       <ProfileClient

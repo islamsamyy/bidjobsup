@@ -61,7 +61,9 @@
     "showMore": "عرض المزيد",
     "showLess": "عرض أقل",
     "tryAgain": "حاول مرة أخرى",
-    "refresh": "تحديث"
+    "refresh": "تحديث",
+    "level": "المستوى",
+    "verified": "موثق"
   },
   "header": {
     "hireTalent": "توظيف الموهوبين",
@@ -1271,6 +1273,7 @@
       "title": "ملفي الشخصي",
       "editProfile": "تحرير الملف الشخصي",
       "successRate": "معدل النجاح",
+      "avgRating": "متوسط التقييم",
       "totalBids": "إجمالي العطاءات",
       "acceptedBids": "العطاءات المقبولة",
       "rating": "التقييم",
@@ -1279,6 +1282,8 @@
       "experience": "الخبرة",
       "portfolio": "المحفظة",
       "completeYourName": "أكمل اسمك",
+      "setExperienceLevel": "حدد مستوى الخبرة",
+      "setLocation": "حدد الموقع",
       "profileCompletion": "اكتمال الملف الشخصي"
     },
     "savedJobs": {

@@ -61,7 +61,9 @@
     "showMore": "Show More",
     "showLess": "Show Less",
     "tryAgain": "Try Again",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "level": "Level",
+    "verified": "Verified"
   },
   "header": {
     "hireTalent": "Hire Talent",
@@ -1271,6 +1273,7 @@
       "title": "My Profile",
       "editProfile": "Edit Profile",
       "successRate": "Success Rate",
+      "avgRating": "Avg Rating",
       "totalBids": "Total Bids",
       "acceptedBids": "Accepted Bids",
       "rating": "Rating",
@@ -1279,6 +1282,8 @@
       "experience": "Experience",
       "portfolio": "Portfolio",
       "completeYourName": "Complete Your Name",
+      "setExperienceLevel": "Set Experience Level",
+      "setLocation": "Set Location",
       "profileCompletion": "Profile Completion"
     },
     "savedJobs": {

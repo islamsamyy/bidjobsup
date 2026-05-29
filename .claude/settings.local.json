@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npx tsc:*)",
-      "Bash(curl -s -o /dev/null -w \"Pricing Page: %{http_code}\\\\n\" http://localhost:3000/pricing)"
+      "Bash(curl -s -o /dev/null -w \"Pricing Page: %{http_code}\\\\n\" http://localhost:3000/pricing)",
+      "Bash(grep -E \"\\\\.tsx?$\")"
     ]
   }
 }

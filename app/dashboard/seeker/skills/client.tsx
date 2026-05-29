@@ -107,18 +107,18 @@ export default function SkillsClient({
         className="w-full bg-primary text-on-primary px-6 py-4 rounded-lg font-semibold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
       >
         <span className="material-symbols-outlined">add</span>
-        Add New Skill
+        {t('dashboardPages.skillsPage.addNewSkill')}
       </button>
 
       {/* Add Skill Form */}
       {showAddForm && (
         <div className="glass border border-outline-variant/15 rounded-xl p-8 space-y-6">
-          <h3 className="text-xl font-semibold text-on-surface">Add a New Skill</h3>
+          <h3 className="text-xl font-semibold text-on-surface">{t('dashboardPages.skillsPage.addNewSkill')}</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">
-                Skill Name
+                {t('dashboardPages.skillsPage.skillName')}
               </label>
               <input
                 type="text"
@@ -129,10 +129,10 @@ export default function SkillsClient({
 
             <div>
               <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">
-                Category
+                {t('dashboardPages.skillsPage.category')}
               </label>
               <select className="input-inset w-full">
-                <option value="">Select a category</option>
+                <option value="">{t('dashboardPages.skillsPage.selectCategory')}</option>
                 {categories.map(cat => (
                   <option key={cat.id} value={cat.name}>
                     {cat.name}
@@ -143,33 +143,33 @@ export default function SkillsClient({
 
             <div>
               <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">
-                Proficiency Level
+                {t('dashboardPages.skillsPage.proficiencyLevel')}
               </label>
               <select className="input-inset w-full">
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-                <option value="expert">Expert</option>
+                <option value="beginner">{t('dashboardPages.skillsPage.beginner')}</option>
+                <option value="intermediate">{t('dashboardPages.skillsPage.intermediate')}</option>
+                <option value="advanced">{t('dashboardPages.skillsPage.advanced')}</option>
+                <option value="expert">{t('dashboardPages.skillsPage.expert')}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-2">
                 <input type="checkbox" className="mr-2" />
-                Featured Skill
+                {t('dashboardPages.skillsPage.featuredSkill')}
               </label>
             </div>
           </div>
 
           <div className="flex gap-3">
             <button className="bg-primary text-on-primary px-6 py-3 rounded-lg font-semibold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity">
-              Add Skill
+              {t('dashboardPages.skillsPage.addSkill')}
             </button>
             <button
               onClick={() => setShowAddForm(false)}
               className="bg-surface-container hover:bg-surface-bright text-on-surface px-6 py-3 rounded-lg font-semibold uppercase tracking-widest text-sm transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function SkillsClient({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Category Filter */}
           <div>
-            <p className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-3">Filter by Category</p>
+            <p className="text-xs uppercase tracking-widest text-on-surface-variant font-semibold mb-3">{t('dashboardPages.skillsPage.filterByCategory')}</p>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setFilterCategory(null)}
@@ -190,7 +190,7 @@ export default function SkillsClient({
                     : 'bg-surface-container hover:bg-surface-bright text-on-surface'
                 }`}
               >
-                All
+                {t('common.all')}
               </button>
               {categories.map(cat => (
                 <button

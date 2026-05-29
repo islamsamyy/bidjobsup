@@ -1437,6 +1437,7 @@
       "addNewSkill": "Add New Skill",
       "skillName": "Skill Name",
       "category": "Category",
+      "selectCategory": "Select a category",
       "proficiencyLevel": "Proficiency Level",
       "featuredSkill": "Featured Skill",
       "addSkill": "Add Skill",

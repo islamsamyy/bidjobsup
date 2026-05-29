@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Briefcase, Filter, ArrowRight, DollarSign, Clock, MapPin, Send } from 'lucide-react'
 import { submitBid } from '@/lib/actions/bids'
@@ -10,7 +10,11 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
   const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedJob, setSelectedJob] = useState<any | null>(null)
-  
+  const [experienceLevel, setExperienceLevel] = useState('')
+  const [sortOrder, setSortOrder] = useState('recent')
+  const [isLoadingFilters, setIsLoadingFilters] = useState(false)
+  const [filteredJobs, setFilteredJobs] = useState(initialJobs)
+
   // Apply logic state
   const [proposal, setProposal] = useState('')
   const [amount, setAmount] = useState<number>(0)
@@ -18,11 +22,37 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set())
-  
-  const filteredJobs = initialJobs.filter(job => 
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    job.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+
+  // Fetch filtered jobs from backend
+  useEffect(() => {
+    const fetchFilteredJobs = async () => {
+      setIsLoadingFilters(true)
+      try {
+        const params = new URLSearchParams()
+        if (searchTerm) params.append('search', searchTerm)
+        if (experienceLevel) params.append('experience_level', experienceLevel)
+        params.append('sort', sortOrder)
+
+        const res = await fetch(`/api/jobs?${params.toString()}`)
+        const data = await res.json()
+
+        if (data.success && Array.isArray(data.data)) {
+          setFilteredJobs(data.data)
+        } else {
+          setFilteredJobs([])
+        }
+      } catch (err) {
+        console.error('Failed to fetch filtered jobs:', err)
+        setFilteredJobs([])
+      } finally {
+        setIsLoadingFilters(false)
+      }
+    }
+
+    // Debounce search (only call after 500ms of inactivity)
+    const timeout = setTimeout(fetchFilteredJobs, 500)
+    return () => clearTimeout(timeout)
+  }, [searchTerm, experienceLevel, sortOrder])
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -21,6 +21,18 @@ export async function submitBid(
     .eq('id', Number(jobId))
     .single()
 
+  // Check if user has already applied to this job
+  const { data: existingBid, error: checkError } = await supabase!
+    .from('bids')
+    .select('id')
+    .eq('job_id', Number(jobId))
+    .eq('bidder_id', profile?.id)
+    .single()
+
+  if (existingBid) {
+    return { error: 'You have already applied to this job' }
+  }
+
   const { data, error } = await supabase!
     .from('bids')
     .insert([{

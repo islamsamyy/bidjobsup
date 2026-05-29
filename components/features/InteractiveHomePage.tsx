@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useLanguage } from '@/app/providers/LanguageProvider'
 
 interface InteractiveHomePageProps {
@@ -208,41 +209,13 @@ export function InteractiveHomePage({ handleSearch }: InteractiveHomePageProps) 
 
             {/* BidJobs Logo SVG Container */}
             <div className="relative z-10 flex flex-col items-center justify-center gap-12">
-              <svg
-                className="animate-float animate-glow w-64 h-64"
-                viewBox="0 0 240 240"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Palm Leaves */}
-                <path d="M120 20 Q130 50 125 80" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.8"/>
-                <path d="M120 20 Q110 50 115 80" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.8"/>
-                <path d="M120 20 Q145 45 160 70" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.7"/>
-                <path d="M120 20 Q95 45 80 70" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.7"/>
-                <path d="M120 20 Q155 55 170 95" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.6"/>
-                <path d="M120 20 Q85 55 70 95" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.6"/>
-                <path d="M120 20 Q160 70 160 120" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.5"/>
-                <path d="M120 20 Q80 70 80 120" stroke="#caa2f7" strokeWidth="8" strokeLinecap="round" opacity="0.5"/>
-
-                {/* Building */}
-                <rect x="90" y="100" width="60" height="80" fill="#caa2f7" opacity="0.9"/>
-                <rect x="95" y="105" width="50" height="70" fill="#100d10"/>
-
-                {/* Windows */}
-                {[0, 1, 2].map((row) => (
-                  [0, 1, 2, 3].map((col) => (
-                    <rect
-                      key={`window-${row}-${col}`}
-                      x={97 + col * 12}
-                      y={107 + row * 18}
-                      width="10"
-                      height="10"
-                      fill="#caa2f7"
-                      opacity="0.6"
-                    />
-                  ))
-                ))}
-              </svg>
+              <Image
+                src="/logo.png"
+                alt="BidJobs Logo"
+                width={240}
+                height={240}
+                className="animate-float animate-glow w-64 h-auto object-contain"
+              />
 
               <div className="text-center max-w-md">
                 <h3 className="text-3xl font-headline font-bold text-[#caa2f7] mb-2">BidJobs Platform</h3>

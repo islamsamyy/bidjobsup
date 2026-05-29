@@ -12,7 +12,7 @@ export default async function EmployerDashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { profile, user } = await getAuthUserAs('employer')
+  const { profile, user: authUser } = await getAuthUserAs('employer')
 
   return (
     <div className="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
@@ -59,7 +59,7 @@ export default async function EmployerDashboardLayout({
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            <NotificationBell userId={Number(profile?.id)} userAuthId={user?.id!} userType={profile?.user_type!} />
+            <NotificationBell userId={Number(profile?.id)} userAuthId={authUser?.id!} userType={profile?.user_type!} />
             <Link href="/dashboard/settings" className="p-2 text-on-surface-variant hover:text-on-surface transition-colors">
               <span className="material-symbols-outlined">settings</span>
             </Link>
@@ -69,7 +69,7 @@ export default async function EmployerDashboardLayout({
                   <img src={profile?.avatar_url as string} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                 ) : (
                   <div className="w-full h-full rounded-full flex items-center justify-center text-secondary font-bold bg-surface-container-lowest">
-                    {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'C'}
+                    {profile?.full_name?.charAt(0) || authUser?.email?.charAt(0) || 'C'}
                   </div>
                 )}
               </div>

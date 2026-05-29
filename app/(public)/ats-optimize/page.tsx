@@ -4,9 +4,11 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { analyzeCV } from "@/lib/actions/ats";
+import { useLanguage } from "@/app/providers/LanguageProvider";
 
 export default function ATSOptimizePage() {
   const router = useRouter();
+  const { t, isRtl } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cvText, setCvText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -155,7 +157,7 @@ export default function ATSOptimizePage() {
   };
 
   return (
-    <main className="min-h-screen pt-28 pb-20 px-5 md:px-10 lg:px-14">
+    <main className={`min-h-screen pt-28 pb-20 px-5 md:px-10 lg:px-14 ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-12">
@@ -164,13 +166,11 @@ export default function ATSOptimizePage() {
               verified_user
             </span>
             <h1 className="text-4xl md:text-5xl font-bold text-on-surface">
-              ATS Optimizer
+              {t('atsOptimizePage.title')}
             </h1>
           </div>
           <p className="text-on-surface-variant text-lg max-w-2xl">
-            Optimize your CV for Applicant Tracking Systems. Get a detailed
-            analysis and recommendations to improve your chances of passing ATS
-            filters and getting noticed by employers.
+            {t('atsOptimizePage.subtitle')}
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export default function ATSOptimizePage() {
               <span className="material-symbols-outlined text-primary">
                 description
               </span>
-              Your CV/Resume
+              {t('atsOptimizePage.yourCv')}
             </h2>
 
             {/* Tab Switcher */}
@@ -199,7 +199,7 @@ export default function ATSOptimizePage() {
                 <span className="material-symbols-outlined text-sm">
                   upload_file
                 </span>
-                Upload PDF
+                {t('atsOptimizePage.uploadPdf')}
               </button>
               <button
                 type="button"
@@ -213,7 +213,7 @@ export default function ATSOptimizePage() {
                 <span className="material-symbols-outlined text-sm">
                   content_paste
                 </span>
-                Paste Text
+                {t('atsOptimizePage.pasteText')}
               </button>
             </div>
 
@@ -241,10 +241,10 @@ export default function ATSOptimizePage() {
                   cloud_upload
                 </span>
                 <p className="text-on-surface font-semibold mb-1">
-                  Drag and drop your PDF or text file
+                  {t('atsOptimizePage.dragDrop')}
                 </p>
                 <p className="text-on-surface-variant text-sm">
-                  or click to browse (max 5MB)
+                  {t('atsOptimizePage.orClick')}
                 </p>
                 <input
                   ref={fileInputRef}
@@ -266,7 +266,7 @@ export default function ATSOptimizePage() {
                       />
                     </div>
                     <p className="text-xs text-on-surface-variant mt-2">
-                      Processing... {uploadProgress}%
+                      {t('atsOptimizePage.processing')} {uploadProgress}%
                     </p>
                   </div>
                 )}
@@ -276,7 +276,7 @@ export default function ATSOptimizePage() {
                       <span className="material-symbols-outlined text-sm">
                         check_circle
                       </span>
-                      File loaded successfully ({cvText.length} characters)
+                      {t('atsOptimizePage.fileLoaded')} ({cvText.length} {t('atsOptimizePage.characters')})
                     </p>
                   </div>
                 )}
@@ -285,12 +285,12 @@ export default function ATSOptimizePage() {
               <textarea
                 value={cvText}
                 onChange={(e) => setCvText(e.target.value)}
-                placeholder="Paste your CV/Resume text here..."
+                placeholder={t('atsOptimizePage.pasteCv')}
                 className="w-full h-64 p-4 bg-surface-container-lowest border border-outline-variant/20 rounded-lg text-on-surface placeholder-on-surface-variant/50 focus:ring-2 focus:ring-primary/50 focus:border-transparent outline-none resize-none"
               />
             )}
             <p className="text-xs text-on-surface-variant mt-3">
-              {cvText.length} characters
+              {cvText.length} {t('atsOptimizePage.characters')}
             </p>
           </div>
 
@@ -300,17 +300,17 @@ export default function ATSOptimizePage() {
               <span className="material-symbols-outlined text-secondary">
                 work
               </span>
-              Target Job Description
+              {t('atsOptimizePage.targetJob')}
             </h2>
 
             <textarea
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
-              placeholder="Paste the job description you're applying for..."
+              placeholder={t('atsOptimizePage.pasteJob')}
               className="w-full h-48 p-4 bg-surface-container-lowest border border-outline-variant/20 rounded-lg text-on-surface placeholder-on-surface-variant/50 focus:ring-2 focus:ring-secondary/50 focus:border-transparent outline-none resize-none"
             />
             <p className="text-xs text-on-surface-variant mt-3">
-              {jobDescription.length} characters
+              {jobDescription.length} {t('atsOptimizePage.characters')}
             </p>
           </div>
 
@@ -321,7 +321,7 @@ export default function ATSOptimizePage() {
                 error
               </span>
               <div>
-                <p className="font-semibold">Error</p>
+                <p className="font-semibold">{t('atsOptimizePage.error')}</p>
                 <p className="text-sm mt-1">{error}</p>
               </div>
             </div>
@@ -339,14 +339,14 @@ export default function ATSOptimizePage() {
                   <span className="material-symbols-outlined animate-spin">
                     hourglass_top
                   </span>
-                  Analyzing...
+                  {t('atsOptimizePage.analyzing')}
                 </>
               ) : (
                 <>
                   <span className="material-symbols-outlined">
                     analytics
                   </span>
-                  Analyze CV for ATS
+                  {t('atsOptimizePage.analyzeCv')}
                 </>
               )}
             </button>
@@ -355,21 +355,21 @@ export default function ATSOptimizePage() {
               className="flex-1 bg-secondary/20 border border-secondary/30 text-secondary font-bold py-4 px-6 rounded-xl hover:bg-secondary/30 transition-all flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined">edit</span>
-              Use CV Editor
+              {t('atsOptimizePage.useCvEditor')}
             </Link>
             <Link
               href="/"
               className="flex-1 bg-surface-container border border-outline-variant/20 text-on-surface font-bold py-4 px-6 rounded-xl hover:bg-surface-container-high transition-all flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined">home</span>
-              Back to Home
+              {t('atsOptimizePage.backToHome')}
             </Link>
           </div>
         </form>
 
         {/* Additional Features */}
         <div className="mt-12 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl border border-primary/20 p-8 mb-12">
-          <h2 className="text-2xl font-bold text-on-surface mb-6">More Features</h2>
+          <h2 className="text-2xl font-bold text-on-surface mb-6">{t('atsOptimizePage.moreFeatures')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/ats-optimize/editor"
@@ -378,9 +378,9 @@ export default function ATSOptimizePage() {
               <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
                 <span className="material-symbols-outlined text-primary">edit</span>
               </div>
-              <h3 className="font-bold text-on-surface mb-1">CV Editor</h3>
+              <h3 className="font-bold text-on-surface mb-1">{t('atsOptimizePage.cvEditor')}</h3>
               <p className="text-xs text-on-surface-variant">
-                Edit your CV and see live ATS score updates
+                {t('atsOptimizePage.cvEditorDesc')}
               </p>
             </Link>
 
@@ -393,9 +393,9 @@ export default function ATSOptimizePage() {
                   batch_prediction
                 </span>
               </div>
-              <h3 className="font-bold text-on-surface mb-1">Batch Analyzer</h3>
+              <h3 className="font-bold text-on-surface mb-1">{t('atsOptimizePage.batchAnalyzer')}</h3>
               <p className="text-xs text-on-surface-variant">
-                Compare one CV against multiple jobs or vice versa
+                {t('atsOptimizePage.batchAnalyzerDesc')}
               </p>
             </Link>
 
@@ -408,9 +408,9 @@ export default function ATSOptimizePage() {
                   history
                 </span>
               </div>
-              <h3 className="font-bold text-on-surface mb-1">View History</h3>
+              <h3 className="font-bold text-on-surface mb-1">{t('atsOptimizePage.viewHistory')}</h3>
               <p className="text-xs text-on-surface-variant">
-                Track your ATS improvement over time with analytics
+                {t('atsOptimizePage.viewHistoryDesc')}
               </p>
             </Link>
           </div>
@@ -425,11 +425,10 @@ export default function ATSOptimizePage() {
                   check_circle
                 </span>
               </div>
-              <h3 className="font-bold text-on-surface">Quick Analysis</h3>
+              <h3 className="font-bold text-on-surface">{t('atsOptimizePage.quickAnalysis')}</h3>
             </div>
             <p className="text-sm text-on-surface-variant">
-              Get instant feedback on your CV compatibility with the job
-              description in seconds.
+              {t('atsOptimizePage.quickAnalysisDesc')}
             </p>
           </div>
 
@@ -440,11 +439,10 @@ export default function ATSOptimizePage() {
                   trending_up
                 </span>
               </div>
-              <h3 className="font-bold text-on-surface">Detailed Score</h3>
+              <h3 className="font-bold text-on-surface">{t('atsOptimizePage.detailedScore')}</h3>
             </div>
             <p className="text-sm text-on-surface-variant">
-              See your match percentage and get specific insights on missing
-              keywords and skills.
+              {t('atsOptimizePage.detailedScoreDesc')}
             </p>
           </div>
 
@@ -455,11 +453,10 @@ export default function ATSOptimizePage() {
                   lightbulb
                 </span>
               </div>
-              <h3 className="font-bold text-on-surface">Smart Tips</h3>
+              <h3 className="font-bold text-on-surface">{t('atsOptimizePage.smartTips')}</h3>
             </div>
             <p className="text-sm text-on-surface-variant">
-              Get actionable recommendations to optimize your CV and improve
-              your chances.
+              {t('atsOptimizePage.smartTipsDesc')}
             </p>
           </div>
         </div>

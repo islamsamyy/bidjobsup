@@ -74,6 +74,8 @@ export default function CreateProfileForm({ initialMessage, defaultUserType = 'j
     formData.append('fullName', data.fullName)
     formData.append('phone', data.phone || '')
     formData.append('userType', data.userType)
+    // Explicitly send tos as 'true' boolean string, not HTML checkbox 'on'
+    formData.append('tos', data.tos === true ? 'true' : 'false')
 
     startTransition(async () => {
       signup(formData)

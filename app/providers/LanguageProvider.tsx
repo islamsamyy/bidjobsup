@@ -22,22 +22,27 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem('language') as Locale | null;
-    if (saved && locales.includes(saved)) {
-      setLocaleState(saved);
-    }
+    const newLocale = (saved && locales.includes(saved)) ? saved : defaultLocale;
+    setLocaleState(newLocale);
+    document.documentElement.lang = newLocale;
+    document.documentElement.dir = newLocale === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.style.direction = newLocale === 'ar' ? 'rtl' : 'ltr';
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     document.documentElement.lang = locale;
     document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
-  }, [locale]);
+    document.documentElement.style.direction = locale === 'ar' ? 'rtl' : 'ltr';
+  }, [locale, mounted]);
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);
     localStorage.setItem('language', newLocale);
     document.documentElement.lang = newLocale;
     document.documentElement.dir = newLocale === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.style.direction = newLocale === 'ar' ? 'rtl' : 'ltr';
   };
 
   const dir = locale === 'ar' ? 'rtl' : 'ltr';

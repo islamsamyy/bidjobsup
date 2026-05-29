@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { submitContactForm } from '@/lib/actions/contact'
+import { useLanguage } from '@/app/providers/LanguageProvider'
 
 export default function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const { t, dir } = useLanguage()
 
   async function handleSubmit(formData: FormData) {
     setStatus('sending')
@@ -20,18 +22,17 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen pb-24 px-6 md:px-12 lg:px-24">
+    <div dir={dir} className="min-h-screen pb-24 px-6 md:px-12 lg:px-24">
       <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
         {/* Left Side: Contact Information */}
         <div className="space-y-12">
           <header className="space-y-4">
             <h1 className="text-5xl md:text-6xl font-headline font-bold text-on-background tracking-tight leading-tight">
-              Connect with <span className="text-primary italic">Concierge</span>
+              {t('contactPage.connectWith')}{' '}
+              <span className="text-primary italic">{t('contactPage.concierge')}</span>
             </h1>
             <p className="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light">
-              Our elite support team is here to assist with your studio inquiries,
-              talent sourcing, and high-stakes bidding. Experience the Neon Nocturne
-              with seamless assistance.
+              {t('contactPage.heroDesc')}
             </p>
           </header>
 
@@ -45,11 +46,11 @@ export default function ContactPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-headline text-xl text-on-surface mb-1">Riyadh HQ</h3>
+                <h3 className="font-headline text-xl text-on-surface mb-1">{t('contactPage.locationTitle')}</h3>
                 <p className="text-on-surface-variant font-light">
-                  Kingdom Centre Tower, Floor 42
+                  {t('contactPage.locationAddress1')}
                   <br />
-                  Al Olaya, Riyadh, Saudi Arabia
+                  {t('contactPage.locationAddress2')}
                 </p>
               </div>
             </div>
@@ -62,7 +63,7 @@ export default function ContactPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-headline text-xl text-on-surface mb-1">Direct Inquiries</h3>
+                <h3 className="font-headline text-xl text-on-surface mb-1">{t('contactPage.emailTitle')}</h3>
                 <p className="text-on-surface-variant font-light">concierge@bidjobs.vision</p>
                 <p className="text-on-surface-variant font-light">talent@bidjobs.vision</p>
               </div>
@@ -76,9 +77,9 @@ export default function ContactPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-headline text-xl text-on-surface mb-1">Hours of Operation</h3>
-                <p className="text-on-surface-variant font-light">24/7 Digital Concierge Access</p>
-                <p className="text-on-surface-variant font-light">Live Support: 9:00 AM - 6:00 PM AST</p>
+                <h3 className="font-headline text-xl text-on-surface mb-1">{t('contactPage.hoursTitle')}</h3>
+                <p className="text-on-surface-variant font-light">{t('contactPage.hours247')}</p>
+                <p className="text-on-surface-variant font-light">{t('contactPage.hoursLive')}</p>
               </div>
             </div>
           </div>
@@ -86,18 +87,12 @@ export default function ContactPage() {
           {/* Social Links */}
           <div className="pt-8 border-t border-white/5 max-w-sm">
             <p className="text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-6 font-semibold">
-              Follow the Vision
+              {t('contactPage.followVision')}
             </p>
             <div className="flex space-x-8">
-              <span className="text-neutral-500 hover:text-primary transition-colors duration-300 cursor-default">
-                LinkedIn
-              </span>
-              <span className="text-neutral-500 hover:text-primary transition-colors duration-300 cursor-default">
-                Instagram
-              </span>
-              <span className="text-neutral-500 hover:text-primary transition-colors duration-300 cursor-default">
-                X (Twitter)
-              </span>
+              <span className="text-neutral-500 hover:text-primary transition-colors duration-300 cursor-default">LinkedIn</span>
+              <span className="text-neutral-500 hover:text-primary transition-colors duration-300 cursor-default">Instagram</span>
+              <span className="text-neutral-500 hover:text-primary transition-colors duration-300 cursor-default">X (Twitter)</span>
             </div>
           </div>
 
@@ -109,7 +104,7 @@ export default function ContactPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
               </svg>
-              <span className="text-sm font-body text-on-surface">View on Map</span>
+              <span className="text-sm font-body text-on-surface">{t('contactPage.viewOnMap')}</span>
             </div>
           </div>
         </div>
@@ -121,114 +116,91 @@ export default function ContactPage() {
               <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
                 <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
               </div>
-              <h3 className="font-headline text-2xl font-bold text-on-surface">Message Dispatched</h3>
-              <p className="text-on-surface-variant">Our concierge team will respond within 24 hours.</p>
+              <h3 className="font-headline text-2xl font-bold text-on-surface">{t('contactPage.messageDispatched')}</h3>
+              <p className="text-on-surface-variant">{t('contactPage.conciergeResponse')}</p>
               <button
                 onClick={() => setStatus('idle')}
                 className="mt-6 px-8 py-3 border border-primary/30 text-primary rounded-lg hover:bg-primary/10 transition-all font-bold text-sm"
               >
-                Send Another Message
+                {t('contactPage.sendAnother')}
               </button>
             </div>
           ) : (
-          <form action={handleSubmit} className="space-y-8">
-            {errorMsg && (
-              <div className="bg-error-container/20 border border-error/30 text-error px-5 py-3 rounded-lg text-sm">
-                {errorMsg}
+            <form action={handleSubmit} className="space-y-8">
+              {errorMsg && (
+                <div className="bg-error-container/20 border border-error/30 text-error px-5 py-3 rounded-lg text-sm">
+                  {errorMsg}
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold" htmlFor="name">
+                    {t('contactPage.fullNameLabel')}
+                  </label>
+                  <input
+                    className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface placeholder:text-neutral-700 focus:ring-1 focus:ring-primary/50 transition-all font-body"
+                    id="name" name="name" placeholder="Elias Vance" type="text" required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold" htmlFor="email">
+                    {t('contactPage.emailLabel')}
+                  </label>
+                  <input
+                    className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface placeholder:text-neutral-700 focus:ring-1 focus:ring-primary/50 transition-all font-body"
+                    id="email" name="email" placeholder="elias@studio.co" type="email" required
+                  />
+                </div>
               </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
               <div className="space-y-2">
-                <label
-                  className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
-                  htmlFor="name"
-                >
-                  Full Name
+                <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold" htmlFor="subject">
+                  {t('contactPage.subjectLabel')}
                 </label>
-                <input
-                  className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface placeholder:text-neutral-700 focus:ring-1 focus:ring-primary/50 transition-all font-body"
-                  id="name"
-                  name="name"
-                  placeholder="Elias Vance"
-                  type="text"
-                  required
+                <select
+                  className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 appearance-none transition-all font-body"
+                  id="subject" name="subject"
+                >
+                  <option>{t('contactPage.subjectPartnerships')}</option>
+                  <option>{t('contactPage.subjectVerification')}</option>
+                  <option>{t('contactPage.subjectBrief')}</option>
+                  <option>{t('contactPage.subjectSupport')}</option>
+                  <option>{t('contactPage.subjectPress')}</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold" htmlFor="message">
+                  {t('contactPage.messageLabel')}
+                </label>
+                <textarea
+                  className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface placeholder:text-neutral-700 focus:ring-1 focus:ring-primary/50 transition-all font-body resize-none"
+                  id="message" name="message"
+                  placeholder={t('contactPage.messagePlaceholder')}
+                  rows={6} required
                 />
               </div>
-              <div className="space-y-2">
-                <label
-                  className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
-                  htmlFor="email"
+
+              <div className="pt-4">
+                <button
+                  className="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-xl py-5 rounded-lg shadow-lg shadow-purple-900/20 hover:shadow-purple-900/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 disabled:opacity-50"
+                  type="submit"
+                  disabled={status === 'sending'}
                 >
-                  Email Address
-                </label>
-                <input
-                  className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface placeholder:text-neutral-700 focus:ring-1 focus:ring-primary/50 transition-all font-body"
-                  id="email"
-                  name="email"
-                  placeholder="elias@studio.co"
-                  type="email"
-                  required
-                />
+                  {status === 'sending' ? t('contactPage.dispatching') : t('contactPage.dispatch')}
+                </button>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <label
-                className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
-                htmlFor="subject"
-              >
-                Subject of Inquiry
-              </label>
-              <select
-                className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 appearance-none transition-all font-body"
-                id="subject"
-                name="subject"
-              >
-                <option>Studio Partnerships</option>
-                <option>Talent Verification</option>
-                <option>Brief Management</option>
-                <option>Technical Support</option>
-                <option>Press &amp; Media</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label
-                className="block text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
-                htmlFor="message"
-              >
-                Your Message
-              </label>
-              <textarea
-                className="w-full bg-surface-container-lowest border-0 rounded-lg py-4 px-5 text-on-surface placeholder:text-neutral-700 focus:ring-1 focus:ring-primary/50 transition-all font-body resize-none"
-                id="message"
-                name="message"
-                placeholder="How can we elevate your experience?"
-                rows={6}
-                required
-              />
-            </div>
-
-            <div className="pt-4">
-              <button
-                className="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-xl py-5 rounded-lg shadow-lg shadow-purple-900/20 hover:shadow-purple-900/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 disabled:opacity-50"
-                type="submit"
-                disabled={status === 'sending'}
-              >
-                {status === 'sending' ? 'Dispatching...' : 'Dispatch Message'}
-              </button>
-            </div>
-
-            <div className="flex items-center justify-center space-x-3 text-on-surface-variant/60">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-              </svg>
-              <p className="text-xs font-body">Your data is secured with AES-256 encryption.</p>
-            </div>
-          </form>
+              <div className="flex items-center justify-center space-x-3 text-on-surface-variant/60">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                <p className="text-xs font-body">{t('contactPage.encrypted')}</p>
+              </div>
+            </form>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }

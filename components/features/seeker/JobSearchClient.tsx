@@ -4,8 +4,10 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Briefcase, Filter, ArrowRight, DollarSign, Clock, MapPin, Send } from 'lucide-react'
 import { submitBid } from '@/lib/actions/bids'
+import { useLanguage } from '@/app/providers/LanguageProvider'
 
 export default function JobSearchClient({ initialJobs }: { initialJobs: any[] }) {
+  const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedJob, setSelectedJob] = useState<any | null>(null)
   
@@ -15,6 +17,7 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
   const [deliveryDays, setDeliveryDays] = useState<number>(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set())
   
   const filteredJobs = initialJobs.filter(job => 
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -31,6 +34,7 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
     setIsSubmitting(false)
     if (res.success) {
       setMessage({ type: 'success', text: "Mission Proposition Dispatched. Await Handshake Protocol." })
+      setAppliedJobs(prev => new Set([...prev, selectedJob.id]))
       // Clear proposal but keep context for a bit
       setTimeout(() => setSelectedJob(null), 3000)
     } else {
@@ -48,10 +52,10 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
         className="relative z-10"
       >
         <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter text-on-background mb-4 glow-text-subtle">
-          Discover <span className="text-primary">Missions.</span>
+          {t('dashboardPages.search.title')} <span className="text-primary">Missions.</span>
         </h1>
         <p className="text-on-surface-variant max-w-xl font-body text-sm md:text-base leading-relaxed">
-          Access high-end projects matching your aesthetic and technical prowess. Dive into the grid to find your next major engagement.
+          {t('dashboardPages.search.subtitle')}
         </p>
       </motion.div>
 
@@ -66,16 +70,16 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
           <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-stone-500 group-focus-within:text-primary transition-colors">
             <Search className="w-5 h-5" />
           </div>
-          <input 
-            type="text" 
-            placeholder="Search by keyword, category, or technical stack..."
+          <input
+            type="text"
+            placeholder={t('dashboardPages.search.discoverMissions')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-surface-container-high/50 border border-outline-variant/20 text-on-surface rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-body backdrop-blur-xl"
           />
         </div>
         <button className="bg-surface-container-high border border-outline-variant/30 text-on-surface px-8 rounded-2xl flex items-center gap-2 hover:bg-surface-container-highest transition-colors uppercase font-black text-xs tracking-widest shadow-lg">
-          <Filter className="w-4 h-4" /> Filters
+          <Filter className="w-4 h-4" /> {t('dashboardPages.search.filters')}
         </button>
       </motion.div>
 
@@ -94,7 +98,7 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
       >
         <AnimatePresence>
           {filteredJobs.length === 0 ? (
-            <motion.div 
+            <motion.div
               key="empty"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -104,8 +108,18 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
               <div className="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mx-auto mb-6 border border-outline-variant/20 shadow-2xl">
                 <Briefcase className="w-10 h-10 text-stone-600" />
               </div>
-              <h3 className="text-2xl font-headline font-bold text-on-surface italic">No missions found</h3>
-              <p className="text-on-surface-variant text-sm mt-2">Try adjusting your search parameters in the grid.</p>
+              <h3 className="text-2xl font-headline font-bold text-on-surface italic">{t('dashboardPages.search.noMissionsFound')}</h3>
+              <p className="text-on-surface-variant text-sm mt-2">
+                {searchTerm ? 'Try adjusting your search parameters or clear the search to see all available missions.' : 'No missions available at this time.'}
+              </p>
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="mt-6 text-primary hover:text-primary/80 font-semibold text-sm transition-colors"
+                >
+                  Clear search
+                </button>
+              )}
             </motion.div>
           ) : (
             filteredJobs.map((job) => (
@@ -221,14 +235,28 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
                   Initiate Engagement
                 </h3>
 
+                {appliedJobs.has(selectedJob.id) && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-8 p-6 rounded-2xl border bg-amber-500/10 border-amber-500/20 text-amber-600 flex items-center gap-4"
+                  >
+                    <span className="material-symbols-outlined">info</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed">
+                      You have already applied to this mission
+                    </p>
+                  </motion.div>
+                )}
+
                 {message && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
                     className={`mb-8 p-6 rounded-2xl border flex items-center gap-4 ${
-                      message.type === 'success' 
-                        ? 'bg-primary/10 border-primary/20 text-primary shadow-[0_0_20px_rgba(202,162,247,0.1)]' 
+                      message.type === 'success'
+                        ? 'bg-primary/10 border-primary/20 text-primary shadow-[0_0_20px_rgba(202,162,247,0.1)]'
                         : 'bg-red-500/10 border-red-500/20 text-red-500'
                     }`}
                   >
@@ -239,7 +267,7 @@ export default function JobSearchClient({ initialJobs }: { initialJobs: any[] })
                   </motion.div>
                 )}
 
-                <form onSubmit={handleApply} className="space-y-6">
+                <form onSubmit={handleApply} className="space-y-6" style={{ opacity: appliedJobs.has(selectedJob.id) ? 0.5 : 1, pointerEvents: appliedJobs.has(selectedJob.id) ? 'none' : 'auto' }}>
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-stone-400">Bid Amount ($)</label>
                     <input 

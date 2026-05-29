@@ -41,6 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      dir="ltr"
       suppressHydrationWarning
       className={cn("h-full", notoSerif.variable, plusJakarta.variable, "font-sans", geist.variable)}
     >

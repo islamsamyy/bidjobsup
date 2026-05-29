@@ -1,0 +1,40 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "tests": [
+    {
+      "name": "Home page loads",
+      "path": "/",
+      "expectText": "BidJobs"
+    },
+    {
+      "name": "Sign-up page loads",
+      "path": "/sign-up",
+      "expectText": "Create Your Account"
+    },
+    {
+      "name": "Sign-in page loads",
+      "path": "/sign-in",
+      "expectText": "Sign In"
+    },
+    {
+      "name": "Pricing page loads",
+      "path": "/pricing",
+      "expectText": "Plans"
+    },
+    {
+      "name": "Jobs browse page loads",
+      "path": "/jobs/browse",
+      "expectText": "Jobs"
+    },
+    {
+      "name": "Talent directory loads",
+      "path": "/talent",
+      "expectText": "Talent"
+    },
+    {
+      "name": "Settings page loads (authenticated)",
+      "path": "/dashboard/settings",
+      "expectText": "Account Settings"
+    }
+  ]
+}

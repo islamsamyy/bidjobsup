@@ -92,7 +92,7 @@ export function DashboardClient({
             </span>
           </div>
           <div className="font-headline text-4xl font-bold mb-1">{activeAppsCount || 0}</div>
-          <div className="text-sm font-body text-on-surface-variant">
+          <div className="text-sm font-body text-on-surface-variant text-right">
             {t('dashboardPages.seekerDashboard.activeApplications')}
           </div>
         </div>
@@ -105,7 +105,7 @@ export function DashboardClient({
             </span>
           </div>
           <div className="font-headline text-4xl font-bold mb-1">{avgRating || '—'}</div>
-          <div className="text-sm font-body text-on-surface-variant">
+          <div className="text-sm font-body text-on-surface-variant text-right">
             {t('dashboardPages.seekerDashboard.averageRating')} {reviewsCount > 0 ? `(${reviewsCount})` : ''}
           </div>
         </div>
@@ -127,7 +127,7 @@ export function DashboardClient({
             )}
           </div>
           <div className="font-headline text-4xl font-bold mb-1">{successRate}</div>
-          <div className="text-sm font-body text-on-surface-variant">
+          <div className="text-sm font-body text-on-surface-variant text-right">
             {t('dashboardPages.seekerDashboard.bidSuccessRate')}
           </div>
         </div>
@@ -140,7 +140,7 @@ export function DashboardClient({
             </span>
           </div>
           <div className="font-headline text-4xl font-bold mb-1">{savedJobsCount || 0}</div>
-          <div className="text-sm font-body text-on-surface-variant">
+          <div className="text-sm font-body text-on-surface-variant text-right">
             {t('dashboardPages.seekerDashboard.savedJobs')}
           </div>
         </div>
@@ -149,7 +149,7 @@ export function DashboardClient({
       {/* Analytics Charts */}
       {analyticsData && (
         <div>
-          <h2 className="text-3xl font-bold text-on-surface mb-8">
+          <h2 className="text-3xl font-bold text-on-surface mb-8 text-right">
             {t('dashboardPages.seekerDashboard.analyticsInsights')}
           </h2>
           <AnalyticsCharts

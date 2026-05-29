@@ -1412,7 +1412,11 @@
       "analyticsInsights": "التحليلات والرؤى",
       "excellent": "ممتاز",
       "good": "جيد",
-      "building": "في بناء"
+      "building": "في بناء",
+      "applicationsOverTime": "الطلبات على مدار الوقت (آخر 7 أيام)",
+      "applications": "طلبات",
+      "jobsByCategory": "الوظائف حسب الفئة",
+      "applicationStatus": "حالة الطلب"
     },
     "employerListings": {
       "title": "قائمة الوظائف",

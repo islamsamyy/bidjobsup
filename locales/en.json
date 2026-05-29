@@ -63,7 +63,9 @@
     "tryAgain": "Try Again",
     "refresh": "Refresh",
     "level": "Level",
-    "verified": "Verified"
+    "verified": "Verified",
+    "total": "Total",
+    "accepted": "Accepted"
   },
   "header": {
     "hireTalent": "Hire Talent",
@@ -1412,7 +1414,11 @@
       "analyticsInsights": "Analytics & Insights",
       "excellent": "EXCELLENT",
       "good": "GOOD",
-      "building": "BUILDING"
+      "building": "BUILDING",
+      "applicationsOverTime": "Applications Over Time (Last 7 Days)",
+      "applications": "applications",
+      "jobsByCategory": "Jobs by Category",
+      "applicationStatus": "Application Status"
     },
     "employerListings": {
       "title": "Job Listings",

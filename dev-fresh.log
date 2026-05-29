@@ -9,3 +9,7 @@
 ✓ Ready in 733ms
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
 
+ POST /api/auth/login 404 in 2.5s (next.js: 586ms, proxy.ts: 241ms, application-code: 1714ms)
+ POST /api/auth/login 200 in 319ms (next.js: 225ms, proxy.ts: 52ms, application-code: 41ms)
+ POST /api/auth/logout 200 in 648ms (next.js: 479ms, proxy.ts: 157ms, application-code: 12ms)
+ POST /api/auth/login 400 in 119ms (next.js: 57ms, proxy.ts: 54ms, application-code: 8ms)

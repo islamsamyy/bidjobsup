@@ -40,8 +40,8 @@ export async function POST(req: NextRequest) {
 
       const subscriptionId = session.subscription as string
       const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-      const priceId = subscription.items.data[0]?.price.id
-      const planName = PLAN_NAMES[priceId] || 'Unknown Plan'
+      const priceId = subscription.items.data[0]?.price?.id
+      const planName = priceId ? PLAN_NAMES[priceId] || 'Unknown Plan' : 'Unknown Plan'
 
       await supabase
         .from('users')
@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
       const supabaseUid = subscription.metadata?.supabase_uid
       if (!supabaseUid) break
 
-      const priceId = subscription.items.data[0]?.price.id
-      const planName = PLAN_NAMES[priceId] || 'Unknown Plan'
+      const priceId = subscription.items.data[0]?.price?.id
+      const planName = priceId ? PLAN_NAMES[priceId] || 'Unknown Plan' : 'Unknown Plan'
       const status = subscription.status
 
       await supabase

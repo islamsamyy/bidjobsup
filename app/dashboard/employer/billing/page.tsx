@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import StripeCheckoutButton from '@/components/features/StripeCheckoutButton'
 import StripeBillingPortalButton from '@/components/features/StripeBillingPortalButton'
+import DownloadLedgerButton from './DownloadLedgerButton'
 
 async function getStripeSubscription(stripeCustomerId: string | null) {
   if (!stripeCustomerId || !process.env.STRIPE_SECRET_KEY) return null
@@ -178,25 +179,36 @@ export default async function EmployerBillingPage() {
         {/* Payment Methods */}
         <section className="col-span-12 lg:col-span-5 bg-surface-container-low rounded-[3rem] p-12 border border-outline-variant/10 shadow-2xl flex flex-col justify-between">
            <div className="space-y-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-500 mb-6">Master Payment method</p>
-              <div className="p-8 rounded-3xl bg-surface-container-highest border border-outline-variant/20 flex items-center justify-between group hover:border-secondary transition-all">
-                <div className="flex items-center gap-6">
-                  <div className="w-14 h-9 bg-black rounded border border-white/10 flex items-center justify-center font-black italic text-[10px] text-stone-400">VISA</div>
-                  <div>
-                    <p className="text-sm font-bold text-on-surface uppercase tracking-tight">Corporate Amex •••• 9902</p>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">Exp 12 / 2026</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-500 mb-6">Payment Method</p>
+              {subscription ? (
+                <div className="p-8 rounded-3xl bg-surface-container-highest border border-outline-variant/20 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>credit_card</span>
+                    <p className="text-sm font-bold text-on-surface">Managed via Stripe</p>
                   </div>
+                  <p className="text-[10px] text-stone-500 leading-relaxed font-bold uppercase tracking-widest">
+                    Your payment method is securely stored by Stripe. Use the portal below to update card details or billing information.
+                  </p>
+                  <StripeBillingPortalButton
+                    label="Manage Payment Method"
+                    className="w-full mt-4 bg-secondary/10 border border-secondary/30 text-secondary px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-secondary/20 transition-all disabled:opacity-50"
+                  />
                 </div>
-                <button className="material-symbols-outlined text-stone-500 hover:text-secondary transition-colors">edit</button>
-              </div>
+              ) : (
+                <div className="p-8 rounded-3xl bg-surface-container-highest border border-dashed border-outline-variant/30 flex flex-col items-center text-center gap-4">
+                  <span className="material-symbols-outlined text-4xl text-stone-600">credit_card_off</span>
+                  <p className="text-sm text-stone-400 font-bold">No payment method on file</p>
+                  <p className="text-[10px] text-stone-600 uppercase tracking-widest font-bold">Subscribe to a plan to add a payment method</p>
+                </div>
+              )}
            </div>
-           
+
            <div className="mt-12 p-8 rounded-3xl bg-primary/5 border border-primary/10 space-y-4">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>lock</span>
-                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Biometric Security Enabled</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">256-bit SSL Encryption</p>
               </div>
-              <p className="text-[9px] text-stone-500 leading-relaxed font-bold uppercase tracking-widest">Transactions are finalized via encrypted neural link and verified across the global node network.</p>
+              <p className="text-[9px] text-stone-500 leading-relaxed font-bold uppercase tracking-widest">All payment data is processed and secured by Stripe. BidJobs never stores your card details.</p>
            </div>
         </section>
       </div>
@@ -205,7 +217,7 @@ export default async function EmployerBillingPage() {
       <section className="mb-24">
         <div className="flex justify-between items-end mb-12">
            <h3 className="text-4xl font-headline font-black italic text-on-surface">Invoice History</h3>
-           <button className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary hover:underline underline-offset-8">Download Protocol Ledger</button>
+           <DownloadLedgerButton invoices={invoices} />
         </div>
 
         <div className="bg-surface-container rounded-[3rem] overflow-hidden border border-outline-variant/10">

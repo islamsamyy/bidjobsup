@@ -13,6 +13,9 @@ interface EmployerDashboardClientProps {
   totalJobsPosted: number
   isProfileComplete: boolean
   analyticsData: any
+  hasFirstJob?: boolean
+  hasFirstHire?: boolean
+  hasSubscription?: boolean
 }
 
 export function EmployerDashboardClient({
@@ -24,8 +27,45 @@ export function EmployerDashboardClient({
   totalJobsPosted,
   isProfileComplete,
   analyticsData,
+  hasFirstJob = false,
+  hasFirstHire = false,
+  hasSubscription = false,
 }: EmployerDashboardClientProps) {
   const { t } = useLanguage()
+
+  const onboardingSteps = [
+    {
+      done: isProfileComplete,
+      icon: 'corporate_fare',
+      label: 'Complete company profile',
+      sub: 'Add bio, logo, and company details',
+      href: '/dashboard/employer/profile',
+    },
+    {
+      done: hasFirstJob,
+      icon: 'work',
+      label: 'Post your first role',
+      sub: 'List a job and start receiving bids',
+      href: '/dashboard/employer/post-job',
+    },
+    {
+      done: hasFirstHire,
+      icon: 'handshake',
+      label: 'Hire your first talent',
+      sub: 'Accept a bid and create a contract',
+      href: '/dashboard/contracts',
+    },
+    {
+      done: hasSubscription,
+      icon: 'workspace_premium',
+      label: 'Upgrade to Enterprise',
+      sub: 'Unlock unlimited posts, analytics & priority support',
+      href: '/dashboard/employer/billing',
+    },
+  ]
+
+  const doneCount = onboardingSteps.filter(s => s.done).length
+  const allDone = doneCount === onboardingSteps.length
 
   return (
     <>
@@ -143,6 +183,76 @@ export function EmployerDashboardClient({
           </div>
         </div>
       </div>
+
+      {/* Onboarding Checklist */}
+      {!allDone && (
+        <div className="bg-surface-container rounded-2xl border border-outline-variant/10 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-black tracking-[0.25em] uppercase text-secondary mb-1">Getting Started</p>
+              <h3 className="text-lg font-bold text-on-surface">Your launch checklist</h3>
+            </div>
+            <span className="text-sm font-bold text-on-surface-variant">{doneCount}/{onboardingSteps.length}</span>
+          </div>
+          <div className="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-secondary to-primary h-full rounded-full transition-all duration-700"
+              style={{ width: `${(doneCount / onboardingSteps.length) * 100}%` }}
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {onboardingSteps.map((step) => (
+              <Link
+                key={step.label}
+                href={step.done ? '#' : step.href}
+                className={`flex items-start gap-3 p-4 rounded-xl border transition-all duration-200 ${
+                  step.done
+                    ? 'border-secondary/20 bg-secondary/5 cursor-default'
+                    : 'border-outline-variant/20 hover:border-secondary/30 hover:bg-white/3'
+                }`}
+              >
+                <div className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                  step.done ? 'bg-secondary text-on-secondary' : 'bg-surface-container-highest text-on-surface-variant'
+                }`}>
+                  {step.done
+                    ? <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>check</span>
+                    : <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{step.icon}</span>
+                  }
+                </div>
+                <div className="min-w-0">
+                  <p className={`text-sm font-semibold ${step.done ? 'text-on-surface-variant line-through' : 'text-on-surface'}`}>
+                    {step.label}
+                  </p>
+                  <p className="text-xs text-on-surface-variant mt-0.5">{step.sub}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Talent Pool Discovery Banner */}
+      {totalJobsPosted === 0 && (
+        <div className="relative overflow-hidden rounded-2xl border border-secondary/20 bg-gradient-to-br from-secondary/10 via-surface-container to-primary/5 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-secondary/15 border border-secondary/25 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-secondary text-2xl">groups</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-black tracking-[0.25em] uppercase text-secondary mb-1">Ready to hire?</p>
+            <h3 className="font-bold text-on-surface">500+ verified talents are waiting</h3>
+            <p className="text-sm text-on-surface-variant mt-0.5">
+              Post a role in 2 minutes and start receiving bids from top-tier candidates.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/employer/post-job"
+            className="shrink-0 px-5 py-2.5 rounded-xl bg-secondary text-on-secondary text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap"
+          >
+            Post a Role
+          </Link>
+          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-secondary/5 rounded-full pointer-events-none" />
+        </div>
+      )}
 
       {/* Analytics Charts */}
       {analyticsData && (

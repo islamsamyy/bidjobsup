@@ -33,7 +33,10 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'File exceeds 10MB limit' }, { status: 400 })
     }
 
-    const ext = file.name.split('.').pop()
+    const ext = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin'
+    if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx'].includes(ext)) {
+      return Response.json({ error: 'File extension not permitted' }, { status: 400 })
+    }
     const fileName = `${user.id}/${Date.now()}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
 

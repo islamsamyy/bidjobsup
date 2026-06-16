@@ -1,7 +1,9 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { getAuthUser } from '@/lib/supabase/get-user'
 import { toActionError } from '@/lib/errors'
+import { sendContractCreatedEmail, sendContractCompletedEmail } from '@/lib/email'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -190,12 +192,46 @@ export async function updateContractStatus(
     if (!contract) return { success: false, error: 'Contract not found' }
     if (!isParticipant(contract, user?.id)) return { success: false, error: 'Unauthorized' }
 
+    const updates: Record<string, string> = { status, updated_at: new Date().toISOString() }
+    if (status === 'completed') updates.completed_at = new Date().toISOString()
+
     const { error } = await supabase!
       .from('contracts')
-      .update({ status, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq('id', contractId)
 
     if (error) return { success: false, error: error.message }
+
+    // Fire emails to both parties on key status transitions
+    if (status === 'active' || status === 'completed') {
+      const { data: full } = await supabase!
+        .from('contracts')
+        .select(`
+          job:job_id(title),
+          freelancer:freelancer_id(full_name, email, auth_id),
+          employer:employer_id(full_name, email, auth_id)
+        `)
+        .eq('id', contractId)
+        .single()
+
+      if (full) {
+        const jobTitle = (full.job as any)?.title || 'Contract'
+        const freelancer = full.freelancer as any
+        const employer = full.employer as any
+
+        if (status === 'active') {
+          if (employer?.email) sendContractCreatedEmail({ to: employer.email, recipientName: employer.full_name || 'Employer', otherPartyName: freelancer?.full_name || 'Freelancer', jobTitle, contractId, role: 'employer' }).catch(() => {})
+          if (freelancer?.email) sendContractCreatedEmail({ to: freelancer.email, recipientName: freelancer.full_name || 'Freelancer', otherPartyName: employer?.full_name || 'Employer', jobTitle, contractId, role: 'freelancer' }).catch(() => {})
+        }
+        if (status === 'completed') {
+          if (employer?.email) sendContractCompletedEmail({ to: employer.email, recipientName: employer.full_name || 'Employer', otherPartyName: freelancer?.full_name || 'Freelancer', jobTitle, contractId }).catch(() => {})
+          if (freelancer?.email) sendContractCompletedEmail({ to: freelancer.email, recipientName: freelancer.full_name || 'Freelancer', otherPartyName: employer?.full_name || 'Employer', jobTitle, contractId }).catch(() => {})
+        }
+      }
+    }
+
+    revalidatePath('/dashboard/contracts')
+    revalidatePath(`/dashboard/contracts/${contractId}`)
     return { success: true }
   } catch (err) {
     return toActionError(err) as any
@@ -246,6 +282,8 @@ export async function releaseMilestonePayment(
     if (milestoneRes.error) return { success: false, error: milestoneRes.error.message }
     if (contractRes.error) return { success: false, error: contractRes.error.message }
 
+    revalidatePath(`/dashboard/contracts/${milestone.contract_id}`)
+    revalidatePath('/dashboard/contracts')
     return { success: true }
   } catch (err) {
     return toActionError(err) as any

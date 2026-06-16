@@ -2,18 +2,10 @@
 > bidjob@0.1.0 dev
 > next dev
 
-⚠ Port 3000 is in use by process 23044, using available port 3001 instead.
 ▲ Next.js 16.2.1 (Turbopack)
-- Local:         http://localhost:3001
-- Network:       http://192.168.1.6:3001
+- Local:         http://localhost:3000
+- Network:       http://192.168.100.7:3000
 - Environments: .env.local
-✓ Ready in 1854ms
-⨯ Another next dev server is already running.
+✓ Ready in 693ms
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
 
-- Local:        http://localhost:3000
-- PID:          23044
-- Dir:          E:\bidjob
-- Log:          .next\dev\logs\next-development.log
-
-Run taskkill /PID 23044 /F to stop it.
-[?25h

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/app/providers/LanguageProvider'
 import { likePost, addComment, savePost } from '@/lib/actions/profile-feed'
 import Link from 'next/link'
@@ -41,6 +42,7 @@ export default function DiscoveryFeedClient({
   currentUserId: number
 }) {
   const { t, dir } = useLanguage()
+  const router = useRouter()
   const [postComments, setPostComments] = useState<{ [key: number]: string }>({})
   const [loadingPost, setLoadingPost] = useState<number | null>(null)
   const [filterType, setFilterType] = useState<'all' | 'text' | 'project' | 'achievement'>('all')
@@ -66,6 +68,7 @@ export default function DiscoveryFeedClient({
     setLoadingPost(postId)
     try {
       await likePost(postId)
+      router.refresh()
     } finally {
       setLoadingPost(null)
     }
@@ -79,6 +82,7 @@ export default function DiscoveryFeedClient({
     try {
       await addComment({ postId, content })
       setPostComments(prev => ({ ...prev, [postId]: '' }))
+      router.refresh()
     } finally {
       setLoadingPost(null)
     }

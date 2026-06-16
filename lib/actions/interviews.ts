@@ -161,8 +161,21 @@ export async function scheduleInterview(
     if (!job) return { success: false, error: 'Job not found' }
 
     const isEmployer = user?.user_type === 'employer' || user?.user_type === 'both'
-    const freelancerId = isEmployer ? null : user?.id
     const employerId = isEmployer ? user?.id : job.employer_id
+    let freelancerId: number | null = isEmployer ? null : user?.id
+
+    // When an employer schedules, resolve the freelancer from the contract
+    if (isEmployer && contractId) {
+      const { data: contract } = await supabase!
+        .from('contracts')
+        .select('freelancer_id')
+        .eq('id', contractId)
+        .single()
+      freelancerId = contract?.freelancer_id ?? null
+    }
+    if (isEmployer && !freelancerId) {
+      return { success: false, error: 'Cannot schedule interview: no freelancer identified for this job.' }
+    }
 
     const { data, error } = await supabase!
       .from('interviews')

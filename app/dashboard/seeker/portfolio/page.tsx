@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { getUserPortfolio, createPortfolioItem } from '@/lib/actions/portfolio'
+import { getMyPortfolio, createPortfolioItem } from '@/lib/actions/portfolio'
 import { useLanguage } from '@/app/providers/LanguageProvider'
 import PortfolioCard from '@/components/features/PortfolioCard'
 
@@ -21,7 +21,6 @@ export default function PortfolioPage() {
   const { t, dir } = useLanguage()
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [userId, setUserId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -36,26 +35,10 @@ export default function PortfolioPage() {
   })
 
   useEffect(() => {
-    const loadPortfolio = async () => {
-      try {
-        // Get user ID from localStorage or API
-        const stored = localStorage.getItem('currentUser')
-        if (stored) {
-          const user = JSON.parse(stored)
-          setUserId(user?.id)
-          const result = await getUserPortfolio(user?.id)
-          if (!result.error) {
-            setPortfolio(result.portfolio)
-          }
-        }
-      } catch (err) {
-        console.error('Error loading portfolio:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadPortfolio()
+    getMyPortfolio().then((result) => {
+      if (!result.error) setPortfolio(result.portfolio as PortfolioItem[])
+      setLoading(false)
+    })
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,13 +62,8 @@ export default function PortfolioPage() {
       )
 
       if (result.success) {
-        // Reload portfolio
-        if (userId) {
-          const updated = await getUserPortfolio(userId)
-          if (!updated.error) {
-            setPortfolio(updated.portfolio)
-          }
-        }
+        const updated = await getMyPortfolio()
+        if (!updated.error) setPortfolio(updated.portfolio as PortfolioItem[])
 
         // Reset form
         setFormData({

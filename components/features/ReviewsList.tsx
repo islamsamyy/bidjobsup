@@ -71,9 +71,6 @@ export default function ReviewsList({ talentId, currentUserId }: ReviewsListProp
   }, [talentId])
 
   const handleDeleteReview = async (reviewId: number) => {
-    const confirmed = confirm('Are you sure you want to delete this review?')
-    if (!confirmed) return
-
     try {
       const result = await deleteReview(reviewId)
       if (result.success) {

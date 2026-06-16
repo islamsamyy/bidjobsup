@@ -9,7 +9,14 @@ export default async function SavedJobsAndNotificationsPage() {
     .select(`
       *,
       job:jobs!job_id (
-        *,
+        id,
+        title,
+        description,
+        budget_min,
+        budget_max,
+        employer_id,
+        location,
+        job_type,
         employer:employer_id (
           full_name,
           avatar_url

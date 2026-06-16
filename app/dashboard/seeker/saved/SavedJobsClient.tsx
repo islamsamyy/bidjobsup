@@ -13,6 +13,8 @@ interface SavedJob {
     budget_min: number
     budget_max: number
     employer_id: number
+    location?: string
+    job_type?: string
     employer?: {
       full_name: string
       avatar_url: string
@@ -89,13 +91,17 @@ export function SavedJobsClient({ savedJobs }: { savedJobs: SavedJob[] | null })
               </p>
 
               <div className="flex items-center justify-between pt-6 border-t border-outline-variant/10">
-                <div className="flex gap-2">
-                  <span className="px-3 py-1 bg-stone-900 rounded-full text-[9px] font-black uppercase tracking-widest text-stone-400 border border-outline-variant/5">
-                    Remote
-                  </span>
-                  <span className="px-3 py-1 bg-stone-900 rounded-full text-[9px] font-black uppercase tracking-widest text-stone-400 border border-outline-variant/5">
-                    Full-Time
-                  </span>
+                <div className="flex gap-2 flex-wrap">
+                  {fav.job?.location && (
+                    <span className="px-3 py-1 bg-stone-900 rounded-full text-[9px] font-black uppercase tracking-widest text-stone-400 border border-outline-variant/5">
+                      {fav.job.location}
+                    </span>
+                  )}
+                  {fav.job?.job_type && (
+                    <span className="px-3 py-1 bg-stone-900 rounded-full text-[9px] font-black uppercase tracking-widest text-stone-400 border border-outline-variant/5">
+                      {fav.job.job_type}
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-4">
                   <Link

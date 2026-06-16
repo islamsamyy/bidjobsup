@@ -26,26 +26,26 @@ export async function createReview({
 
     if (user?.id === revieweeId) return { error: 'You cannot review yourself.' }
 
-    if (jobId > 0) {
-      const { data: job } = await supabase!
-        .from('jobs')
-        .select('employer_id')
-        .eq('id', jobId)
+    if (!jobId || jobId <= 0) return { error: 'A valid job is required to submit a review.' }
+
+    const { data: job } = await supabase!
+      .from('jobs')
+      .select('employer_id')
+      .eq('id', jobId)
+      .single()
+
+    if (!job) return { error: 'Job not found.' }
+
+    if (job.employer_id !== user?.id) {
+      const { data: bid } = await supabase!
+        .from('bids')
+        .select('id')
+        .eq('job_id', jobId)
+        .eq('bidder_id', user?.id)
+        .eq('status', 'accepted')
         .single()
 
-      if (!job) return { error: 'Job not found.' }
-
-      if (job.employer_id !== user?.id) {
-        const { data: bid } = await supabase!
-          .from('bids')
-          .select('id')
-          .eq('job_id', jobId)
-          .eq('bidder_id', user?.id)
-          .eq('status', 'accepted')
-          .single()
-
-        if (!bid) return { error: 'You are not involved in this job.' }
-      }
+      if (!bid) return { error: 'You are not involved in this job.' }
     }
 
     const { error } = await supabase!.from('reviews').insert({

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/app/providers/LanguageProvider'
 import { createPost, likePost, addComment, deletePost, savePost } from '@/lib/actions/profile-feed'
 import Link from 'next/link'
@@ -33,6 +34,7 @@ interface Comment {
 
 const CreatePost = ({ userId }: { userId: number }) => {
   const { t, dir } = useLanguage()
+  const router = useRouter()
   const [content, setContent] = useState('')
   const [postType, setPostType] = useState<'text' | 'project' | 'achievement'>('text')
   const [title, setTitle] = useState('')
@@ -61,6 +63,7 @@ const CreatePost = ({ userId }: { userId: number }) => {
         setTitle('')
         setDescription('')
         setPostType('text')
+        router.refresh()
       }
     } finally {
       setLoading(false)
@@ -155,6 +158,7 @@ const PostsList = ({
   currentUserId: number
 }) => {
   const { t, dir } = useLanguage()
+  const router = useRouter()
   const [postComments, setPostComments] = useState<{ [key: number]: string }>({})
   const [loadingPost, setLoadingPost] = useState<number | null>(null)
 
@@ -175,6 +179,7 @@ const PostsList = ({
     setLoadingPost(postId)
     try {
       await likePost(postId)
+      router.refresh()
     } finally {
       setLoadingPost(null)
     }
@@ -188,19 +193,19 @@ const PostsList = ({
     try {
       await addComment({ postId, content })
       setPostComments(prev => ({ ...prev, [postId]: '' }))
+      router.refresh()
     } finally {
       setLoadingPost(null)
     }
   }
 
   const handleDelete = async (postId: number) => {
-    if (confirm('Are you sure you want to delete this post?')) {
-      setLoadingPost(postId)
-      try {
-        await deletePost(postId)
-      } finally {
-        setLoadingPost(null)
-      }
+    setLoadingPost(postId)
+    try {
+      await deletePost(postId)
+      router.refresh()
+    } finally {
+      setLoadingPost(null)
     }
   }
 

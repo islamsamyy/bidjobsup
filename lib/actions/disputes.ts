@@ -175,6 +175,11 @@ export async function createDispute({
     const { data: job } = await supabase!.from('jobs').select('id').eq('id', jobId).single()
     if (!job) return { success: false, error: 'Job not found' }
 
+    if (contractId) {
+      const { data: contract } = await supabase!.from('contracts').select('id').eq('id', contractId).single()
+      if (!contract) return { success: false, error: 'Contract not found.' }
+    }
+
     const { data, error } = await supabase!
       .from('disputes')
       .insert({
@@ -284,6 +289,45 @@ export async function addDisputeMessage(
   }
 }
 
+// User-facing: initiator may only withdraw (close) their own open dispute.
+export async function withdrawDispute(
+  disputeId: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const auth = await getAuthUser()
+    if (!auth.ok) return { success: false, error: auth.error }
+    const { user, supabase } = auth
+
+    const { data: dispute } = await supabase!
+      .from('disputes')
+      .select('initiated_by, status')
+      .eq('id', disputeId)
+      .single()
+
+    if (!dispute) return { success: false, error: 'Dispute not found' }
+    if (dispute.initiated_by !== user?.id) {
+      return { success: false, error: 'Only the initiator can withdraw this dispute' }
+    }
+    if (dispute.status === 'resolved' || dispute.status === 'closed') {
+      return { success: false, error: 'Dispute is already closed' }
+    }
+
+    const { error } = await supabase!
+      .from('disputes')
+      .update({ status: 'closed', updated_at: new Date().toISOString() })
+      .eq('id', disputeId)
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath(`/dashboard/disputes/${disputeId}`)
+    revalidatePath('/dashboard/disputes')
+    return { success: true }
+  } catch (err) {
+    return toActionError(err) as any
+  }
+}
+
+// Admin-only: resolve or escalate a dispute with an official resolution.
 export async function updateDisputeStatus(
   disputeId: number,
   status: string,
@@ -294,26 +338,33 @@ export async function updateDisputeStatus(
     if (!auth.ok) return { success: false, error: auth.error }
     const { user, supabase } = auth
 
+    if (user?.role !== 'admin') {
+      return { success: false, error: 'Admin access required' }
+    }
+
     const { data: dispute } = await supabase!
       .from('disputes')
-      .select('initiated_by')
+      .select('id')
       .eq('id', disputeId)
       .single()
 
     if (!dispute) return { success: false, error: 'Dispute not found' }
-    if (dispute.initiated_by !== user?.id) {
-      return { success: false, error: 'Only the initiator can update dispute status' }
-    }
 
     const { error } = await supabase!
       .from('disputes')
-      .update({ status, resolution: resolution ?? null, updated_at: new Date().toISOString() })
+      .update({
+        status,
+        resolution: resolution ?? null,
+        resolved_by: user.id,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', disputeId)
 
     if (error) return { success: false, error: error.message }
 
     revalidatePath(`/dashboard/disputes/${disputeId}`)
     revalidatePath('/dashboard/disputes')
+    revalidatePath('/admin/disputes')
     return { success: true }
   } catch (err) {
     return toActionError(err) as any

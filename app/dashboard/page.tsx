@@ -6,6 +6,11 @@ export const dynamic = 'force-dynamic'
 export default async function DashboardLocatorPage() {
   const { profile: user } = await getAuthUser()
 
+  // Admins land on the admin panel first
+  if (user?.role === 'admin') {
+    redirect('/admin')
+  }
+
   // 3. Redirect matching their role
   if (user?.user_type === 'employer') {
     redirect('/dashboard/employer')

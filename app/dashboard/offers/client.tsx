@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useLanguage } from '@/app/providers/LanguageProvider'
 import Link from 'next/link'
+import { acceptInvitation, declineInvitation, acceptOffer, declineOffer } from '@/lib/actions/offers'
 
 interface Invitation {
   id: number
@@ -52,6 +53,9 @@ export default function OffersClient({
   const { t, dir } = useLanguage()
   const [activeTab, setActiveTab] = useState<'all' | 'invitations' | 'offers' | 'sent'>('all')
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
+  const [invitations, setInvitations] = useState<Invitation[]>(initialInvitations)
+  const [offers, setOffers] = useState<Offer[]>(initialOffers)
+  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -76,20 +80,41 @@ export default function OffersClient({
     }
   }
 
+  const handleInvitationAction = async (id: number, action: 'accept' | 'decline') => {
+    setLoadingId(`inv-${id}-${action}`)
+    setInvitations(prev => prev.map(i => i.id === id ? { ...i, status: action === 'accept' ? 'accepted' : 'declined' } : i))
+    const result = action === 'accept' ? await acceptInvitation(id) : await declineInvitation(id)
+    if (!result.success) {
+      // revert on error
+      setInvitations(prev => prev.map(i => i.id === id ? { ...i, status: 'pending' } : i))
+    }
+    setLoadingId(null)
+  }
+
+  const handleOfferAction = async (id: number, action: 'accept' | 'decline') => {
+    setLoadingId(`offer-${id}-${action}`)
+    setOffers(prev => prev.map(o => o.id === id ? { ...o, status: action === 'accept' ? 'accepted' : 'declined' } : o))
+    const result = action === 'accept' ? await acceptOffer(id) : await declineOffer(id)
+    if (!result.success) {
+      setOffers(prev => prev.map(o => o.id === id ? { ...o, status: 'open' } : o))
+    }
+    setLoadingId(null)
+  }
+
   // Filter items based on tab
   let filteredItems: (Invitation | Offer)[] = []
 
   if (activeTab === 'invitations') {
-    filteredItems = initialInvitations
+    filteredItems = invitations
   } else if (activeTab === 'offers') {
-    filteredItems = initialOffers
+    filteredItems = offers
   } else if (activeTab === 'sent') {
     filteredItems = [
-      ...initialInvitations.filter(i => i.sender_id === currentUserId),
-      ...initialOffers.filter(o => o.from_user_id === currentUserId),
+      ...invitations.filter(i => i.sender_id === currentUserId),
+      ...offers.filter(o => o.from_user_id === currentUserId),
     ]
   } else {
-    filteredItems = [...initialInvitations, ...initialOffers]
+    filteredItems = [...invitations, ...offers]
   }
 
   // Apply status filter
@@ -235,10 +260,20 @@ export default function OffersClient({
 
                       {isReceived && item.status === 'pending' && (
                         <div className="flex gap-3 mt-6">
-                          <button className="bg-primary text-on-primary px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+                          <button
+                            onClick={() => handleInvitationAction(item.id, 'accept')}
+                            disabled={!!loadingId}
+                            className="bg-primary text-on-primary px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {loadingId === `inv-${item.id}-accept` && <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                             Accept
                           </button>
-                          <button className="bg-surface-container hover:bg-error/10 text-on-surface px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest transition-colors">
+                          <button
+                            onClick={() => handleInvitationAction(item.id, 'decline')}
+                            disabled={!!loadingId}
+                            className="bg-surface-container hover:bg-error/10 text-on-surface hover:text-error px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest transition-colors disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {loadingId === `inv-${item.id}-decline` && <span className="w-3 h-3 border-2 border-error/30 border-t-error rounded-full animate-spin" />}
                             Decline
                           </button>
                         </div>
@@ -314,14 +349,21 @@ export default function OffersClient({
 
                       {isReceived && item.status === 'open' && (
                         <div className="flex gap-3 mt-6">
-                          <button className="bg-primary text-on-primary px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+                          <button
+                            onClick={() => handleOfferAction(item.id, 'accept')}
+                            disabled={!!loadingId}
+                            className="bg-primary text-on-primary px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {loadingId === `offer-${item.id}-accept` && <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                             Accept
                           </button>
-                          <button className="bg-surface-container hover:bg-error/10 text-on-surface px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest transition-colors">
+                          <button
+                            onClick={() => handleOfferAction(item.id, 'decline')}
+                            disabled={!!loadingId}
+                            className="bg-surface-container hover:bg-error/10 text-on-surface hover:text-error px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest transition-colors disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {loadingId === `offer-${item.id}-decline` && <span className="w-3 h-3 border-2 border-error/30 border-t-error rounded-full animate-spin" />}
                             Decline
-                          </button>
-                          <button className="bg-surface-container text-on-surface px-6 py-2 rounded-lg font-semibold text-sm uppercase tracking-widest hover:bg-surface-bright transition-colors">
-                            Counter Offer
                           </button>
                         </div>
                       )}

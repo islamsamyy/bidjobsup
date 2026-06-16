@@ -214,6 +214,7 @@ export function InteractiveHomePage({ handleSearch }: InteractiveHomePageProps) 
                 alt="BidJobs Logo"
                 width={240}
                 height={240}
+                priority
                 className="animate-float animate-glow w-64 h-auto object-contain"
               />
 

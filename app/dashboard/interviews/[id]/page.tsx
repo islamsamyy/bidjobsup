@@ -9,6 +9,7 @@ import {
   updateInterviewMeeting,
   rescheduleInterview,
 } from '@/lib/actions/interviews'
+import { getCurrentUser } from '@/lib/actions/me'
 
 interface Interview {
   id: number
@@ -68,21 +69,23 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
   const [meetingUrl, setMeetingUrl] = useState('')
   const [meetingPlatform, setMeetingPlatform] = useState('Google Meet')
   const [savingMeeting, setSavingMeeting] = useState(false)
+  const [showRescheduleForm, setShowRescheduleForm] = useState(false)
+  const [newScheduledTime, setNewScheduledTime] = useState('')
+  const [rescheduling, setRescheduling] = useState(false)
 
   useEffect(() => {
     const loadDetails = async () => {
       try {
         const { id } = await params
-        const stored = localStorage.getItem('currentUser')
-        if (stored) {
-          const user = JSON.parse(stored)
-          setCurrentUserId(user?.id)
+        const [me, result] = await Promise.all([
+          getCurrentUser(),
+          getInterviewDetails(parseInt(id)),
+        ])
+        if (me?.id) setCurrentUserId(me.id)
 
-          const result = await getInterviewDetails(parseInt(id))
-          if (!result.error) {
-            setInterview(result.interview)
-            setNotes(result.notes)
-          }
+        if (!result.error) {
+          setInterview(result.interview)
+          setNotes(result.notes)
         }
       } catch (err) {
         console.error('Error loading interview:', err)
@@ -149,6 +152,24 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
       setInterview({ ...interview, status: newStatus })
     }
     setUpdatingStatus(false)
+  }
+
+  const handleReschedule = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newScheduledTime) return
+
+    setRescheduling(true)
+    const result = await rescheduleInterview(interview.id, new Date(newScheduledTime).toISOString())
+    if (result.success) {
+      setInterview({
+        ...interview,
+        scheduled_time: new Date(newScheduledTime).toISOString(),
+        status: 'rescheduled',
+      })
+      setShowRescheduleForm(false)
+      setNewScheduledTime('')
+    }
+    setRescheduling(false)
   }
 
   const handleAddMeeting = async (e: React.FormEvent) => {
@@ -438,13 +459,43 @@ export default function InterviewDetailPage({ params }: { params: Promise<{ id: 
                 </>
               )}
 
-              {['scheduled', 'confirmed'].includes(interview.status) && (
-                <button
-                  className="w-full px-4 py-2 rounded-lg bg-yellow-500/20 text-yellow-600 hover:bg-yellow-500/30 disabled:opacity-50 font-bold text-sm transition-all"
-                  disabled
-                >
-                  Reschedule
-                </button>
+              {['scheduled', 'confirmed', 'rescheduled'].includes(interview.status) && (
+                showRescheduleForm ? (
+                  <form onSubmit={handleReschedule} className="space-y-2">
+                    <input
+                      type="datetime-local"
+                      value={newScheduledTime}
+                      onChange={(e) => setNewScheduledTime(e.target.value)}
+                      min={new Date().toISOString().slice(0, 16)}
+                      required
+                      className="w-full px-3 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant/20 text-on-surface text-sm focus:border-primary focus:outline-none"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="submit"
+                        disabled={rescheduling || !newScheduledTime}
+                        className="flex-1 px-4 py-2 rounded-lg bg-yellow-500/20 text-yellow-600 hover:bg-yellow-500/30 disabled:opacity-50 font-bold text-sm transition-all"
+                      >
+                        {rescheduling ? 'Saving…' : 'Confirm'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowRescheduleForm(false)}
+                        disabled={rescheduling}
+                        className="flex-1 px-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-bold text-sm transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <button
+                    onClick={() => setShowRescheduleForm(true)}
+                    className="w-full px-4 py-2 rounded-lg bg-yellow-500/20 text-yellow-600 hover:bg-yellow-500/30 font-bold text-sm transition-all"
+                  >
+                    Reschedule
+                  </button>
+                )
               )}
             </div>
           </div>

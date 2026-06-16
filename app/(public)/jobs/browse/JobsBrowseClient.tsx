@@ -116,7 +116,7 @@ export default function JobsBrowseClient({
             <span className="text-[#caa2f7] font-black tracking-[0.2em] uppercase text-[10px] mb-3 block">{t('jobsBrowsePage.curatedSectors')}</span>
             <h2 className="font-headline text-4xl font-bold tracking-tight">{t('jobsBrowsePage.eliteClusters')}</h2>
           </div>
-          <Link href="/jobs" className="text-[#caa2f7] hover:text-[#faf1f5] transition-colors flex items-center gap-3 text-xs font-black uppercase tracking-widest group">
+          <Link href="/jobs/search" className="text-[#caa2f7] hover:text-[#faf1f5] transition-colors flex items-center gap-3 text-xs font-black uppercase tracking-widest group">
             {t('jobsBrowsePage.allSectors')} 
             <span className={`material-symbols-outlined text-sm transition-transform ${dir === 'rtl' ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`}>{dir === 'rtl' ? 'arrow_back' : 'arrow_forward'}</span>
           </Link>
@@ -160,6 +160,8 @@ export default function JobsBrowseClient({
             experience_level: experienceLevel || undefined,
             sort: sort || 'newest'
           }}
+          totalCount={jobs?.length ?? undefined}
+          searchQuery={query || undefined}
         />
       </section>
 

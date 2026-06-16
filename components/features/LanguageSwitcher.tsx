@@ -2,11 +2,14 @@
 
 import { useLanguage } from '@/app/providers/LanguageProvider';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Close on click outside
   useEffect(() => {
@@ -34,7 +37,13 @@ export function LanguageSwitcher() {
         <div className="absolute right-0 mt-3 w-44 bg-surface-container/95 backdrop-blur-xl border border-outline-variant/40 rounded-2xl shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden z-50">
           <div className="p-2 space-y-0.5">
             <button
-              onClick={() => { setLocale('en'); setIsOpen(false); }}
+              onClick={() => {
+                setLocale('en');
+                setIsOpen(false);
+                // Navigate to English version (remove -ar suffix)
+                const enPath = pathname.replace(/-ar$/, '') || '/';
+                router.push(enPath);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 locale === 'en'
                   ? 'bg-primary/10 text-primary'
@@ -48,7 +57,13 @@ export function LanguageSwitcher() {
               )}
             </button>
             <button
-              onClick={() => { setLocale('ar'); setIsOpen(false); }}
+              onClick={() => {
+                setLocale('ar');
+                setIsOpen(false);
+                // Navigate to Arabic version (add -ar suffix)
+                const arPath = pathname.endsWith('-ar') ? pathname : `${pathname}-ar`;
+                router.push(arPath);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 locale === 'ar'
                   ? 'bg-primary/10 text-primary'

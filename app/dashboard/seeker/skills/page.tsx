@@ -180,29 +180,12 @@ export default async function SkillsPage() {
       {/* All Skills */}
       <div>
         <h2 className="font-headline text-2xl font-bold text-on-surface mb-6">All Skills</h2>
-        {!skills || skills.length === 0 ? (
-          <div className="glass border border-outline-variant/15 rounded-xl p-12 text-center">
-            <span className="material-symbols-outlined text-5xl text-outline-variant/30 block mb-4">
-              school
-            </span>
-            <p className="text-on-surface-variant text-lg mb-4">
-              No skills added yet
-            </p>
-            <p className="text-on-surface-variant text-sm mb-6">
-              Add your professional skills to showcase your expertise to clients and receive endorsements.
-            </p>
-            <button className="bg-primary text-on-primary px-6 py-3 rounded-lg font-semibold uppercase tracking-widest text-sm hover:opacity-90 transition-opacity">
-              Add Your First Skill
-            </button>
-          </div>
-        ) : (
-          <SkillsClient
-            skills={skills}
-            endorsements={endorsements || []}
-            categories={categories || []}
-            currentUserId={currentUser?.id}
-          />
-        )}
+        <SkillsClient
+          skills={skills || []}
+          endorsements={endorsements || []}
+          categories={categories || []}
+          currentUserId={currentUser?.id}
+        />
       </div>
     </main>
   )

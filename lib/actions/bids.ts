@@ -46,7 +46,10 @@ export async function submitBid(
     .select()
     .single()
 
-  if (error) return { error: error.message }
+  if (error) {
+    if (error.code === '23505') return { error: 'You have already applied to this job.' }
+    return { error: error.message }
+  }
 
   if (jobData?.employer) {
     const employer = jobData.employer as any
@@ -150,13 +153,15 @@ export async function withdrawBid(bidId: string | number) {
   if (!auth.ok) return { error: auth.error }
   const { profile, supabase } = auth
 
-  const { error } = await supabase!
+  const { data: deleted, error } = await supabase!
     .from('bids')
     .delete()
     .eq('id', Number(bidId))
     .eq('bidder_id', profile?.id)
+    .select('id')
+    .single()
 
-  if (error) return { error: error.message }
+  if (error || !deleted) return { error: 'Bid not found or already withdrawn.' }
 
   revalidatePath('/dashboard/seeker')
   return { success: true }

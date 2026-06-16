@@ -18,9 +18,11 @@ interface Conversation {
 
 interface MessagesClientProps {
   conversations: Conversation[]
+  userType?: string
 }
 
-export function MessagesClient({ conversations }: MessagesClientProps) {
+export function MessagesClient({ conversations, userType }: MessagesClientProps) {
+  const isEmployer = userType === 'employer'
   const { t } = useLanguage()
 
   const formatTime = (dateString: string) => {
@@ -46,7 +48,7 @@ export function MessagesClient({ conversations }: MessagesClientProps) {
       </header>
 
       {conversations.length === 0 ? (
-        <div className="p-20 rounded-3xl bg-surface-container border-2 border-dashed border-outline-variant/20 flex flex-col items-center justify-center text-center space-y-6">
+        <div className="p-16 rounded-3xl bg-surface-container border-2 border-dashed border-outline-variant/20 flex flex-col items-center justify-center text-center space-y-6">
           <div className="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center">
             <span className="material-symbols-outlined text-4xl text-stone-600">forum</span>
           </div>
@@ -54,15 +56,17 @@ export function MessagesClient({ conversations }: MessagesClientProps) {
             <h3 className="text-2xl font-headline font-bold text-on-surface italic">
               {t('dashboardPages.messages.noMessages')}
             </h3>
-            <p className="text-on-surface-variant max-w-xs mx-auto text-sm">
-              {t('dashboardPages.messages.startConversation')}
+            <p className="text-on-surface-variant max-w-sm mx-auto text-sm">
+              {isEmployer
+                ? 'Post a job and accept bids to start conversations with candidates.'
+                : 'Apply to jobs and get noticed — employers will reach out here.'}
             </p>
           </div>
           <Link
-            href="/dashboard/seeker/search"
-            className="text-primary font-black uppercase tracking-widest text-xs hover:underline decoration-2 underline-offset-8 transition-all"
+            href={isEmployer ? '/dashboard/employer/post-job' : '/jobs/browse'}
+            className="px-6 py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold text-xs uppercase tracking-widest hover:bg-primary/20 transition-colors"
           >
-            {t('dashboardPages.messages.browseJobs')}
+            {isEmployer ? 'Post a Role' : 'Browse Jobs'}
           </Link>
         </div>
       ) : (

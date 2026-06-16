@@ -15,6 +15,10 @@ interface DashboardClientProps {
   reviewsCount: number
   savedJobsCount: number
   analyticsData: any
+  hasSubscription?: boolean
+  hasCompletedProfile?: boolean
+  hasFirstBid?: boolean
+  hasContract?: boolean
 }
 
 export function DashboardClient({
@@ -28,8 +32,46 @@ export function DashboardClient({
   reviewsCount,
   savedJobsCount,
   analyticsData,
+  hasSubscription = false,
+  hasCompletedProfile = false,
+  hasFirstBid = false,
+  hasContract = false,
 }: DashboardClientProps) {
   const { t } = useLanguage()
+
+  const onboardingSteps = [
+    {
+      done: hasCompletedProfile,
+      icon: 'person',
+      label: 'Complete your profile',
+      sub: 'Add bio, skills, and portfolio to stand out',
+      href: '/dashboard/seeker/profile',
+    },
+    {
+      done: hasFirstBid,
+      icon: 'send',
+      label: 'Submit your first bid',
+      sub: 'Browse jobs and apply to get started',
+      href: '/jobs/browse',
+    },
+    {
+      done: hasContract,
+      icon: 'handshake',
+      label: 'Land your first contract',
+      sub: 'Win a bid and begin working',
+      href: '/dashboard/contracts',
+    },
+    {
+      done: hasSubscription,
+      icon: 'workspace_premium',
+      label: 'Upgrade to Elite',
+      sub: 'Unlock ATS Optimizer, priority visibility & more',
+      href: '/dashboard/seeker/subscription',
+    },
+  ]
+
+  const doneCount = onboardingSteps.filter(s => s.done).length
+  const allDone = doneCount === onboardingSteps.length
 
   return (
     <>
@@ -145,6 +187,76 @@ export function DashboardClient({
           </div>
         </div>
       </div>
+
+      {/* Onboarding Checklist — hide once all steps complete */}
+      {!allDone && (
+        <div className="bg-surface-container rounded-2xl border border-outline-variant/10 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-black tracking-[0.25em] uppercase text-primary mb-1">Getting Started</p>
+              <h3 className="text-lg font-bold text-on-surface">Your launch checklist</h3>
+            </div>
+            <span className="text-sm font-bold text-on-surface-variant">{doneCount}/{onboardingSteps.length}</span>
+          </div>
+          <div className="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-primary to-secondary h-full rounded-full transition-all duration-700"
+              style={{ width: `${(doneCount / onboardingSteps.length) * 100}%` }}
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {onboardingSteps.map((step) => (
+              <Link
+                key={step.label}
+                href={step.done ? '#' : step.href}
+                className={`flex items-start gap-3 p-4 rounded-xl border transition-all duration-200 ${
+                  step.done
+                    ? 'border-primary/20 bg-primary/5 cursor-default'
+                    : 'border-outline-variant/20 hover:border-primary/30 hover:bg-white/3'
+                }`}
+              >
+                <div className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                  step.done ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-on-surface-variant'
+                }`}>
+                  {step.done
+                    ? <span className="material-symbols-outlined text-sm" style={{ fontSize: '14px' }}>check</span>
+                    : <span className="material-symbols-outlined text-sm" style={{ fontSize: '14px' }}>{step.icon}</span>
+                  }
+                </div>
+                <div className="min-w-0">
+                  <p className={`text-sm font-semibold ${step.done ? 'text-on-surface-variant line-through' : 'text-on-surface'}`}>
+                    {step.label}
+                  </p>
+                  <p className="text-xs text-on-surface-variant mt-0.5">{step.sub}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ATS Optimizer Discovery Banner — show only for non-subscribers */}
+      {!hasSubscription && (
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-surface-container to-secondary/5 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-primary text-2xl">psychology</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-black tracking-[0.25em] uppercase text-primary mb-1">Elite Feature</p>
+            <h3 className="font-bold text-on-surface">Not getting interview calls?</h3>
+            <p className="text-sm text-on-surface-variant mt-0.5">
+              Our AI ATS Optimizer scores your CV against job descriptions and tells you exactly what to fix.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/seeker/subscription"
+            className="shrink-0 px-5 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap"
+          >
+            Unlock ATS Optimizer
+          </Link>
+          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full pointer-events-none" />
+        </div>
+      )}
 
       {/* Analytics Charts */}
       {analyticsData && (

@@ -567,7 +567,16 @@
     "findOpportunities": "ابحث عن فرص",
     "helpCenter": "مركز المساعدة",
     "searchTalentPool": "ابحث في قائمة المواهب...",
-    "searchOpportunities": "ابحث عن فرص نخبة..."
+    "searchOpportunities": "ابحث عن فرص نخبة...",
+    "offers": "العروض",
+    "payments": "المدفوعات",
+    "reviews": "التقييمات",
+    "interviews": "المقابلات",
+    "disputes": "النزاعات",
+    "portfolio": "معرض الأعمال",
+    "skills": "المهارات",
+    "feed": "المنشورات",
+    "adminPanel": "لوحة الإدارة"
   },
   "atsHistory": {
     "pageTitle": "سجل تحليل ATS — BidJobs",

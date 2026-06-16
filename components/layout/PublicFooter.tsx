@@ -9,7 +9,7 @@ export default function PublicFooter() {
       links: [
         { name: "Find Jobs", href: "/jobs/browse" },
         { name: "Find Talent", href: "/talent" },
-        { name: "CV Optimizer", href: "/dashboard/seeker/profile" },
+        { name: "CV Optimizer", href: "/ats-optimize" },
         { name: "Pricing", href: "/pricing" },
       ],
     },
@@ -45,10 +45,19 @@ export default function PublicFooter() {
               Empowering the Kingdom's most elite talent to build the future of Vision 2030. Connect with premier organizations and lead the digital renaissance.
             </p>
             <div className="flex items-center gap-4">
-              {["language", "public", "hub"].map((icon) => (
-                <div key={icon} className="w-10 h-10 rounded-full bg-[#1c181c] flex items-center justify-center hover:bg-[#caa2f7]/20 hover:text-[#caa2f7] transition-colors cursor-pointer text-[#b0a9ad]">
+              {[
+                { icon: "language", href: "/about", label: "About BidJobs" },
+                { icon: "public", href: "/vision-2030", label: "Vision 2030" },
+                { icon: "hub", href: "/community", label: "Community" },
+              ].map(({ icon, href, label }) => (
+                <Link
+                  key={icon}
+                  href={href}
+                  aria-label={label}
+                  className="w-10 h-10 rounded-full bg-[#1c181c] flex items-center justify-center hover:bg-[#caa2f7]/20 hover:text-[#caa2f7] transition-colors text-[#b0a9ad]"
+                >
                   <span className="material-symbols-outlined text-xl">{icon}</span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

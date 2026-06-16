@@ -167,7 +167,7 @@ export default function PublicHeader({
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <Image src="/logo.png" alt="BidJobs" width={140} height={36} className="h-9 w-auto group-hover:opacity-80 transition-opacity" />
+            <Image src="/logo.png" alt="BidJobs" width={140} height={36} priority className="h-9 w-auto group-hover:opacity-80 transition-opacity" />
           </Link>
 
           {/* ── Desktop nav ── */}

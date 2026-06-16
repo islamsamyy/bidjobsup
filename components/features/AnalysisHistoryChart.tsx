@@ -54,17 +54,16 @@ export function AnalysisHistoryChart() {
 
   const handleDelete = async (id: string | undefined) => {
     if (!id) return
-    if (!confirm('Delete this analysis record?')) return
-
     try {
       const result = await deleteAnalysisRecord(id)
       if (result.success) {
         setAnalyses(analyses.filter(a => a.id !== id))
       } else {
-        alert('Failed to delete analysis')
+        setError('Failed to delete analysis')
       }
     } catch (err) {
       console.error('Error deleting analysis:', err)
+      setError('Failed to delete analysis')
     }
   }
 

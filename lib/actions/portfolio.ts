@@ -18,6 +18,35 @@ export interface PortfolioItem {
 }
 
 /**
+ * Get the authenticated user's own portfolio items (no userId needed)
+ */
+export async function getMyPortfolio(): Promise<{
+  portfolio: PortfolioItem[]
+  error?: string
+}> {
+  try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) return { portfolio: [], error: 'Not authenticated' }
+
+    const { data: profile } = await supabase.from('users').select('id').eq('auth_id', user.id).single()
+    if (!profile) return { portfolio: [], error: 'Profile not found' }
+
+    const { data, error } = await supabase
+      .from('portfolio_items')
+      .select('*')
+      .eq('user_id', profile.id)
+      .order('featured', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    if (error) return { portfolio: [], error: error.message }
+    return { portfolio: data || [] }
+  } catch (err: unknown) {
+    return { portfolio: [], error: (toActionError(err) as any).error }
+  }
+}
+
+/**
  * Get user's portfolio items
  */
 export async function getUserPortfolio(userId: number): Promise<{

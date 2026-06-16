@@ -69,5 +69,5 @@ export default async function MessagesPage({
     })
   )
 
-  return <MessagesClient conversations={conversationsWithPreview} />
+  return <MessagesClient conversations={conversationsWithPreview} userType={internalUser?.user_type} />
 }

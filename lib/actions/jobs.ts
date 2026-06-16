@@ -5,7 +5,7 @@ import { getAuthUser, getAuthUserAs } from '@/lib/supabase/get-user'
 import { createNotification } from '@/lib/actions/notifications'
 import { toActionError } from '@/lib/errors'
 
-export async function inviteToJob(jobId: number | string, seekerId: number) {
+export async function inviteToJob(jobId: number | string, seekerId: number, message?: string) {
   try {
     const auth = await getAuthUserAs('employer')
     if (!auth.ok) return { error: auth.error }
@@ -20,12 +20,15 @@ export async function inviteToJob(jobId: number | string, seekerId: number) {
     if (seekerRes.error || !seekerRes.data) return { error: 'Seeker not found.' }
     if (jobRes.data.employer_id !== user?.id) return { error: 'You do not own this job.' }
 
+    const baseContent = `${user?.full_name || 'An employer'} invited you to apply for "${jobRes.data.title}"`
+    const content = message?.trim() ? `${baseContent}: "${message.trim()}"` : baseContent
+
     const { error } = await createNotification({
       userId: seekerRes.data.id,
       userAuthId: seekerRes.data.auth_id,
       type: 'invitation',
       title: 'Job Invitation',
-      content: `${user?.full_name || 'An employer'} invited you to apply for "${jobRes.data.title}"`,
+      content,
       link: `/dashboard/seeker/search?jobId=${jobId}`,
     })
 
@@ -42,11 +45,19 @@ export async function editJob(jobId: string | number, updates: Record<string, un
     if (!auth.ok) return { error: auth.error }
     const { user, supabase } = auth
 
+    const { data: existing } = await supabase!
+      .from('jobs')
+      .select('id, employer_id')
+      .eq('id', jobId)
+      .single()
+
+    if (!existing) return { error: 'Job not found.' }
+    if (existing.employer_id !== user?.id) return { error: 'Unauthorized.' }
+
     const { data, error } = await supabase!
       .from('jobs')
       .update(updates)
       .eq('id', jobId)
-      .eq('employer_id', user?.id)
       .select()
       .single()
 

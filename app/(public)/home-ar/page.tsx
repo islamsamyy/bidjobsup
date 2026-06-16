@@ -35,27 +35,29 @@ export default async function ArabicLandingPage() {
             </p>
 
             {/* High-Fidelity Search Module */}
-            <div className="p-2.5 rounded-2xl bg-[#1c181c]/50 backdrop-blur-xl border border-[#4b474a]/20 shadow-2xl flex flex-col md:flex-row gap-3 max-w-3xl group hover:border-[#caa2f7]/20 transition-all duration-300">
+            <form action="/jobs/browse" method="GET" className="p-2.5 rounded-2xl bg-[#1c181c]/50 backdrop-blur-xl border border-[#4b474a]/20 shadow-2xl flex flex-col md:flex-row gap-3 max-w-3xl group hover:border-[#caa2f7]/20 transition-all duration-300">
               <div className="flex-1 flex items-center gap-4 px-5 py-4 bg-[#100d10] border border-[#292428] rounded-xl focus-within:border-[#caa2f7]/50 focus-within:shadow-[0_0_15px_rgba(202,162,247,0.1)] transition-all">
                 <span className="material-symbols-outlined text-[#caa2f7] text-2xl">work</span>
-                <input 
-                  className="bg-transparent border-none text-[#faf1f5] focus:ring-0 w-full placeholder:text-[#4b474a] text-sm font-medium text-right" 
-                  placeholder="مسمى الوظيفة، المهارات أو الشركة" 
-                  type="text" 
+                <input
+                  name="q"
+                  className="bg-transparent border-none text-[#faf1f5] focus:ring-0 w-full placeholder:text-[#4b474a] text-sm font-medium text-right"
+                  placeholder="مسمى الوظيفة، المهارات أو الشركة"
+                  type="text"
                 />
               </div>
               <div className="flex-1 flex items-center gap-4 px-5 py-4 bg-[#100d10] border border-[#292428] rounded-xl focus-within:border-[#caa2f7]/50 focus-within:shadow-[0_0_15px_rgba(202,162,247,0.1)] transition-all">
                 <span className="material-symbols-outlined text-[#caa2f7] text-2xl">location_on</span>
-                <input 
-                  className="bg-transparent border-none text-[#faf1f5] focus:ring-0 w-full placeholder:text-[#4b474a] text-sm font-medium text-right" 
-                  placeholder="الرياض، نيوم، جدة" 
-                  type="text" 
+                <input
+                  name="l"
+                  className="bg-transparent border-none text-[#faf1f5] focus:ring-0 w-full placeholder:text-[#4b474a] text-sm font-medium text-right"
+                  placeholder="الرياض، نيوم، جدة"
+                  type="text"
                 />
               </div>
-              <button className="bg-[#caa2f7] hover:bg-[#bc95e9] text-[#431f6b] font-black px-10 py-4 rounded-xl shadow-[0_4px_20px_rgba(202,162,247,0.3)] hover:scale-[0.98] transition-all duration-200 uppercase tracking-widest text-xs">
+              <button type="submit" className="bg-[#caa2f7] hover:bg-[#bc95e9] text-[#431f6b] font-black px-10 py-4 rounded-xl shadow-[0_4px_20px_rgba(202,162,247,0.3)] hover:scale-[0.98] transition-all duration-200 uppercase tracking-widest text-xs">
                 بحث
               </button>
-            </div>
+            </form>
           </div>
 
           <div className="relative group perspective-1000 order-1 lg:order-2">
@@ -80,9 +82,9 @@ export default async function ArabicLandingPage() {
                 </div>
                 <div className="flex justify-end -space-x-reverse space-x-3">
                   <div className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-[#100d10] bg-[#caa2f7] text-[10px] font-black text-[#431f6b]">12k+</div>
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[#100d10] bg-[#292428] overflow-hidden">
-                      <img src={`https://i.pravatar.cc/100?u=user${i}`} alt="user" />
+                  {[['A','#613471'],['S','#4a2060'],['M','#7c3aed']].map(([letter, bg]) => (
+                    <div key={letter} className="w-10 h-10 rounded-full border-2 border-[#100d10] overflow-hidden flex items-center justify-center text-[10px] font-black text-white" style={{ backgroundColor: bg }}>
+                      {letter}
                     </div>
                   ))}
                 </div>

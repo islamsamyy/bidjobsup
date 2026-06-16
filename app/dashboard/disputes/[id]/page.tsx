@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { getDisputeDetails, addDisputeMessage, updateDisputeStatus } from '@/lib/actions/disputes'
-import { Star } from 'lucide-react'
+import { getDisputeDetails, addDisputeMessage, withdrawDispute } from '@/lib/actions/disputes'
+import { getCurrentUser } from '@/lib/actions/me'
 
 interface DisputeDetail {
   dispute: any
@@ -34,7 +34,6 @@ export default function DisputeDetailPage({ params }: { params: Promise<{ id: st
   const [currentUserId, setCurrentUserId] = useState<number | null>(null)
   const [messageText, setMessageText] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [resolution, setResolution] = useState('')
   const [resolving, setResolving] = useState(false)
   const [id, setId] = useState<string>('')
 
@@ -51,20 +50,18 @@ export default function DisputeDetailPage({ params }: { params: Promise<{ id: st
 
     const loadDisputeDetails = async () => {
       try {
-        const stored = localStorage.getItem('currentUser')
-        if (stored) {
-          const user = JSON.parse(stored)
-          setCurrentUserId(user?.id)
+        const [me, result] = await Promise.all([
+          getCurrentUser(),
+          getDisputeDetails(parseInt(id)),
+        ])
+        if (me?.id) setCurrentUserId(me.id)
 
-          const result = await getDisputeDetails(parseInt(id))
-          if (!result.error && result.dispute) {
-            setDetail({
-              dispute: result.dispute,
-              evidence: result.evidence,
-              messages: result.messages,
-            })
-            setResolution(result.dispute.resolution || '')
-          }
+        if (!result.error && result.dispute) {
+          setDetail({
+            dispute: result.dispute,
+            evidence: result.evidence,
+            messages: result.messages,
+          })
         }
       } catch (err) {
         console.error('Error loading dispute:', err)
@@ -102,14 +99,13 @@ export default function DisputeDetailPage({ params }: { params: Promise<{ id: st
     }
   }
 
-  const handleResolveDispute = async () => {
-    if (!resolution.trim() || !detail) return
+  const handleWithdrawDispute = async () => {
+    if (!detail) return
 
     setResolving(true)
     try {
-      const result = await updateDisputeStatus(detail.dispute.id, 'resolved', resolution)
+      const result = await withdrawDispute(detail.dispute.id)
       if (result.success) {
-        // Reload dispute details
         const reloadResult = await getDisputeDetails(detail.dispute.id)
         if (!reloadResult.error && reloadResult.dispute) {
           setDetail({
@@ -120,7 +116,7 @@ export default function DisputeDetailPage({ params }: { params: Promise<{ id: st
         }
       }
     } catch (err) {
-      console.error('Error resolving dispute:', err)
+      console.error('Error withdrawing dispute:', err)
     } finally {
       setResolving(false)
     }
@@ -338,28 +334,20 @@ export default function DisputeDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Resolve Section */}
+          {/* Withdraw Section */}
           {dispute.status !== 'resolved' && dispute.status !== 'closed' && isInitiator && (
             <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6 sticky top-20">
-              <h3 className="text-lg font-bold text-on-surface mb-4">Resolve Dispute</h3>
-
-              <div className="space-y-4">
-                <textarea
-                  value={resolution}
-                  onChange={(e) => setResolution(e.target.value.slice(0, 1000))}
-                  placeholder="Describe the resolution or agreement reached..."
-                  rows={4}
-                  className="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-lg px-4 py-3 text-on-surface focus:border-primary/50 transition-all outline-none text-xs resize-none"
-                />
-                <p className="text-[10px] text-on-surface-variant">{resolution.length}/1000</p>
-                <button
-                  onClick={handleResolveDispute}
-                  disabled={resolving || !resolution.trim()}
-                  className="w-full px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
-                >
-                  {resolving ? 'Resolving...' : 'Mark as Resolved'}
-                </button>
-              </div>
+              <h3 className="text-lg font-bold text-on-surface mb-2">Withdraw Dispute</h3>
+              <p className="text-xs text-on-surface-variant mb-4">
+                You can withdraw this dispute if you no longer wish to pursue it. Resolution is handled by our admin team.
+              </p>
+              <button
+                onClick={handleWithdrawDispute}
+                disabled={resolving}
+                className="w-full px-4 py-3 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
+              >
+                {resolving ? 'Withdrawing...' : 'Withdraw Dispute'}
+              </button>
             </div>
           )}
 

@@ -130,6 +130,75 @@ export async function sendNewBidEmail({
   })
 }
 
+// ── Contract Created ──────────────────────────────────────────────────────────
+export async function sendContractCreatedEmail({
+  to,
+  recipientName,
+  otherPartyName,
+  jobTitle,
+  contractId,
+  role,
+}: {
+  to: string
+  recipientName: string
+  otherPartyName: string
+  jobTitle: string
+  contractId: number
+  role: 'employer' | 'freelancer'
+}) {
+  const resend = getResend()
+  if (!resend) return
+
+  const isEmployer = role === 'employer'
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Contract Started — ${jobTitle}`,
+    html: emailTemplate({
+      recipientName,
+      headline: 'Contract Activated',
+      color: '#22c55e',
+      body: isEmployer
+        ? `Your contract with <strong>${otherPartyName}</strong> for <strong>${jobTitle}</strong> is now active. Track milestones and release payments from your dashboard.`
+        : `<strong>${otherPartyName}</strong> has activated your contract for <strong>${jobTitle}</strong>. Head to your dashboard to view milestones and get started.`,
+      ctaLabel: 'View Contract',
+      ctaUrl: `${SITE_URL}/dashboard/contracts/${contractId}`,
+    }),
+  })
+}
+
+// ── Contract Completed ────────────────────────────────────────────────────────
+export async function sendContractCompletedEmail({
+  to,
+  recipientName,
+  otherPartyName,
+  jobTitle,
+  contractId,
+}: {
+  to: string
+  recipientName: string
+  otherPartyName: string
+  jobTitle: string
+  contractId: number
+}) {
+  const resend = getResend()
+  if (!resend) return
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Contract Completed — ${jobTitle}`,
+    html: emailTemplate({
+      recipientName,
+      headline: 'Mission Complete',
+      color: '#caa2f7',
+      body: `Your contract with <strong>${otherPartyName}</strong> for <strong>${jobTitle}</strong> has been marked as completed. Don't forget to leave a review!`,
+      ctaLabel: 'Leave a Review',
+      ctaUrl: `${SITE_URL}/dashboard/reviews`,
+    }),
+  })
+}
+
 // ── HTML Template ─────────────────────────────────────────────────────────────
 function emailTemplate({
   recipientName,

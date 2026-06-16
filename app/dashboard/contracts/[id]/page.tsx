@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ReviewForm from '@/components/features/ReviewForm'
 import ReviewsList from '@/components/features/ReviewsList'
+import MarkCompleteButton from './ContractActions'
+import DisputeButton from './DisputeButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -275,21 +277,16 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
             {/* Actions */}
             <div className="mt-8 space-y-3">
               {contract.status === 'active' && !isEmployer && (
-                <button
-                  disabled
-                  className="w-full px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg text-xs font-bold uppercase tracking-widest opacity-50 cursor-not-allowed"
-                >
-                  Mark Complete
-                </button>
+                <MarkCompleteButton contractId={contract.id} />
               )}
 
               {contract.status === 'active' && isEmployer && (
-                <button
-                  disabled
-                  className="w-full px-4 py-3 bg-primary/10 border border-primary/20 text-primary rounded-lg text-xs font-bold uppercase tracking-widest opacity-50 cursor-not-allowed"
+                <Link
+                  href={`/dashboard/contracts/${contract.id}/payment`}
+                  className="block text-center w-full px-4 py-3 bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
                 >
                   Release Payment
-                </button>
+                </Link>
               )}
 
               <Link
@@ -298,6 +295,14 @@ export default async function ContractDetailPage({ params }: { params: Promise<{
               >
                 Message
               </Link>
+
+              {(contract.status === 'active' || contract.status === 'completed') && (
+                <DisputeButton
+                  contractId={contract.id}
+                  againstUserId={isEmployer ? contract.freelancer_id : contract.employer_id}
+                  jobId={contract.job_id}
+                />
+              )}
             </div>
           </div>
         </div>

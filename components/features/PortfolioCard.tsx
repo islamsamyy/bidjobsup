@@ -30,8 +30,6 @@ export default function PortfolioCard({
   const [isTogglingFeatured, setIsTogglingFeatured] = useState(false)
 
   const handleDelete = async () => {
-    if (!window.confirm('Delete this portfolio item?')) return
-
     setIsDeleting(true)
     const result = await deletePortfolioItem(item.id)
     if (result.success && onDelete) {

@@ -133,80 +133,9 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json()
-    const {
-      title,
-      description,
-      budget,
-      category,
-      skills,
-      deadline,
-    } = body
-
-    // Validate input
-    const errors: string[] = []
-
-    if (!title || title.trim() === '') {
-      errors.push('Title is required')
-    }
-    if (!description || description.trim() === '') {
-      errors.push('Description is required')
-    }
-    if (!budget || budget <= 0) {
-      errors.push('Budget must be greater than 0')
-    }
-    if (!category || category.trim() === '') {
-      errors.push('Category is required')
-    }
-
-    if (errors.length > 0) {
-      return Response.json(
-        { error: 'Validation failed', details: errors },
-        { status: 400 }
-      )
-    }
-
-    // Insert job into Supabase database
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('jobs')
-      .insert([{
-        title,
-        description,
-        budget_min: budget,
-        budget_max: budget,
-        category,
-        skills: skills || [],
-        deadline,
-        status: 'active',
-      }])
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Database error:', error)
-      return Response.json(
-        { error: 'Failed to create job: ' + error.message },
-        { status: 400 }
-      )
-    }
-
-    return Response.json(
-      {
-        success: true,
-        message: 'Job created successfully',
-        id: data.id,
-        job: data,
-      },
-      { status: 201 }
-    )
-  } catch (err) {
-    console.error('Create job error:', err)
-    return Response.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+export async function POST(_req: NextRequest) {
+  return Response.json(
+    { error: 'Use server actions to create jobs.' },
+    { status: 501 }
+  )
 }

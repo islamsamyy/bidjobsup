@@ -569,7 +569,16 @@
     "findOpportunities": "Find Opportunities",
     "helpCenter": "Help Center",
     "searchTalentPool": "Search talent pool...",
-    "searchOpportunities": "Search elite opportunities..."
+    "searchOpportunities": "Search elite opportunities...",
+    "offers": "Offers",
+    "payments": "Payments",
+    "reviews": "Reviews",
+    "interviews": "Interviews",
+    "disputes": "Disputes",
+    "portfolio": "Portfolio",
+    "skills": "Skills",
+    "feed": "Feed",
+    "adminPanel": "Admin Panel"
   },
   "atsHistory": {
     "pageTitle": "ATS Analysis History — BidJobs",

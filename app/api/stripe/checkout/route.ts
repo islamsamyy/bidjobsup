@@ -35,9 +35,18 @@ export async function POST(req: NextRequest) {
 
     const { data: profile } = await supabase
       .from('users')
-      .select('full_name, stripe_customer_id')
+      .select('full_name, stripe_customer_id, user_type')
       .eq('auth_id', user.id)
       .single()
+
+    const isEmployer = profile?.user_type === 'employer' || profile?.user_type === 'both'
+    const isSeeker = profile?.user_type === 'jobseeker' || profile?.user_type === 'both'
+    if (planId.startsWith('employer_') && !isEmployer) {
+      return Response.json({ error: 'This plan is only available for employers.', code: 'PLAN_MISMATCH' }, { status: 403 })
+    }
+    if (planId.startsWith('seeker_') && !isSeeker) {
+      return Response.json({ error: 'This plan is only available for job seekers.', code: 'PLAN_MISMATCH' }, { status: 403 })
+    }
 
     let customerId = profile?.stripe_customer_id
 

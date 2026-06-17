@@ -274,10 +274,9 @@ async function MessagesSection() {
         .limit(1)
         .single()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const p1 = conv.participant_1 as any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const p2 = conv.participant_2 as any
+      type Participant = { id: number; full_name?: string; username?: string; avatar_url?: string } | null
+      const p1 = conv.participant_1 as unknown as Participant
+      const p2 = conv.participant_2 as unknown as Participant
       const other = p1?.id === internalUser?.id ? p2 : p1
 
       return {
@@ -376,8 +375,8 @@ async function getStripeSubscription(stripeCustomerId: string | null) {
       limit: 1,
       expand: ['data.items.data.price.product'],
     })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sub = subs.data[0] as any
+    type SubAny = { items?: { data: Array<{ price: { unit_amount: number; recurring?: { interval: string }; product?: { name?: string } | string } }> }; current_period_end?: number; status: string }
+    const sub = subs.data[0] as unknown as SubAny | undefined
     if (!sub) return null
     const items = sub.items as { data: Array<{ price: { unit_amount: number; recurring?: { interval: string }; product?: { name?: string } | string } }> }
     const item = items?.data?.[0]

@@ -242,7 +242,7 @@ async function OffersSection() {
     <OffersClient
       invitations={invitations || []}
       offers={offers || []}
-      currentUserId={currentUser?.id || 0}
+      currentUserId={Number(currentUser?.id) || 0}
     />
   )
 }
@@ -451,10 +451,9 @@ async function MessagesSection() {
         .limit(1)
         .single()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const p1 = conv.participant_1 as any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const p2 = conv.participant_2 as any
+      type Participant = { id: number; full_name?: string; username?: string; avatar_url?: string } | null
+      const p1 = conv.participant_1 as unknown as Participant
+      const p2 = conv.participant_2 as unknown as Participant
       const other = p1?.id === internalUser?.id ? p2 : p1
 
       return {
@@ -510,8 +509,8 @@ async function SubscriptionSection() {
         limit: 1,
         expand: ['data.items.data.price.product'],
       })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sub = subs.data[0] as any
+      type SubAny = { items?: { data: Array<{ price: { product?: { name?: string } | string } }> } }
+      const sub = subs.data[0] as unknown as SubAny | undefined
       if (sub) {
         const product = sub.items?.data?.[0]?.price?.product
         activePlanName = (typeof product === 'object' ? product?.name : '') || ''

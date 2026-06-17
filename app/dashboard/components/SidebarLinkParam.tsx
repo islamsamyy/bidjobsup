@@ -61,12 +61,6 @@ function SidebarLinkParamInner({
 
 // Exported wrapper with Suspense boundary so useSearchParams never causes static-render bail-out
 export function SidebarLinkParam(props: SidebarLinkParamInnerProps) {
-  // Fallback renders the link without active state (no flash on server)
-  const activeClass =
-    props.accentColor === 'secondary'
-      ? 'bg-stone-800/50 text-secondary border-r-4 border-secondary'
-      : 'bg-stone-800/50 text-primary border-r-4 border-primary'
-
   const fallback = (
     <Link
       href={`${props.basePath}?s=${props.paramValue}`}

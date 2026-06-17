@@ -12,21 +12,25 @@ export function MobileSidebarWrapper({ children, accentColor = 'primary' }: Prop
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
-  useEffect(() => { setOpen(false) }, [pathname])
+  useEffect(() => {
+    // Close drawer on route change — intentional derived-state reset on pathname change
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOpen(false)
+  }, [pathname])
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  const color = accentColor === 'secondary' ? 'text-secondary' : 'text-primary'
+  const menuColor = accentColor === 'secondary' ? 'text-secondary' : 'text-primary'
 
   return (
     <>
       {/* Hamburger button - shows in header on mobile */}
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors"
+        className={`md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors ${menuColor}`}
         aria-label="Open navigation menu"
       >
         <span className="material-symbols-outlined text-2xl">menu</span>

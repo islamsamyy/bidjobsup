@@ -84,7 +84,7 @@ export default async function SeekerDashboardLayout({
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            <NotificationBell userId={Number(profile?.id)} userAuthId={authUser?.id!} userType={profile?.user_type!} />
+            <NotificationBell userId={Number(profile?.id)} userAuthId={authUser?.id ?? ''} userType={profile?.user_type ?? 'jobseeker'} />
             <Link href="/dashboard/settings" className="hidden md:block p-2 text-on-surface-variant hover:text-on-surface transition-colors">
               <span className="material-symbols-outlined">settings</span>
             </Link>

@@ -65,7 +65,7 @@ export default async function SettingsPage() {
         </div>
       </header>
 
-      <SettingsClient profile={profile as any} email={user?.email!} />
+      <SettingsClient profile={profile as any} email={user?.email ?? ''} />
 
       {/* Footer note */}
       <div className="mt-12 pt-8 border-t border-outline-variant/10 flex items-center gap-3 text-[10px] text-stone-600 font-bold uppercase tracking-widest">

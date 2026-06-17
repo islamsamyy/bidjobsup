@@ -23,6 +23,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem('language') as Locale | null;
     const newLocale = (saved && locales.includes(saved)) ? saved : defaultLocale;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocaleState(newLocale);
     document.documentElement.lang = newLocale;
     document.documentElement.dir = newLocale === 'ar' ? 'rtl' : 'ltr';

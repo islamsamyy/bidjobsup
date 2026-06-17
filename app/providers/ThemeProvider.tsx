@@ -34,6 +34,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       initial = 'dark';
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(initial);
     applyTheme(initial);
   }, []);

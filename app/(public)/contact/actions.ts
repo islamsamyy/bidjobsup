@@ -27,8 +27,7 @@ export async function sendContactEmail(formData: FormData): Promise<{ success: b
 
   const resend = getResend()
   if (!resend) {
-    // Dev / missing key — log and pretend success
-    console.log('[Contact Form] No RESEND_API_KEY set. Message from:', email, message)
+    // Dev / missing key — pretend success silently
     return { success: true }
   }
 

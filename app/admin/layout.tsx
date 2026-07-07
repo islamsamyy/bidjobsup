@@ -7,10 +7,13 @@ export const dynamic = 'force-dynamic'
 
 const ADMIN_NAV = [
   { href: '/admin', icon: 'dashboard', label: 'Overview' },
-  { href: '/admin/jobs', icon: 'work', label: 'Job Moderation' },
-  { href: '/admin/users', icon: 'group', label: 'User Management' },
+  { href: '/admin/analytics', icon: 'bar_chart', label: 'Analytics' },
+  { href: '/admin/users', icon: 'group', label: 'Users' },
+  { href: '/admin/jobs', icon: 'work', label: 'Jobs' },
+  { href: '/admin/contracts', icon: 'handshake', label: 'Contracts' },
   { href: '/admin/disputes', icon: 'gavel', label: 'Disputes' },
   { href: '/admin/reports', icon: 'flag', label: 'Reports' },
+  { href: '/admin/reviews', icon: 'rate_review', label: 'Reviews' },
 ]
 
 export default async function AdminLayout({

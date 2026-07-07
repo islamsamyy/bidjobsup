@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { getAllJobsForModeration, updateJobModeration, flagJob } from '@/lib/actions/admin'
+import { getAllJobsForModeration, updateJobModeration, flagJob, deleteJob } from '@/lib/actions/admin'
 
 interface Job {
   id: number
@@ -22,6 +22,7 @@ export default function ModerateJobsPage() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('pending')
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
 
   useEffect(() => {
     const loadJobs = async () => {
@@ -43,6 +44,14 @@ export default function ModerateJobsPage() {
     const result = await flagJob(jobId, shouldFlag)
     if (result.success) {
       setJobs(jobs.map(j => j.id === jobId ? { ...j, flagged: shouldFlag } : j))
+    }
+  }
+
+  const handleDeleteJob = async (jobId: number) => {
+    const result = await deleteJob(jobId)
+    if (result.success) {
+      setJobs(jobs.filter(j => j.id !== jobId))
+      setConfirmDelete(null)
     }
   }
 
@@ -184,18 +193,38 @@ export default function ModerateJobsPage() {
                 {!job.flagged ? (
                   <button
                     onClick={() => handleFlagJob(job.id, true)}
-                    className="px-4 py-2 bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ml-auto"
+                    className="px-4 py-2 bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
                   >
                     Flag
                   </button>
                 ) : (
                   <button
                     onClick={() => handleFlagJob(job.id, false)}
-                    className="px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ml-auto"
+                    className="px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
                   >
                     Unflag
                   </button>
                 )}
+                <div className="ml-auto">
+                  {confirmDelete === job.id ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-red-400 font-bold">Delete permanently?</span>
+                      <button onClick={() => handleDeleteJob(job.id)} className="px-3 py-1.5 bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 rounded-lg text-xs font-bold uppercase tracking-wider transition-all">
+                        Confirm
+                      </button>
+                      <button onClick={() => setConfirmDelete(null)} className="px-3 py-1.5 bg-surface-container-high text-on-surface-variant rounded-lg text-xs font-bold transition-all">
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmDelete(job.id)}
+                      className="px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

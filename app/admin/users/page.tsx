@@ -1,65 +1,84 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
-import { getAllUsers, updateUserRole } from '@/lib/actions/admin'
+import Link from 'next/link'
+import { getAllUsers, updateUserRole, suspendUser, verifyUser, deleteUser } from '@/lib/actions/admin'
 
 interface User {
   id: number
+  auth_id: string
   full_name: string
   email: string
   role: string
+  user_type: string
   avatar_url: string | null
   is_verified: boolean
+  is_suspended: boolean
   created_at: string
-  updated_at: string
 }
+
+const FILTER_OPTIONS = [
+  { value: 'all', label: 'All Users' },
+  { value: 'seeker', label: 'Seekers' },
+  { value: 'employer', label: 'Employers' },
+  { value: 'admin', label: 'Admins' },
+  { value: 'suspended', label: 'Suspended' },
+  { value: 'verified', label: 'Verified' },
+]
 
 export default function ManageUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [filterRole, setFilterRole] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
+  const [actionLoading, setActionLoading] = useState<number | null>(null)
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      const result = await getAllUsers(filterRole === 'all' ? undefined : filterRole)
-      setUsers(result.users || [])
-      setLoading(false)
-    }
-    loadUsers()
-  }, [filterRole])
+  const load = async () => {
+    setLoading(true)
+    const result = await getAllUsers(filterRole === 'all' ? undefined : filterRole)
+    setUsers(result.users || [])
+    setLoading(false)
+  }
+
+  useEffect(() => { load() }, [filterRole])
 
   const handleRoleChange = async (userId: number, newRole: string) => {
+    setActionLoading(userId)
     const result = await updateUserRole(userId, newRole)
+    if (result.success) setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+    setActionLoading(null)
+  }
+
+  const handleSuspend = async (userId: number, isSuspended: boolean) => {
+    setActionLoading(userId)
+    const result = await suspendUser(userId, !isSuspended)
+    if (result.success) setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_suspended: !isSuspended } : u))
+    setActionLoading(null)
+  }
+
+  const handleVerify = async (userId: number, isVerified: boolean) => {
+    setActionLoading(userId)
+    const result = await verifyUser(userId, !isVerified)
+    if (result.success) setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_verified: !isVerified } : u))
+    setActionLoading(null)
+  }
+
+  const handleDelete = async (userId: number) => {
+    const result = await deleteUser(userId)
     if (result.success) {
-      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u))
+      setUsers(prev => prev.filter(u => u.id !== userId))
+      setConfirmDelete(null)
     }
   }
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-  }
-
-  const filteredUsers = users.filter(
-    user => user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = users.filter(u =>
+    u.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <span className="material-symbols-outlined animate-spin text-primary text-4xl">
-          hourglass_top
-        </span>
-      </div>
-    )
-  }
+  const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
   return (
     <div className="space-y-8">
@@ -67,151 +86,179 @@ export default function ManageUsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-on-surface mb-2">Manage Users</h1>
-          <p className="text-on-surface-variant">View and manage user accounts</p>
+          <p className="text-on-surface-variant">Full user management — role, verification, suspension, deletion</p>
         </div>
-        <Link
-          href="/admin"
-          className="px-4 py-2 bg-surface-container-high text-on-surface hover:bg-surface-container-highest rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
-        >
+        <Link href="/admin" className="px-4 py-2 bg-surface-container-high text-on-surface hover:bg-surface-container-highest rounded-lg text-xs font-bold uppercase tracking-widest transition-all">
           Back to Admin
         </Link>
       </div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {[
+          { label: 'Total', count: users.length, color: 'text-on-surface' },
+          { label: 'Seekers', count: users.filter(u => u.user_type === 'jobseeker').length, color: 'text-green-400' },
+          { label: 'Employers', count: users.filter(u => u.user_type === 'employer').length, color: 'text-blue-400' },
+          { label: 'Verified', count: users.filter(u => u.is_verified).length, color: 'text-primary' },
+          { label: 'Suspended', count: users.filter(u => u.is_suspended).length, color: 'text-red-400' },
+        ].map(s => (
+          <div key={s.label} className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-4">
+            <div className="text-xs font-bold uppercase text-on-surface-variant mb-1">{s.label}</div>
+            <div className={`text-2xl font-black ${s.color}`}>{s.count}</div>
+          </div>
+        ))}
+      </div>
+
       {/* Search and Filters */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         <input
           type="text"
           placeholder="Search by name or email..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
           className="w-full px-4 py-3 bg-surface-container-high rounded-lg border border-white/5 text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary/30 transition-all"
         />
-
         <div className="flex gap-2 flex-wrap">
-          {['all', 'seeker', 'employer', 'admin'].map(role => (
+          {FILTER_OPTIONS.map(opt => (
             <button
-              key={role}
-              onClick={() => setFilterRole(role)}
+              key={opt.value}
+              onClick={() => setFilterRole(opt.value)}
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                filterRole === role
-                  ? 'bg-primary text-on-primary-container'
-                  : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
+                filterRole === opt.value ? 'bg-primary text-on-primary-container' : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'
               }`}
             >
-              {role.charAt(0).toUpperCase() + role.slice(1)}
+              {opt.label}
             </button>
           ))}
         </div>
       </div>
 
       {/* Users Table */}
-      {filteredUsers.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/5">
-                <th className="px-4 py-3 text-left text-xs font-bold uppercase text-on-surface-variant">User</th>
-                <th className="px-4 py-3 text-left text-xs font-bold uppercase text-on-surface-variant">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-bold uppercase text-on-surface-variant">Role</th>
-                <th className="px-4 py-3 text-left text-xs font-bold uppercase text-on-surface-variant">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-bold uppercase text-on-surface-variant">Joined</th>
-                <th className="px-4 py-3 text-left text-xs font-bold uppercase text-on-surface-variant">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map(user => (
-                <tr key={user.id} className="border-b border-white/5 hover:bg-surface-container/30 transition-all">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {user.avatar_url ? (
-                        <Image
-                          src={user.avatar_url}
-                          alt={user.full_name}
-                          width={36}
-                          height={36}
-                          className="w-9 h-9 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="material-symbols-outlined text-sm text-primary">person</span>
-                        </div>
-                      )}
-                      <span className="font-medium text-on-surface">{user.full_name}</span>
+      {loading ? (
+        <div className="flex justify-center py-12"><span className="material-symbols-outlined animate-spin text-primary text-4xl">hourglass_top</span></div>
+      ) : filtered.length > 0 ? (
+        <div className="space-y-3">
+          {filtered.map(user => (
+            <div
+              key={user.id}
+              className={`bg-surface-container/60 backdrop-blur-xl rounded-xl border transition-all p-5 ${
+                user.is_suspended ? 'border-red-500/20 bg-red-500/5' : 'border-white/5 hover:border-primary/20'
+              }`}
+            >
+              <div className="flex items-start gap-4 flex-wrap">
+                {/* Avatar + Name */}
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  {user.avatar_url ? (
+                    <Image src={user.avatar_url} alt={user.full_name} width={40} height={40} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-primary text-sm">person</span>
                     </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-on-surface-variant">{user.email}</td>
-                  <td className="px-4 py-3">
-                    <select
-                      value={user.role}
-                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold uppercase border transition-all focus:outline-none ${
-                        user.role === 'admin'
-                          ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-                          : user.role === 'employer'
-                          ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-                          : 'bg-green-500/20 text-green-400 border-green-500/30'
-                      }`}
-                    >
-                      <option value="seeker">Seeker</option>
-                      <option value="employer">Employer</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </td>
-                  <td className="px-4 py-3">
-                    {user.is_verified ? (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold">
-                        <span className="material-symbols-outlined text-sm">check_circle</span>
-                        Verified
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-xs font-bold">
-                        <span className="material-symbols-outlined text-sm">schedule</span>
-                        Pending
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
-                  <td className="px-4 py-3">
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-bold text-on-surface truncate">{user.full_name}</p>
+                      {user.is_verified && (
+                        <span className="px-1.5 py-0.5 rounded bg-primary/15 text-primary text-[10px] font-black uppercase">Verified</span>
+                      )}
+                      {user.is_suspended && (
+                        <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 text-[10px] font-black uppercase">Suspended</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-on-surface-variant truncate">{user.email}</p>
+                    <p className="text-xs text-on-surface-variant">Joined {formatDate(user.created_at)}</p>
+                  </div>
+                </div>
+
+                {/* Role + Type badges */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase border ${
+                    user.role === 'admin' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                    : 'bg-surface-container-high text-on-surface-variant border-white/10'
+                  }`}>
+                    {user.role}
+                  </span>
+                  <span className="px-2 py-1 rounded-lg text-[10px] font-black uppercase border bg-surface-container-high text-on-surface-variant border-white/10">
+                    {user.user_type}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Row */}
+              <div className="flex gap-2 mt-4 pt-4 border-t border-white/5 flex-wrap items-center">
+                {/* Role select */}
+                <select
+                  value={user.role}
+                  onChange={e => handleRoleChange(user.id, e.target.value)}
+                  disabled={actionLoading === user.id}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold border bg-surface-container-high border-white/10 text-on-surface focus:outline-none focus:border-primary/30 transition-all disabled:opacity-50"
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+
+                {/* Verify toggle */}
+                <button
+                  onClick={() => handleVerify(user.id, user.is_verified)}
+                  disabled={actionLoading === user.id}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all disabled:opacity-50 ${
+                    user.is_verified
+                      ? 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'
+                      : 'bg-surface-container-high border-white/10 text-on-surface-variant hover:bg-surface-container-highest'
+                  }`}
+                >
+                  {user.is_verified ? '✓ Verified' : 'Verify'}
+                </button>
+
+                {/* Suspend toggle */}
+                <button
+                  onClick={() => handleSuspend(user.id, user.is_suspended)}
+                  disabled={actionLoading === user.id}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border transition-all disabled:opacity-50 ${
+                    user.is_suspended
+                      ? 'bg-orange-500/10 border-orange-500/20 text-orange-400 hover:bg-orange-500/20'
+                      : 'bg-surface-container-high border-white/10 text-on-surface-variant hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20'
+                  }`}
+                >
+                  {user.is_suspended ? 'Unsuspend' : 'Suspend'}
+                </button>
+
+                {/* Delete */}
+                <div className="ml-auto">
+                  {confirmDelete === user.id ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-red-400 font-bold">Delete permanently?</span>
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="px-3 py-1.5 bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(null)}
+                        className="px-3 py-1.5 bg-surface-container-high text-on-surface-variant rounded-lg text-xs font-bold transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
                     <button
-                      className="text-xs font-bold uppercase px-3 py-1 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-all"
+                      onClick={() => setConfirmDelete(user.id)}
+                      className="px-3 py-1.5 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
                     >
-                      View
+                      Delete
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="bg-surface-container/60 backdrop-blur-xl rounded-2xl border border-white/5 p-12 text-center">
-          <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-4 block">
-            person_search
-          </span>
+          <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-4 block">person_search</span>
           <h3 className="text-xl font-bold text-on-surface mb-2">No Users Found</h3>
           <p className="text-on-surface-variant">Try adjusting your filters or search term</p>
-        </div>
-      )}
-
-      {/* Stats */}
-      {users.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6">
-            <div className="text-xs font-bold uppercase text-on-surface-variant mb-2">Total Users</div>
-            <div className="text-2xl font-bold text-on-surface">{users.length}</div>
-          </div>
-          <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6">
-            <div className="text-xs font-bold uppercase text-on-surface-variant mb-2">Seekers</div>
-            <div className="text-2xl font-bold text-green-400">{users.filter(u => u.role === 'seeker').length}</div>
-          </div>
-          <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6">
-            <div className="text-xs font-bold uppercase text-on-surface-variant mb-2">Employers</div>
-            <div className="text-2xl font-bold text-blue-400">{users.filter(u => u.role === 'employer').length}</div>
-          </div>
-          <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6">
-            <div className="text-xs font-bold uppercase text-on-surface-variant mb-2">Verified</div>
-            <div className="text-2xl font-bold text-green-500">{users.filter(u => u.is_verified).length}</div>
-          </div>
         </div>
       )}
     </div>

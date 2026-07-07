@@ -82,6 +82,14 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="text-3xl font-bold text-blue-500">{metrics.totalReports}</div>
         </div>
+
+        <div className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="material-symbols-outlined text-green-500 text-2xl">handshake</span>
+            <span className="text-xs font-bold uppercase text-on-surface-variant">Total Contracts</span>
+          </div>
+          <div className="text-3xl font-bold text-green-500">{metrics.totalContracts ?? 0}</div>
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -120,6 +128,33 @@ export default async function AdminDashboardPage() {
           <span className="material-symbols-outlined text-yellow-500 text-3xl mb-4 block group-hover:scale-110 transition-transform">gavel</span>
           <h3 className="text-sm font-bold text-on-surface mb-1">Review Disputes</h3>
           <p className="text-xs text-on-surface-variant">Mediate job conflicts</p>
+        </Link>
+
+        <Link
+          href="/admin/contracts"
+          className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6 hover:border-green-500/30 transition-all group"
+        >
+          <span className="material-symbols-outlined text-green-500 text-3xl mb-4 block group-hover:scale-110 transition-transform">handshake</span>
+          <h3 className="text-sm font-bold text-on-surface mb-1">Contracts</h3>
+          <p className="text-xs text-on-surface-variant">View all platform contracts</p>
+        </Link>
+
+        <Link
+          href="/admin/reviews"
+          className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6 hover:border-blue-500/30 transition-all group"
+        >
+          <span className="material-symbols-outlined text-blue-500 text-3xl mb-4 block group-hover:scale-110 transition-transform">rate_review</span>
+          <h3 className="text-sm font-bold text-on-surface mb-1">Reviews</h3>
+          <p className="text-xs text-on-surface-variant">Moderate user reviews</p>
+        </Link>
+
+        <Link
+          href="/admin/analytics"
+          className="bg-surface-container/60 backdrop-blur-xl rounded-xl border border-white/5 p-6 hover:border-primary/30 transition-all group"
+        >
+          <span className="material-symbols-outlined text-primary text-3xl mb-4 block group-hover:scale-110 transition-transform">bar_chart</span>
+          <h3 className="text-sm font-bold text-on-surface mb-1">Analytics</h3>
+          <p className="text-xs text-on-surface-variant">Platform growth & metrics</p>
         </Link>
       </div>
 
